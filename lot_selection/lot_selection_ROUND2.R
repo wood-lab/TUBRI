@@ -320,7 +320,7 @@ lots_MS_lower$decade
 car_vel<-lots_MS_lower %>%
   filter(ScientificName =="Carpiodes velifer")
 
-car_vel<-car_vel[which(car_vel$IndividualCount >= 8),]
+car_vel<-car_vel[which(car_vel$IndividualCount >= 4),]
 
 plot(jitter(car_vel$Latitude,5)~car_vel$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
@@ -389,4 +389,4 @@ lots_MS_number_available_to_dissect<-rbind.data.frame(car_vel,gam_aff,hyb_nuc,ic
 
 # Export the sheet
 
-write.csv(lots_MS_number_available_to_dissect, file="lot_selection/lots_suggested_for_dissection_ROUND2.csv")
+write.csv(lots_MS_number_available_to_dissect, file="lot_selection/lots_suggested_for_dissection_ROUND3.csv")
