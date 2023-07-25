@@ -429,7 +429,51 @@ ict_pun_replace_147873 <- lots_MS_number_available_to_dissect %>%
 write.csv(ict_pun_replace_147873, file="lot_selection/replacements/ICTPUN/ict_pun_replace_147873.csv")
 
 
+# Katie went through all in-bounds PERVIG and found all valid lots (i.e., present, big enough)
+# Now I need to randomly select the lots to be dissected from among these valid lots.
+
+# Here is the code to generate a list of all of the "in-play" lots.
+
+katie_valid_PERVIG<-read.csv("lot_selection/lots_suggested_for_dissection_LOTS_KATIE_IDS_AS_VALID.csv")
+
+katie_valid_PERVIG <- katie_valid_PERVIG %>%
+  filter(ScientificName == "Percina vigil")
+
+per_vig_matrix<-katie_valid_PERVIG %>%
+  group_by(CI, decade) %>%
+  summarize(total_available = n())
+
+katie_valid_PERVIG$combo<-paste(katie_valid_PERVIG$CI,katie_valid_PERVIG$decade,sep="_")
+
+#control_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1954-1963"), 3), ]#not enough for 5
+control_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1964-1973"), 5), ]
+control_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1974-1983"), 5), ]
+#control_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1984-1993"), 1), ]#not enough for 5
+control_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1994-2003"), 4), ]#not enough for 5
+#control_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_2004-2013"), 2), ]#not enough for 5
+impact_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1954-1963"), 5), ]
+impact_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1964-1973"), 5), ]
+impact_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1974-1983"), 5), ]
+impact_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1984-1993"), 5), ]
+impact_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1994-2003"), 5), ]
+#impact_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_2004-2013"), 4), ]#don't bother because we don't have this decade for control
+
+
+per_vig_selected<-rbind.data.frame(control_1964to1973,control_1974to1983,
+                                   control_1994to2003,
+                                   impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
+                                   impact_1994to2003)
+
+per_vig_matrix<-per_vig_selected %>%
+  group_by(combo) %>%
+  summarize(total_request = n())
+
+plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+
+
 
 # Export the sheet
 
-write.csv(lots_MS_number_available_to_dissect, file="lot_selection/lots_suggested_for_dissection_ROUND3.csv")
+write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid_selected.csv")
