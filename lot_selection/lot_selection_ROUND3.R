@@ -8,6 +8,7 @@ library(maptools) #for shapefiles
 library(scales) #for transparency
 library(tidyverse)
 library(ggmap)
+library(cowplot)
 
 
 # We tried to dig up all of the lots for Round 1 (see lot_selection_ROUND1.R and 
@@ -322,7 +323,28 @@ car_vel<-lots_MS_lower %>%
 
 car_vel<-car_vel[which(car_vel$IndividualCount >= 4),]
 
-plot(jitter(car_vel$Latitude,5)~car_vel$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+car_vel_plot<-plot(jitter(car_vel$Latitude,5)~car_vel$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+car_vel_plot
+
+car_vel_plot<-ggplot(data=car_vel,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="darkgray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("Latitude (°N)")+
+  ggtitle("Carpiodes velifer")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+car_vel_plot
 
 
 # GAM_AFF
@@ -333,6 +355,26 @@ gam_aff<-gam_aff[which(gam_aff$IndividualCount >= 8),]
 
 plot(jitter(gam_aff$Latitude,5)~gam_aff$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+gam_aff_plot<-ggplot(data=gam_aff,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("")+
+  ggtitle("Gambusia affinis")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+gam_aff_plot
+
 
 #HYB_NUC
 hyb_nuc<-lots_MS_lower %>%
@@ -341,6 +383,26 @@ hyb_nuc<-lots_MS_lower %>%
 hyb_nuc<-hyb_nuc[which(hyb_nuc$IndividualCount >= 8),]
 
 plot(jitter(hyb_nuc$Latitude,5)~hyb_nuc$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+hyb_nuc_plot<-ggplot(data=hyb_nuc,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("")+
+  ggtitle("Hybognathus nuchalis")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+hyb_nuc_plot
 
 
 #ICT_PUN
@@ -352,6 +414,26 @@ ict_pun<-ict_pun[which(ict_pun$IndividualCount >= 4),]
 
 plot(jitter(ict_pun$Latitude,5)~ict_pun$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+ict_pun_plot<-ggplot(data=ict_pun,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("")+
+  ggtitle("Ictalurus punctatus")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+ict_pun_plot
+
 
 #NOT_ATH
 not_ath<-lots_MS_lower %>%
@@ -360,6 +442,26 @@ not_ath<-lots_MS_lower %>%
 not_ath<-not_ath[which(not_ath$IndividualCount >= 8),]
 
 plot(jitter(not_ath$Latitude,5)~not_ath$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+not_ath_plot<-ggplot(data=not_ath,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("Latitude (°N)")+
+  ggtitle("Notropis atherinoides")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+not_ath_plot
 
 
 #PER_VIG
@@ -372,6 +474,26 @@ per_vig<-per_vig[which(per_vig$IndividualCount >= 4),]
 
 plot(jitter(per_vig$Latitude,5)~per_vig$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+per_vig_plot<-ggplot(data=per_vig,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("")+
+  ggtitle("Percina vigil")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+per_vig_plot
+
 
 #PIM_VIG
 pim_vig<-lots_MS_lower %>%
@@ -381,10 +503,46 @@ pim_vig<-pim_vig[which(pim_vig$IndividualCount >= 8),]
 
 plot(jitter(pim_vig$Latitude,5)~pim_vig$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+pim_vig_plot<-ggplot(data=pim_vig,aes(x=YearCollected,y=jitter(Latitude,5)))+
+  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+           fill = "royalblue3", colour = NA, alpha = 0.7)+
+  annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
+           fill = "red2", colour = NA, alpha = 0.5)+
+  geom_point(color="black",fill="gray",shape=21,size=4)+
+  geom_hline(yintercept = 30.76, lty = 2)+
+  geom_vline(xintercept = 1973, lty = 2)+
+  xlab("")+
+  ylab("")+
+  ggtitle("Pimephales vigilax")+
+  #ylim()+
+  #xlim()+
+  theme_bw()+
+  theme(plot.title=element_text(face="italic",hjust = 0.5,size=20),
+        plot.margin = unit(c(0,0,0,0), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=14),
+        legend.title = element_text(size=14))
+pim_vig_plot
+
 
 # Compile request for MS_lower
 
 lots_MS_number_available_to_dissect<-rbind.data.frame(car_vel,gam_aff,hyb_nuc,ict_pun,not_ath,per_vig,pim_vig)
+
+
+# Plot request
+
+final_figure <- ggdraw(plot=NULL,xlim=c(0,40),ylim=c(0,20))+
+  draw_plot(car_vel_plot,x=0,y=10,width=10,height=10)+
+  draw_plot(gam_aff_plot,x=10,y=10,width=10,height=10)+
+  draw_plot(hyb_nuc_plot,x=20,y=10,width=10,height=10)+
+  draw_plot(ict_pun_plot,x=30,y=10,width=10,height=10)+
+  draw_plot(not_ath_plot,x=0,y=0,width=10,height=10)+
+  draw_plot(per_vig_plot,x=10,y=0,width=10,height=10)+
+  draw_plot(pim_vig_plot,x=20,y=0,width=10,height=10)+
+  draw_label("Year",x=20,y=0.45,size=20)
+final_figure
+
+dev.off()
 
 
 # Katie needs replacements for some ICTPUN specimens
