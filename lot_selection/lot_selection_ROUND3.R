@@ -327,7 +327,7 @@ car_vel_plot<-plot(jitter(car_vel$Latitude,5)~car_vel$YearCollected)+abline(a = 
 car_vel_plot
 
 car_vel_plot<-ggplot(data=car_vel,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -356,7 +356,7 @@ gam_aff<-gam_aff[which(gam_aff$IndividualCount >= 8),]
 plot(jitter(gam_aff$Latitude,5)~gam_aff$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 gam_aff_plot<-ggplot(data=gam_aff,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -385,7 +385,7 @@ hyb_nuc<-hyb_nuc[which(hyb_nuc$IndividualCount >= 8),]
 plot(jitter(hyb_nuc$Latitude,5)~hyb_nuc$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 hyb_nuc_plot<-ggplot(data=hyb_nuc,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -415,7 +415,7 @@ ict_pun<-ict_pun[which(ict_pun$IndividualCount >= 4),]
 plot(jitter(ict_pun$Latitude,5)~ict_pun$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 ict_pun_plot<-ggplot(data=ict_pun,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -444,7 +444,7 @@ not_ath<-not_ath[which(not_ath$IndividualCount >= 8),]
 plot(jitter(not_ath$Latitude,5)~not_ath$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 not_ath_plot<-ggplot(data=not_ath,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -475,7 +475,7 @@ per_vig<-per_vig[which(per_vig$IndividualCount >= 4),]
 plot(jitter(per_vig$Latitude,5)~per_vig$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 per_vig_plot<-ggplot(data=per_vig,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
@@ -504,7 +504,7 @@ pim_vig<-pim_vig[which(pim_vig$IndividualCount >= 8),]
 plot(jitter(pim_vig$Latitude,5)~pim_vig$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 pim_vig_plot<-ggplot(data=pim_vig,aes(x=YearCollected,y=jitter(Latitude,5)))+
-  annotate(geom = "rect", xmin = 1973, xmax = Inf, ymin = -Inf, ymax = Inf,
+  annotate(geom = "rect", xmin = -Inf, xmax = 1973, ymin = -Inf, ymax = Inf,
            fill = "royalblue3", colour = NA, alpha = 0.7)+
   annotate(geom = "rect", xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = 30.76,
            fill = "red2", colour = NA, alpha = 0.5)+
