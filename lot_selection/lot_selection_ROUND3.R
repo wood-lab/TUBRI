@@ -597,6 +597,11 @@ katie_valid_PERVIG<-read.csv("lot_selection/lots_suggested_for_dissection_LOTS_K
 katie_valid_PERVIG <- katie_valid_PERVIG %>%
   filter(ScientificName == "Percina vigil")
 
+# We are including maybes because there are way too few jars in the control without them.
+
+katie_valid_PERVIG <- katie_valid_PERVIG %>%
+  filter(Valid_Invalid == "VALID" | Valid_Invalid == "maybe")
+
 per_vig_matrix<-katie_valid_PERVIG %>%
   group_by(CI, decade) %>%
   summarize(total_available = n())
@@ -604,10 +609,10 @@ per_vig_matrix<-katie_valid_PERVIG %>%
 katie_valid_PERVIG$combo<-paste(katie_valid_PERVIG$CI,katie_valid_PERVIG$decade,sep="_")
 
 #control_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1954-1963"), 3), ]#not enough for 5
-control_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1974-1983"), 5), ]
+control_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1964-1973"), 3), ]
+control_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1974-1983"), 3), ]
 #control_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1984-1993"), 1), ]#not enough for 5
-control_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1994-2003"), 4), ]#not enough for 5
+control_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1994-2003"), 2), ]#not enough for 5
 #control_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_2004-2013"), 2), ]#not enough for 5
 impact_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1954-1963"), 5), ]
 impact_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1964-1973"), 5), ]
@@ -635,3 +640,6 @@ plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(
 # Export the sheet
 
 write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid_selected.csv")
+
+# The sheet above is ready to go - these are the FINAL lots that will be targeted for dissection.
+# The maybes and valids are all pulled so they should be easy to find when you get to TUBRI!
