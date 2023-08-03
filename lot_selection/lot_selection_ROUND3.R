@@ -587,6 +587,15 @@ ict_pun_replace_147873 <- lots_MS_number_available_to_dissect %>%
 write.csv(ict_pun_replace_147873, file="lot_selection/replacements/ICTPUN/ict_pun_replace_147873.csv")
 
 
+# Almost all the ICTPUN to be dissected have been pulled.  We just needed to replace a handful of them.
+# That's what the code above is doing.  We haven't yet pulled the replacements, but once we do, we will have
+# ICTPUN fully ready to go!
+
+# All that you need to do is compile the list of replacements above, put it in numerical order, pull them all,
+# and then randomly select amongst them.
+
+
+
 # Katie went through all in-bounds PERVIG and found all valid lots (i.e., present, big enough)
 # Now I need to randomly select the lots to be dissected from among these valid lots.
 
@@ -643,3 +652,31 @@ write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid
 
 # The sheet above is ready to go - these are the FINAL lots that will be targeted for dissection.
 # The maybes and valids are all pulled so they should be easy to find when you get to TUBRI!
+
+
+####### HERE'S WHERE WE'RE AT (2 Aug 2023) ####### 
+
+# PER_VIG = just a few to pull and then ready to go!
+# ICT_PUN = just a few to pull and then ready to go! (going through the jars for replacements is going to be
+# time consuming because there are sooooo many jars)
+# CAR_VEL = held in a separate building without AC, now moved to the main building. 100% done and stored in the main builing!
+
+# GAM_AFF = We need to send to Justin a list of the NAs to see if there are bigger jars floating about that
+# match those lot numbers /// All in-bounds (maybes/VALIDs) have been pulled, we just need to select from 
+# amongst those.
+
+# HYB_NUC = Looked through all the big jars (not the 4oz jars, which are likely to be way too small).
+# All in-bounds (maybes/VALIDs) have been pulled, we just need to select from amongst those.
+
+# PIM_VIG = Looked through all the big jars (not the 4oz jars, which are likely to be way too small).
+# All in-bounds (maybes/VALIDs) have been pulled, we just need to select from amongst those.
+
+# NOT_ATH = Looked through all the big jars (not the 4oz jars, which are likely to be way too small).
+# All in-bounds (maybes/VALIDs) have been pulled, we just need to select from amongst those.
+
+# Have the entire team go through the lot selection process together with the entire group, 
+# maybe in week 1 as we're getting our feet under us, trading off with parasite dissection training.
+
+
+# Practice dissections should not be counted since they weren't always on randomly selected lots
+
