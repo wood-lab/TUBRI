@@ -879,7 +879,7 @@ View(final_lots)
 
 ### Now write the final file.
 
-write.csv(final_lots, file="lot_selection/final_lots/final_lots_2023.01.7")
+write.csv(final_lots, file="lot_selection/final_lots/final_lots_2023.01.7.csv")
 
 # Prior to Katie's in-person winnowing
 tally_up<-lots_MS_number_available_to_dissect %>%
