@@ -849,7 +849,7 @@ plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(
 
 # Export the sheet
 
-#write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid_selected.csv")
+write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid_selected.csv")
 
 
 # Now bring the per_vig data into the main dataset
