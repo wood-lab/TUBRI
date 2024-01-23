@@ -632,7 +632,7 @@ lots_MS_number_available_to_dissect$number_individuals_requested
 
 # If you don't want to run this again (re-doing the random selection of lots), you can read in the data here
 
-lots_MS_number_available_to_dissect<-read.table("lot_selection/lots_suggested_for_dissection_ROUND1.csv",header=TRUE,sep=",")
+lots_MS_number_available_to_dissect<-read.table("lot_selection/old/lots_suggested_for_dissection_ROUND1.csv",header=TRUE,sep=",")
 
 tally_up<-lots_MS_number_available_to_dissect %>%
   group_by(ScientificName) %>%
@@ -801,20 +801,21 @@ check <- lots_MS_number_available_to_dissect %>%
   filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "157340")
 
 
-# Katie went through all in-bounds PERVIG and found all valid lots (i.e., present, big enough)
+### PERVIG
+# Katie went through all in-bounds PERVIG, CARVEL, ICTPUN, and PIMVIG and found all valid lots (i.e., present, big enough)
 # Now I need to randomly select the lots to be dissected from among these valid lots.
 
 # Here is the code to generate a list of all of the "in-play" lots.
 
-katie_valid_PERVIG<-read.csv("lot_selection/lots_suggested_for_dissection_LOTS_KATIE_IDS_AS_VALID.csv")
+katie_valid<-read.csv("lot_selection/old/lots_suggested_for_dissection_ROUND3 - lots_suggested_for_dissection_ROUND3.csv")
 
-katie_valid_PERVIG <- katie_valid_PERVIG %>%
+katie_valid_PERVIG <- katie_valid %>%
   filter(ScientificName == "Percina vigil")
 
 # We are including maybes because there are way too few jars in the control without them.
 
 katie_valid_PERVIG <- katie_valid_PERVIG %>%
-  filter(Valid_Invalid == "VALID" | Valid_Invalid == "maybe")
+  filter(Valid.Invalid == "VALID" | Valid.Invalid == "maybe")
 
 per_vig_matrix<-katie_valid_PERVIG %>%
   group_by(CI, decade) %>%
@@ -847,39 +848,150 @@ per_vig_matrix<-per_vig_selected %>%
 
 plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
-# Export the sheet
 
-write.csv(per_vig_selected, file="lot_selection/final_lots/per_vig_inbound_valid_selected.csv")
+### CARVEL
+# Katie went through all in-bounds PERVIG, CARVEL, ICTPUN, and PIMVIG and found all valid lots (i.e., present, big enough)
+# Now I need to randomly select the lots to be dissected from among these valid lots.
+
+# Here is the code to generate a list of all of the "in-play" lots.
+
+katie_valid<-read.csv("lot_selection/old/lots_suggested_for_dissection_ROUND3 - lots_suggested_for_dissection_ROUND3.csv")
+
+katie_valid_CARVEL <- katie_valid %>%
+  filter(ScientificName == "Carpiodes velifer")
+
+# We are including maybes because there are way too few jars in the control without them.
+
+katie_valid_CARVEL <- katie_valid_CARVEL %>%
+  filter(Valid.Invalid == "VALID" | Valid.Invalid == "maybe")
+
+per_vig_matrix<-katie_valid_CARVEL %>%
+  group_by(CI, decade) %>%
+  summarize(total_available = n())
+
+katie_valid_CARVEL$combo<-paste(katie_valid_CARVEL$CI,katie_valid_CARVEL$decade,sep="_")
+
+control_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1954-1963"), 5), ]
+control_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1964-1973"), 5), ]
+control_1974to1983<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1974-1983"), 1), ]
+control_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1984-1993"), 5), ]
+control_1994to2003<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1994-2003"), 1), ]
+control_2004to2013<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_2004-2013"), 2), ]
+#impact_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1954-1963"), 5), ]
+impact_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1964-1973"), 5), ]
+impact_1974to1983<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1974-1983"), 1), ]
+impact_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1984-1993"), 2), ]
+impact_1994to2003<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1994-2003"), 3), ]
+impact_2004to2013<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_2004-2013"), 1), ]
 
 
-# Now bring the per_vig data into the main dataset
+car_vel_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,
+                                   control_1984to1993,control_1994to2003,control_2004to2013,
+                                   impact_1964to1973,impact_1974to1983,impact_1984to1993,
+                                   impact_1994to2003,impact_2004to2013)
+
+car_vel_matrix<-car_vel_selected %>%
+  group_by(combo) %>%
+  summarize(total_request = n())
+
+plot(jitter(car_vel_selected$Latitude,5)~car_vel_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+### PIMVIG
+# Katie went through all in-bounds PERVIG, CARVEL, ICTPUN, and PIMVIG and found all valid lots (i.e., present, big enough)
+# Now I need to randomly select the lots to be dissected from among these valid lots.
+
+# Here is the code to generate a list of all of the "in-play" lots.
+
+katie_valid<-read.csv("lot_selection/old/lots_suggested_for_dissection_ROUND3 - lots_suggested_for_dissection_ROUND3.csv")
+
+katie_valid_PIMVIG <- katie_valid %>%
+  filter(ScientificName == "Pimephales vigilax")
+
+# We are including maybes because there are way too few jars in the control without them.
+
+katie_valid_PIMVIG <- katie_valid_PIMVIG %>%
+  filter(Valid.Invalid == "VALID" | Valid.Invalid == "maybe")
+
+pim_vig_matrix<-katie_valid_PIMVIG %>%
+  group_by(CI, decade) %>%
+  summarize(total_available = n())
+
+katie_valid_PIMVIG$combo<-paste(katie_valid_PIMVIG$CI,katie_valid_PIMVIG$decade,sep="_")
+
+control_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1954-1963"), 3), ]
+control_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1964-1973"), 5), ]
+control_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1974-1983"), 5), ]
+control_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1984-1993"), 5), ]
+control_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1994-2003"), 5), ]
+control_2004to2013<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_2004-2013"), 1), ]
+#impact_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1954-1963"), 5), ]
+impact_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1964-1973"), 5), ]
+impact_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1974-1983"), 5), ]
+impact_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1984-1993"), 5), ]
+impact_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1994-2003"), 5), ]
+impact_2004to2013<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_2004-2013"), 2), ]
+
+
+pim_vig_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,
+                                   control_1984to1993,control_1994to2003,control_2004to2013,
+                                   impact_1964to1973,impact_1974to1983,impact_1984to1993,
+                                   impact_1994to2003,impact_2004to2013)
+
+pim_vig_matrix<-pim_vig_selected %>%
+  group_by(combo) %>%
+  summarize(total_request = n())
+
+plot(jitter(pim_vig_selected$Latitude,5)~pim_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+
+
+### Now bring everything together into the main dataset - the newly selected PERVIG, CARVEL, and PIMVIG plus
+### everything from the main dataset. Remember that you already replaced the bad ICTPUN above, so that's sorted.
 
 lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
   filter(!(ScientificName == "Percinus vigil"))
 
+lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
+  filter(!(ScientificName == "Carpiodes velifer"))
+
+lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
+  filter(!(ScientificName == "Pimephales vigilax"))
+
 check <- lots_MS_number_available_to_dissect %>%
   filter(ScientificName == "Percinus vigil")
 
-# Read in the per_vig data
 
-per_vig_final<-read.csv("lot_selection/final_lots/per_vig_inbound_valid_selected.csv", header=T, sep=",")
+### Now remember that you only want 2 individual PERVIG and 4 individual CARVEL nad PIMVIG from each lot
 
-per_vig_final<-per_vig_final[,-c(1,34:36)]
-
-# Now remember that you only want 4 individuals from each lot for small fish, 2 for big fish
-
-per_vig_final <- per_vig_final %>%
+per_vig_final <- per_vig_selected %>%
   mutate(number_individuals_requested = 2)
 
-final_lots<-rbind(lots_MS_number_available_to_dissect,per_vig_final)
+car_vel_final <- car_vel_selected %>%
+  mutate(number_individuals_requested = 2)
 
-View(final_lots)
+pim_vig_final <- pim_vig_selected %>%
+  mutate(number_individuals_requested = 2)
 
 
+### Trim so that the datasets have the same number of columns
+
+ncol(lots_MS_number_available_to_dissect)
+ncol(per_vig_final)
+ncol(car_vel_final)
+ncol(pim_vig_final)
+
+per_vig_final<-per_vig_final[ , -which(names(per_vig_final) %in% c("X.1","Valid.Invalid","notes"))]
+car_vel_final<-car_vel_final[ , -which(names(car_vel_final) %in% c("X.1","Valid.Invalid","notes"))]
+pim_vig_final<-pim_vig_final[ , -which(names(pim_vig_final) %in% c("X.1","Valid.Invalid","notes"))]
+
+final_dataset <- rbind(lots_MS_number_available_to_dissect, per_vig_final, car_vel_final, pim_vig_final)
 
 ### Now write the final file.
 
-write.csv(final_lots, file="lot_selection/final_lots/final_lots_2023.01.7.csv")
+write.csv(final_lots, file="lot_selection/final_lots/final_lots_2024.01.23.csv")
+
 
 # Prior to Katie's in-person winnowing
 tally_up<-lots_MS_number_available_to_dissect %>%
