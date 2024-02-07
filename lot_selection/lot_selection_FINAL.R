@@ -1,6 +1,6 @@
 # Selecting specimens for TUBRI project
 # Chelsea Wood
-# March 2023
+# Updated January 2024
 
 library(maps)
 library(mapdata)
@@ -98,8 +98,13 @@ lots_MS_lower$CI
 
 # Just make sure everything looks okay and is making sense
 
+install.packages("devtools")
+devtools::install_github("stadiamaps/ggmap") 
+library("ggmap")
+register_stadiamaps("45588e55-a703-4f6e-9ef0-ee6ed672b73a", write = TRUE)
+
 bounds<-c(left=-89.87, bottom=30.67, right=-89.79, top=30.81)
-map_check<-get_stamenmap(bounds, zoom=11, maptype = "terrain-background") %>% ggmap()+
+map_check<-get_stadiamap(bounds, zoom=11, maptype = "stamen_terrain_background") %>% ggmap()+
   geom_point(data = lots_MS_lower, aes(x=Longitude,y=Latitude,fill=CI),shape=21)+
   scale_fill_manual(values=c("white","#bdbdbd"))+
   xlab("")+
@@ -115,7 +120,7 @@ map_check
 lots_MS_lower<-lots_MS_lower %>%
   filter(Longitude > -89.85)
 
-map_check<-get_stamenmap(bounds, zoom=12, maptype = "terrain-background") %>% ggmap()+
+map_check<-get_stadiamap(bounds, zoom=11, maptype = "stamen_terrain_background") %>% ggmap()+
   geom_point(data = lots_MS_lower, aes(x=Longitude,y=Latitude,fill=CI),shape=21)+
   scale_fill_manual(values=c("white","#bdbdbd"))+
   xlab("")+
@@ -339,56 +344,13 @@ for(i in 1:length(lots_MS_lower$InstitutionCode)) {
 lots_MS_lower$decade
 
 
-# Cool, now you're ready to select lots.
-# If fewer than 8 individuals are in the lot, throw it out (unless it's a big fish and there are few
-# individuals per lot - then you can change the criterion to 4 fish per lot).  
-# From the remaining lots, randomly select five lots for each decade-impact category combo
-# From each of these five lots, four individual fish will be selected (two for big fish).
-# This will yield 20 individual fish from each decade-impact category combination (10 for big fish).
-
-# CAR_VEL
-car_vel<-lots_MS_lower %>%
-  filter(ScientificName =="Carpiodes velifer")
-
-car_vel<-car_vel[which(car_vel$IndividualCount >= 8),]
-
-car_vel_matrix<-car_vel %>%
-  group_by(CI, decade) %>%
-  summarize(total_available = n())
-
-car_vel$combo<-paste(car_vel$CI,car_vel$decade,sep="_")
-
-control_1954to1963<-car_vel[ sample( which( car_vel$combo == "control_1954-1963"), 3), ]#not enough for 5
-control_1964to1973<-car_vel[ sample( which( car_vel$combo == "control_1964-1973"), 4), ]#not enough for 5
-control_1974to1983<-car_vel[ sample( which( car_vel$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-car_vel[ sample( which( car_vel$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-car_vel[ sample( which( car_vel$combo == "control_1994-2003"), 2), ]#not enough for 5
-#control_2004to2013<-car_vel[ sample( which( car_vel$combo == "control_2004-2013"), 2), ]#not enough for 5
-impact_1954to1963<-car_vel[ sample( which( car_vel$combo == "impact_1954-1963"), 4), ]#not enough for 5
-impact_1964to1973<-car_vel[ sample( which( car_vel$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-car_vel[ sample( which( car_vel$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-car_vel[ sample( which( car_vel$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-car_vel[ sample( which( car_vel$combo == "impact_1994-2003"), 5), ]
-#impact_2004to2013<-car_vel[ sample( which( car_vel$combo == "impact_2004-2013"), 4), ]#don't bother because we don't have this decade for control
-
-
-car_vel_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
-                                   control_1994to2003,
-                                   impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
-                                   impact_1994to2003)
-
-car_vel_matrix<-car_vel_selected %>%
-  group_by(combo) %>%
-  summarize(total_request = n())
-
-plot(jitter(car_vel_selected$Latitude,5)~car_vel_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
-
-
 # GAM_AFF
 gam_aff<-lots_MS_lower %>%
   filter(ScientificName =="Gambusia affinis")
 
-gam_aff<-gam_aff[which(gam_aff$IndividualCount >= 8),]
+## there are so few of these in control-before, drop down the threshold for picking a jar from 8 to 4
+
+gam_aff<-gam_aff[which(gam_aff$IndividualCount >= 4),]
 
 gam_aff_matrix<-gam_aff %>%
   group_by(CI, decade) %>%
@@ -396,24 +358,24 @@ gam_aff_matrix<-gam_aff %>%
 
 gam_aff$combo<-paste(gam_aff$CI,gam_aff$decade,sep="_")
 
-#control_1954to1963<-gam_aff[ sample( which( gam_aff$combo == "control_1954-1963"), 3), ]#not enough for 5
-control_1964to1973<-gam_aff[ sample( which( gam_aff$combo == "control_1964-1973"), 1), ]#not enough for 5
-control_1974to1983<-gam_aff[ sample( which( gam_aff$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-gam_aff[ sample( which( gam_aff$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-gam_aff[ sample( which( gam_aff$combo == "control_1994-2003"), 5), ]#not enough for 5
-control_2004to2013<-gam_aff[ sample( which( gam_aff$combo == "control_2004-2013"), 3), ]#not enough for 5
-#impact_1954to1963<-gam_aff[ sample( which( gam_aff$combo == "impact_1954-1963"), 4), ]#not enough for 5
-impact_1964to1973<-gam_aff[ sample( which( gam_aff$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-gam_aff[ sample( which( gam_aff$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-gam_aff[ sample( which( gam_aff$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-gam_aff[ sample( which( gam_aff$combo == "impact_1994-2003"), 5), ]
-impact_2004to2013<-gam_aff[ sample( which( gam_aff$combo == "impact_2004-2013"), 2), ]#don't bother because we don't have this decade for control
+#control_1954to1963<-gam_aff[ sample( which( gam_aff$combo == "control_1954-1963"), 3, replace = F), ]#not enough for 5
+control_1964to1973<-gam_aff[ sample( which( gam_aff$combo == "control_1964-1973"), 2, replace = F), ]#not enough for 5
+control_1974to1983<-gam_aff[ sample( which( gam_aff$combo == "control_1974-1983"), 5, replace = F), ]
+control_1984to1993<-gam_aff[ sample( which( gam_aff$combo == "control_1984-1993"), 5, replace = F), ]
+control_1994to2003<-gam_aff[ sample( which( gam_aff$combo == "control_1994-2003"), 5, replace = F), ]#not enough for 5
+control_2004to2013<-gam_aff[ sample( which( gam_aff$combo == "control_2004-2013"), 3, replace = F), ]#not enough for 5
+impact_1954to1963<-gam_aff[ which( gam_aff$combo == "impact_1954-1963"), ]#not enough for 5
+impact_1964to1973<-gam_aff[ sample( which( gam_aff$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-gam_aff[ sample( which( gam_aff$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-gam_aff[ sample( which( gam_aff$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-gam_aff[ sample( which( gam_aff$combo == "impact_1994-2003"), 5, replace = F), ]
+impact_2004to2013<-gam_aff[ sample( which( gam_aff$combo == "impact_2004-2013"), 5, replace = F), ]#don't bother because we don't have this decade for control
 
 
-gam_aff_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
-                                   control_1994to2003,
+gam_aff_selected<-rbind.data.frame(control_1964to1973,control_1974to1983,control_1984to1993,
+                                   control_1994to2003,control_2004to2013,
                                    impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
-                                   impact_1994to2003)
+                                   impact_1994to2003,impact_2004to2013)
 
 gam_aff_matrix<-gam_aff_selected %>%
   group_by(combo) %>%
@@ -433,18 +395,18 @@ hyb_nuc_matrix<-hyb_nuc_next %>%
   group_by(CI, decade) %>%
   summarize(total_request = n())
 
-control_1954to1963<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1954-1963"), 4), ]#not enough for 5
-control_1964to1973<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1994-2003"), 5), ]
-control_2004to2013<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_2004-2013"), 5), ]
-impact_1954to1963<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1954-1963"), 3), ]#not enough for 5
-impact_1964to1973<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1994-2003"), 5), ]
-impact_2004to2013<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_2004-2013"), 5), ]
+control_1954to1963<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1954-1963"), 4, replace = F), ]#not enough for 5
+control_1964to1973<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1964-1973"), 5, replace = F), ]
+control_1974to1983<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1974-1983"), 5, replace = F), ]
+control_1984to1993<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1984-1993"), 5, replace = F), ]
+control_1994to2003<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_1994-2003"), 5, replace = F), ]
+control_2004to2013<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "control_2004-2013"), 5, replace = F), ]
+impact_1954to1963<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1954-1963"), 3, replace = F), ]#not enough for 5
+impact_1964to1973<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_1994-2003"), 5, replace = F), ]
+impact_2004to2013<-hyb_nuc_next[ sample( which( hyb_nuc_next$combo == "impact_2004-2013"), 5, replace = F), ]
 
 hyb_nuc_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
                                    control_1994to2003,control_2004to2013,
@@ -470,27 +432,76 @@ ict_pun_matrix<-ict_pun_next %>%
   group_by(CI, decade) %>%
   summarize(total_request = n())
 
-control_1954to1963<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1954-1963"), 2), ]#not enough for 5
-control_1964to1973<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1984-1993"), 3), ]#not enough for 5
-control_1994to2003<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1994-2003"), 1), ]#not enough for 5
-impact_1954to1963<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1954-1963"), 5), ]
-impact_1964to1973<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1994-2003"), 4), ]#not enough for 5
+control_1954to1963<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1954-1963"), 2, replace = F), ]#not enough for 5
+control_1964to1973<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1964-1973"), 5, replace = F), ]
+control_1974to1983<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1974-1983"), 5, replace = F), ]
+control_1984to1993<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1984-1993"), 3, replace = F), ]#not enough for 5
+control_1994to2003<-ict_pun_next[ which( ict_pun_next$combo == "control_1994-2003"), ]#not enough for 5
+impact_1954to1963<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1954-1963"), 5, replace = F), ]
+impact_1964to1973<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1994-2003"), 4, replace = F), ]#not enough for 5
+impact_2004to2013<-ict_pun_next[ which( ict_pun_next$combo == "impact_2004-2013"), ]
 
 ict_pun_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
                                    control_1994to2003,
                                    impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
-                                   impact_1994to2003)
+                                   impact_1994to2003,impact_2004to2013)
 
 ict_pun_matrix<-ict_pun_selected %>%
   group_by(combo) %>%
   summarize(total_request = n())
 
-plot(jitter(ict_pun_selected$Latitude,5)~ict_pun_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+plot(jitter(ict_pun_selected$Latitude,5)~ict_pun_selected$YearCollected)+
+  abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# For ICTPUN specifically: most of these fish are fine. For a few, Katie was able to go into the collection and figure out 
+# whether the lots were present and contained fish of an appropriate size. For those, we needed to find replacements 
+# in a few instances.
+
+# Katie needs replacements for some ICTPUN specimens: 34760, 37883, 115142, 147855, 147873
+
+# 34760 not included
+
+ict_pun_34760 <- ict_pun_selected %>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "34760")
+
+# 37883 not included
+
+ict_pun_37883 <- ict_pun_selected %>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "37883")
+
+# 115142 not included
+
+ict_pun_115142 <- ict_pun_selected %>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "115142")
+
+# 147855
+
+ict_pun_147855 <- ict_pun_selected %>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147855")
+
+replace_147855 <- ict_pun_next %>%
+  filter(ScientificName == "Ictalurus punctatus" & decade == "1984-1993" & CI == "control")
+
+# Remove the bad lot
+
+ict_pun_selected <- ict_pun_selected %>%
+  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147855"))
+
+# All other control_1984-1993 are used, so the bad lot cannot be replaced
+
+check <- ict_pun_selected1%>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "159967")
+
+
+# 147873 not included
+
+ict_pun_147873 <- ict_pun_selected %>%
+  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147873")
+
 
 
 #NOT_ATH
@@ -504,18 +515,18 @@ not_ath_matrix<-not_ath_next %>%
   group_by(CI, decade) %>%
   summarize(total_request = n())
 
-control_1954to1963<-not_ath_next[ sample( which( not_ath_next$combo == "control_1954-1963"), 2), ]#not enough for 5
-control_1964to1973<-not_ath_next[ sample( which( not_ath_next$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-not_ath_next[ sample( which( not_ath_next$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-not_ath_next[ sample( which( not_ath_next$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-not_ath_next[ sample( which( not_ath_next$combo == "control_1994-2003"), 5), ]
-control_2004to2013<-not_ath_next[ sample( which( not_ath_next$combo == "control_2004-2013"), 5), ]
-impact_1954to1963<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1954-1963"), 2), ]#not enough for 5
-impact_1964to1973<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1994-2003"), 5), ]
-impact_2004to2013<-not_ath_next[ sample( which( not_ath_next$combo == "impact_2004-2013"), 5), ]
+control_1954to1963<-not_ath_next[ sample( which( not_ath_next$combo == "control_1954-1963"), 2, replace = F), ]#not enough for 5
+control_1964to1973<-not_ath_next[ sample( which( not_ath_next$combo == "control_1964-1973"), 5, replace = F), ]
+control_1974to1983<-not_ath_next[ sample( which( not_ath_next$combo == "control_1974-1983"), 5, replace = F), ]
+control_1984to1993<-not_ath_next[ sample( which( not_ath_next$combo == "control_1984-1993"), 5, replace = F), ]
+control_1994to2003<-not_ath_next[ sample( which( not_ath_next$combo == "control_1994-2003"), 5, replace = F), ]
+control_2004to2013<-not_ath_next[ sample( which( not_ath_next$combo == "control_2004-2013"), 5, replace = F), ]
+impact_1954to1963<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1954-1963"), 2, replace = F), ]#not enough for 5
+impact_1964to1973<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-not_ath_next[ sample( which( not_ath_next$combo == "impact_1994-2003"), 5, replace = F), ]
+impact_2004to2013<-not_ath_next[ sample( which( not_ath_next$combo == "impact_2004-2013"), 5, replace = F), ]
 
 not_ath_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
                                    control_1994to2003,control_2004to2013,
@@ -528,277 +539,6 @@ not_ath_matrix<-not_ath_selected %>%
 
 plot(jitter(not_ath_selected$Latitude,5)~not_ath_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
-
-#PER_VIG
-per_vig<-lots_MS_lower %>%
-  filter(ScientificName =="Percina vigil")
-
-per_vig$combo<-paste(per_vig$CI,per_vig$decade,sep="_")
-#this is a big fish and there are fewer specimens per lot than others, so lower the threshold
-
-per_vig_next<-per_vig[which(per_vig$IndividualCount >= 4),]
-
-per_vig_matrix<-per_vig_next %>%
-  group_by(CI, decade) %>%
-  summarize(total_request = n())
-
-#control_1954to1963<-per_vig_next[ sample( which( per_vig_next$combo == "control_1954-1963"), 2), ]
-control_1964to1973<-per_vig_next[ sample( which( per_vig_next$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-per_vig_next[ sample( which( per_vig_next$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-per_vig_next[ sample( which( per_vig_next$combo == "control_1984-1993"), 1), ]#not enough for 5
-control_1994to2003<-per_vig_next[ sample( which( per_vig_next$combo == "control_1994-2003"), 4), ]#not enough for 5
-#impact_1954to1963<-per_vig_next[ sample( which( per_vig_next$combo == "impact_1954-1963"), 5), ]#exclude to match control
-impact_1964to1973<-per_vig_next[ sample( which( per_vig_next$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-per_vig_next[ sample( which( per_vig_next$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-per_vig_next[ sample( which( per_vig_next$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-per_vig_next[ sample( which( per_vig_next$combo == "impact_1994-2003"), 5), ]
-
-per_vig_selected<-rbind.data.frame(control_1964to1973,control_1974to1983,control_1984to1993,
-                                   control_1994to2003,
-                                   impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
-                                   impact_1994to2003)
-
-per_vig_matrix<-per_vig_selected %>%
-  group_by(combo) %>%
-  summarize(total_request = n())
-
-plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
-
-
-#PIM_VIG
-pim_vig<-lots_MS_lower %>%
-  filter(ScientificName =="Pimephales vigilax")
-
-pim_vig$combo<-paste(pim_vig$CI,pim_vig$decade,sep="_")
-pim_vig_next<-pim_vig[which(pim_vig$IndividualCount >= 8),]
-
-pim_vig_matrix<-pim_vig_next %>%
-  group_by(CI, decade) %>%
-  summarize(total_request = n())
-
-control_1954to1963<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_1954-1963"), 5), ]
-control_1964to1973<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_1994-2003"), 5), ]
-control_2004to2013<-pim_vig_next[ sample( which( pim_vig_next$combo == "control_2004-2013"), 5), ]
-impact_1954to1963<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_1954-1963"), 3), ]#not enough for 5
-impact_1964to1973<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_1994-2003"), 5), ]
-impact_2004to2013<-pim_vig_next[ sample( which( pim_vig_next$combo == "impact_2004-2013"), 5), ]
-
-
-pim_vig_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,control_1984to1993,
-                                   control_1994to2003,control_2004to2013,
-                                   impact_1954to1963,impact_1964to1973,impact_1974to1983,impact_1984to1993,
-                                   impact_1994to2003,impact_2004to2013)
-
-pim_vig_matrix<-pim_vig_selected %>%
-  group_by(combo) %>%
-  summarize(total_request = n())
-
-plot(jitter(pim_vig_selected$Latitude,5)~pim_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
-
-
-# Compile request for MS_lower
-
-lots_MS_number_available_to_dissect<-rbind.data.frame(car_vel_selected,gam_aff_selected,hyb_nuc_selected,
-                                                      ict_pun_selected,not_ath_selected,per_vig_selected,
-                                                      pim_vig_selected)
-
-
-# Now remember that you only want 4 individuals from each lot for small fish, 2 for big fish
-
-lots_MS_number_available_to_dissect$number_individuals_requested<-vector("numeric",length(lots_MS_number_available_to_dissect$InstitutionCode))
-
-for(i in 1:length(lots_MS_number_available_to_dissect$InstitutionCode)) {
-  
-  if(lots_MS_number_available_to_dissect$ScientificName[i] == "Ictalurus punctatus" ||
-     lots_MS_number_available_to_dissect$ScientificName[i] == "Percina vigil" ){
-    
-    lots_MS_number_available_to_dissect$number_individuals_requested[i] <- 2
-    
-  } else {
-    
-    lots_MS_number_available_to_dissect$number_individuals_requested[i] <- 4
-    
-    
-  }
-}
-lots_MS_number_available_to_dissect$number_individuals_requested
-
-
-# If you don't want to run this again (re-doing the random selection of lots), you can read in the data here
-
-lots_MS_number_available_to_dissect<-read.table("lot_selection/old/lots_suggested_for_dissection_ROUND1.csv",header=TRUE,sep=",")
-
-tally_up<-lots_MS_number_available_to_dissect %>%
-  group_by(ScientificName) %>%
-  summarize(total_lots = n(), total_individuals_requested = sum(number_individuals_requested))
-tally_up
-
-sum(tally_up$total_individuals_requested)
-sum(tally_up$total_lots)
-
-
-# Export the sheet
-
-#write.csv(lots_MS_number_available_to_dissect, file="lot_selection/lots_suggested_for_dissection_ROUND1.csv")
-
-
-
-# Okay. Most of these fish are fine. For a few, Katie was able to go into the collection and figure out whether the lots were
-# present and contained fish of an appropriate size. For those, we needed to find replacements in a few instances.
-
-# Katie needs replacements for some ICTPUN specimens
-
-View(ict_pun)
-
-ict_pun_34760 <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "34760")
-
-ict_pun_replace_34760 <- ict_pun_next %>%
-  filter(ScientificName == "Ictalurus punctatus" & decade == "1964-1973" & CI == "control")
-
-# Remove the bad lot
-
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "34760"))
-
-# Randomly select another lot to replace the bad one and add it to the dataset
-
-replacement_34760<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1964-1973"), 1), ]
-
-# Add first column to replacement so that you can merge the two
-
-replacement_34760<-cbind(X="NA",replacement_34760)
-
-# Indicate how many you want to take
-
-replacement_34760$number_individuals_requested<-2
-
-lots_MS_number_available_to_dissect <- rbind(lots_MS_number_available_to_dissect,replacement_34760)
-
-# Check to make sure it was added
-
-check <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "57368")
-
-
-# NEXT
-
-ict_pun_37883 <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "37883")
-
-ict_pun_replace_37883 <- ict_pun_next %>%
-  filter(ScientificName == "Ictalurus punctatus" & decade == "1964-1973" & CI == "control")
-
-# Remove the bad lot
-
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "37883"))
-
-# Randomly select another lot to replace the bad one and add it to the dataset
-
-replacement_37883<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1964-1973"), 1), ]
-
-# Add first column to replacement so that you can merge the two
-
-replacement_37883<-cbind(X="NA",replacement_37883)
-
-# Indicate how many you want to take
-
-replacement_37883$number_individuals_requested<-2
-
-lots_MS_number_available_to_dissect <- rbind(lots_MS_number_available_to_dissect,replacement_37883)
-
-# Check to make sure it was added
-
-check <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "72375")
-
-# NEXT
-
-ict_pun_115142 <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "115142")
-
-ict_pun_replace_115142 <- ict_pun_next %>%
-  filter(ScientificName == "Ictalurus punctatus" & decade == "1974-1983" & CI == "control")
-
-# Remove the bad lot
-
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "115142"))
-
-# Randomly select another lot to replace the bad one and add it to the dataset
-
-replacement_115142<-ict_pun_next[ sample( which( ict_pun_next$combo == "control_1974-1983"), 1), ]
-
-# Add first column to replacement so that you can merge the two
-
-replacement_115142<-cbind(X="NA",replacement_115142)
-
-# Indicate how many you want to take
-
-replacement_115142$number_individuals_requested<-2
-
-lots_MS_number_available_to_dissect <- rbind(lots_MS_number_available_to_dissect,replacement_115142)
-
-# Check to make sure it was added and that it isn't duplicated
-
-check <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "124399")
-
-
-# NEXT
-
-ict_pun_147855 <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147855")
-
-ict_pun_replace_147855 <- ict_pun_next %>%
-  filter(ScientificName == "Ictalurus punctatus" & decade == "1984-1993" & CI == "control")
-
-# Remove the bad lot
-
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147855"))
-
-# There is no suitable replacement for this lot (all other lots in the same category are already in use). Skip.
-
-
-# NEXT
-
-ict_pun_147873 <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147873")
-
-ict_pun_147873 <- ict_pun_next %>%
-  filter(ScientificName == "Ictalurus punctatus" & decade == "1984-1993" & CI == "impact")
-
-# Remove the bad lot
-
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Ictalurus punctatus" & CatalogNumber == "147873"))
-
-# Randomly select another lot to replace the bad one and add it to the dataset
-
-replacement_147873<-ict_pun_next[ sample( which( ict_pun_next$combo == "impact_1984-1993"), 1), ]
-
-# Add first column to replacement so that you can merge the two
-
-replacement_147873<-cbind(X="NA",replacement_147873)
-
-# Indicate how many you want to take
-
-replacement_147873$number_individuals_requested<-2
-
-lots_MS_number_available_to_dissect <- rbind(lots_MS_number_available_to_dissect,replacement_147873)
-
-# Check to make sure it was added and that it isn't duplicated
-
-check <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Ictalurus punctatus" & CatalogNumber == "157340")
 
 
 ### PERVIG
@@ -823,18 +563,18 @@ per_vig_matrix<-katie_valid_PERVIG %>%
 
 katie_valid_PERVIG$combo<-paste(katie_valid_PERVIG$CI,katie_valid_PERVIG$decade,sep="_")
 
-#control_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1954-1963"), 3), ]#not enough for 5
-control_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1964-1973"), 3), ]
-control_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1974-1983"), 3), ]
-#control_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1984-1993"), 1), ]#not enough for 5
-control_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1994-2003"), 2), ]#not enough for 5
-#control_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_2004-2013"), 2), ]#not enough for 5
-impact_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1954-1963"), 5), ]
-impact_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1994-2003"), 5), ]
-#impact_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_2004-2013"), 4), ]#don't bother because we don't have this decade for control
+#control_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1954-1963"), 3, replace = F), ]#not enough for 5
+control_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1964-1973"), 3, replace = F), ]
+control_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1974-1983"), 3, replace = F), ]
+#control_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1984-1993"), 1, replace = F), ]#not enough for 5
+control_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_1994-2003"), 2, replace = F), ]#not enough for 5
+#control_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "control_2004-2013"), 2, replace = F), ]#not enough for 5
+impact_1954to1963<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1954-1963"), 5, replace = F), ]
+impact_1964to1973<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_1994-2003"), 5, replace = F), ]
+#impact_2004to2013<-katie_valid_PERVIG[ sample( which( katie_valid_PERVIG$combo == "impact_2004-2013"), 4, replace = F), ]#don't bother because we don't have this decade for control
 
 
 per_vig_selected<-rbind.data.frame(control_1964to1973,control_1974to1983,
@@ -871,18 +611,18 @@ per_vig_matrix<-katie_valid_CARVEL %>%
 
 katie_valid_CARVEL$combo<-paste(katie_valid_CARVEL$CI,katie_valid_CARVEL$decade,sep="_")
 
-control_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1954-1963"), 5), ]
-control_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1974-1983"), 1), ]
-control_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1994-2003"), 1), ]
-control_2004to2013<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_2004-2013"), 2), ]
-#impact_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1954-1963"), 5), ]
-impact_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1974-1983"), 1), ]
-impact_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1984-1993"), 2), ]
-impact_1994to2003<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1994-2003"), 3), ]
-impact_2004to2013<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_2004-2013"), 1), ]
+control_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1954-1963"), 5, replace = F), ]
+control_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1964-1973"), 5, replace = F), ]
+control_1974to1983<-katie_valid_CARVEL[ which( katie_valid_CARVEL$combo == "control_1974-1983"), ]
+control_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_1984-1993"), 5, replace = F), ]
+control_1994to2003<-katie_valid_CARVEL[ which( katie_valid_CARVEL$combo == "control_1994-2003"), ]
+control_2004to2013<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "control_2004-2013"), 2, replace = F), ]
+#impact_1954to1963<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1954-1963"), 5, replace = F), ]
+impact_1964to1973<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-katie_valid_CARVEL[ which( katie_valid_CARVEL$combo == "impact_1974-1983"), ]
+impact_1984to1993<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1984-1993"), 2, replace = F), ]
+impact_1994to2003<-katie_valid_CARVEL[ sample( which( katie_valid_CARVEL$combo == "impact_1994-2003"), 3, replace = F), ]
+impact_2004to2013<-katie_valid_CARVEL[ which( katie_valid_CARVEL$combo == "impact_2004-2013"), ]
 
 
 car_vel_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,
@@ -893,6 +633,8 @@ car_vel_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control
 car_vel_matrix<-car_vel_selected %>%
   group_by(combo) %>%
   summarize(total_request = n())
+
+write.csv(car_vel_selected, file="lot_selection/final_lots/CAR_VEL_final_lots_2024.02.07.csv")
 
 plot(jitter(car_vel_selected$Latitude,5)~car_vel_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
@@ -919,18 +661,18 @@ pim_vig_matrix<-katie_valid_PIMVIG %>%
 
 katie_valid_PIMVIG$combo<-paste(katie_valid_PIMVIG$CI,katie_valid_PIMVIG$decade,sep="_")
 
-control_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1954-1963"), 3), ]
-control_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1964-1973"), 5), ]
-control_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1974-1983"), 5), ]
-control_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1984-1993"), 5), ]
-control_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1994-2003"), 5), ]
-control_2004to2013<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_2004-2013"), 1), ]
-#impact_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1954-1963"), 5), ]
-impact_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1964-1973"), 5), ]
-impact_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1974-1983"), 5), ]
-impact_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1984-1993"), 5), ]
-impact_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1994-2003"), 5), ]
-impact_2004to2013<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_2004-2013"), 2), ]
+control_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1954-1963"), 3, replace = F), ]
+control_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1964-1973"), 5, replace = F), ]
+control_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1974-1983"), 5, replace = F), ]
+control_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1984-1993"), 5, replace = F), ]
+control_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "control_1994-2003"), 5, replace = F), ]
+control_2004to2013<-katie_valid_PIMVIG[ which( katie_valid_PIMVIG$combo == "control_2004-2013"), ]
+#impact_1954to1963<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1954-1963"), 5, replace = F), ]
+impact_1964to1973<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1964-1973"), 5, replace = F), ]
+impact_1974to1983<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1974-1983"), 5, replace = F), ]
+impact_1984to1993<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1984-1993"), 5, replace = F), ]
+impact_1994to2003<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_1994-2003"), 5, replace = F), ]
+impact_2004to2013<-katie_valid_PIMVIG[ sample( which( katie_valid_PIMVIG$combo == "impact_2004-2013"), 2, replace = F), ]
 
 
 pim_vig_selected<-rbind.data.frame(control_1954to1963,control_1964to1973,control_1974to1983,
@@ -950,47 +692,49 @@ plot(jitter(pim_vig_selected$Latitude,5)~pim_vig_selected$YearCollected)+abline(
 ### Now bring everything together into the main dataset - the newly selected PERVIG, CARVEL, and PIMVIG plus
 ### everything from the main dataset. Remember that you already replaced the bad ICTPUN above, so that's sorted.
 
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Percinus vigil"))
 
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Carpiodes velifer"))
+car_vel_final <- car_vel_selected %>%
+  mutate(number_individuals_requested = 4)
 
-lots_MS_number_available_to_dissect <- lots_MS_number_available_to_dissect %>%
-  filter(!(ScientificName == "Pimephales vigilax"))
+gam_aff_final <- gam_aff_selected %>%
+  mutate(number_individuals_requested = 4)
 
-check <- lots_MS_number_available_to_dissect %>%
-  filter(ScientificName == "Percinus vigil")
+hyb_nuc_final <- hyb_nuc_selected %>%
+  mutate(number_individuals_requested = 4)
 
+ict_pun_final <- ict_pun_selected %>%
+  mutate(number_individuals_requested = 2)
 
-### Now remember that you only want 2 individual PERVIG and 4 individual CARVEL nad PIMVIG from each lot
+not_ath_final <- not_ath_selected %>%
+  mutate(number_individuals_requested = 4)
 
 per_vig_final <- per_vig_selected %>%
   mutate(number_individuals_requested = 2)
 
-car_vel_final <- car_vel_selected %>%
-  mutate(number_individuals_requested = 2)
-
 pim_vig_final <- pim_vig_selected %>%
-  mutate(number_individuals_requested = 2)
+  mutate(number_individuals_requested = 4)
 
 
 ### Trim so that the datasets have the same number of columns
 
-ncol(lots_MS_number_available_to_dissect)
-ncol(per_vig_final)
 ncol(car_vel_final)
+ncol(gam_aff_final)
+ncol(hyb_nuc_final)
+ncol(ict_pun_final)
+ncol(not_ath_final)
+ncol(per_vig_final)
 ncol(pim_vig_final)
 
-per_vig_final<-per_vig_final[ , -which(names(per_vig_final) %in% c("X.1","Valid.Invalid","notes"))]
-car_vel_final<-car_vel_final[ , -which(names(car_vel_final) %in% c("X.1","Valid.Invalid","notes"))]
-pim_vig_final<-pim_vig_final[ , -which(names(pim_vig_final) %in% c("X.1","Valid.Invalid","notes"))]
+per_vig_final<-per_vig_final[ , -which(names(per_vig_final) %in% c("X.1","X","Valid.Invalid","notes"))]
+car_vel_final<-car_vel_final[ , -which(names(car_vel_final) %in% c("X.1","X","Valid.Invalid","notes"))]
+pim_vig_final<-pim_vig_final[ , -which(names(pim_vig_final) %in% c("X.1","X","Valid.Invalid","notes"))]
 
-final_dataset <- rbind(lots_MS_number_available_to_dissect, per_vig_final, car_vel_final, pim_vig_final)
+final_dataset <- rbind(car_vel_final, gam_aff_final, hyb_nuc_final, ict_pun_final, not_ath_final, per_vig_final, pim_vig_final)
+
 
 ### Now write the final file.
 
-write.csv(final_lots, file="lot_selection/final_lots/final_lots_2024.01.23.csv")
+write.csv(final_lots, file="lot_selection/final_lots/final_lots_2024.02.07.csv")
 
 
 # Prior to Katie's in-person winnowing
