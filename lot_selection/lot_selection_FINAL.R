@@ -1,8 +1,8 @@
 # Selecting specimens for TUBRI project
 # Chelsea Wood
 # Updated May 2024
-#we luv worms
-#and worms luv us <3
+# we luv worms
+# and worms luv us <3
 
 library(maps)
 library(mapdata)
@@ -607,7 +607,7 @@ katie_valid_CARVEL <- katie_valid %>%
 katie_valid_CARVEL <- katie_valid_CARVEL %>%
   filter(Valid.Invalid == "VALID" | Valid.Invalid == "maybe")
 
-per_vig_matrix<-katie_valid_CARVEL %>%
+car_vel_matrix<-katie_valid_CARVEL %>%
   group_by(CI, decade) %>%
   summarize(total_available = n())
 
@@ -656,6 +656,8 @@ katie_valid_PIMVIG <- katie_valid %>%
 
 katie_valid_PIMVIG <- katie_valid_PIMVIG %>%
   filter(Valid.Invalid == "VALID" | Valid.Invalid == "maybe")
+
+View(katie_valid_PIMVIG)
 
 pim_vig_matrix<-katie_valid_PIMVIG %>%
   group_by(CI, decade) %>%
@@ -716,6 +718,8 @@ per_vig_final <- per_vig_selected %>%
 pim_vig_final <- pim_vig_selected %>%
   mutate(number_individuals_requested = 4)
 
+View(pim_vig_selected)
+
 
 ### Trim so that the datasets have the same number of columns
 
@@ -733,10 +737,9 @@ pim_vig_final<-pim_vig_final[ , -which(names(pim_vig_final) %in% c("X.1","X","Va
 
 final_dataset <- rbind(car_vel_final, gam_aff_final, hyb_nuc_final, ict_pun_final, not_ath_final, per_vig_final, pim_vig_final)
 
-
 ### Now write the final file.
 
-write.csv(final_lots, file="lot_selection/final_lots/final_lots_2024.02.07.csv")
+write.csv(final_dataset, file="lot_selection/final_lots/final_lots_2024.06.11.csv")
 
 
 # Prior to Katie's in-person winnowing
