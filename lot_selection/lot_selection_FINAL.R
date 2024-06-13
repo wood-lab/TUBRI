@@ -346,6 +346,12 @@ for(i in 1:length(lots_MS_lower$InstitutionCode)) {
 lots_MS_lower$decade
 
 
+### Export this dataset - it contains all of the lots that it would be okay to sample from.
+
+all_lots_okay_to_dissect<-lots_MS_lower
+write.csv(all_lots_okay_to_dissect,"lot_selection/all_lots_okay_to_dissect.csv")
+
+
 # GAM_AFF
 gam_aff<-lots_MS_lower %>%
   filter(ScientificName =="Gambusia affinis")
@@ -688,6 +694,8 @@ pim_vig_matrix<-pim_vig_selected %>%
   group_by(combo) %>%
   summarize(total_request = n())
 
+write.csv(pim_vig_matrix,file="lot_selection/desired_replication/pim_vig_goal.csv")
+
 plot(jitter(pim_vig_selected$Latitude,5)~pim_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 
@@ -756,6 +764,8 @@ tally_up<-final_lots %>%
   group_by(ScientificName) %>%
   summarize(total_lots = n(), total_individuals_requested = sum(number_individuals_requested))
 tally_up
+
+write.csv(tally_up,"lot_selection/desired_replication/all_spp_goal.csv")
 
 sum(tally_up$total_individuals_requested)
 sum(tally_up$total_lots)
