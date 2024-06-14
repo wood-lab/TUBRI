@@ -32,7 +32,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.13.csv")
+pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.14.csv")
 length(pim_vig_today$CatalogNumber)
 
 
@@ -85,12 +85,12 @@ plot(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$Latitude.y)
 
 # Calculate how many fish you need to do per day to hit your target
 
-working_days_remaining<-45
+working_days_remaining<-44
 read.csv("lot_selection/desired_replication/all_spp_goal.csv")
 
-200+144+228+100+224+136+153
+200+144+228+100+224+136+130
 
-1185/45
+1162/44
 
 
 
