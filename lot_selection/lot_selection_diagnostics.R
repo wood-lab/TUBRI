@@ -32,7 +32,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.14.csv")
+pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.18.csv")
 length(pim_vig_today$CatalogNumber)
 
 
@@ -81,6 +81,13 @@ summary(glm(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$YearColle
 plot(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$YearCollected.x)
 summary(glm(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$Latitude.y))
 plot(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+pim_vig_dailies<-pim_vig_with_metadata %>%
+  group_by(DissectionDate) %>%
+  summarize(actual = n())
 
 
 # Calculate how many fish you need to do per day to hit your target
