@@ -71,6 +71,7 @@ pim_vig_remaining<-merge(pim_vig_desired, pim_vig_actual, by.x = "combo", by.y =
 # Calculate how many you have left
 
 pim_vig_remaining$to_go<-(pim_vig_remaining$individual_fish_desired-ifelse(is.na(pim_vig_remaining$actual),0,pim_vig_remaining$actual))
+pim_vig_remaining<-na.omit(pim_vig_remaining)
 sum(pim_vig_remaining$actual,na.rm=T)
 sum(pim_vig_remaining$to_go,na.rm=T)
 
@@ -92,13 +93,19 @@ pim_vig_dailies<-pim_vig_with_metadata %>%
 
 # Calculate how many fish you need to do per day to hit your target
 
-working_days_remaining<-44
+working_days_remaining<-41
 read.csv("lot_selection/desired_replication/all_spp_goal.csv")
 
-200+144+228+100+224+136+130
+200+144+228+100+224+136+65
 
-1162/44
+1097/41
+7*4
+26/4
 
 
-
+# Replacing lots that we can't find in the collection
+# Look at the first three digits of the lots you are missing.
+# Find lots with those digits (or close) on the "in bounds" shelves in the collection.
+# Of all the close lots, check that they are in the category you're looking for and, if you have more than one,
+# randomly select the ones you'll use.
 
