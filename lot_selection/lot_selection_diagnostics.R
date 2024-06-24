@@ -32,7 +32,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.21.csv")
+pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.24.csv")
 length(pim_vig_today$CatalogNumber)
 
 
@@ -89,6 +89,77 @@ plot(pim_vig_with_metadata$TotalLength_mm~pim_vig_with_metadata$Latitude.y)
 pim_vig_dailies<-pim_vig_with_metadata %>%
   group_by(DissectionDate) %>%
   summarize(actual = n())
+
+
+
+### ICTPUN
+
+# Download latest file # GET THIS WORKING LATER
+drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"), 
+               path = "data/raw/pim_vig.csv", overwrite = TRUE)
+
+
+# You can also do it the old-fashioned way
+
+ict_pun_today<-read.csv("data/Ictalurus_punctatus_Datasheet_2024.06.24.csv")
+length(ict_pun_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+ict_pun_with_metadata<-merge(ict_pun_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(ict_pun_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(ict_pun_with_metadata$Latitude.y,1)~ict_pun_with_metadata$YearCollected.y)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# Desired level of replication
+
+ict_pun_desired<-read.csv(file="lot_selection/desired_replication/ict_pun_goal.csv")
+ict_pun_desired<-ict_pun_desired[,-1]
+colnames(ict_pun_desired)[2]<-"n_lots_desired"
+ict_pun_desired$individual_fish_desired<-ict_pun_desired$n_lots_desired*2
+sum(ict_pun_desired$individual_fish_desired)
+
+
+# Actual level of replication
+
+ict_pun_actual<-ict_pun_with_metadata %>%
+  group_by(combo) %>%
+  summarize(actual = n())
+
+
+# Merge desired and actual
+
+ict_pun_remaining<-merge(ict_pun_desired, ict_pun_actual, by.x = "combo", by.y = "combo", all.x = TRUE, all.y = TRUE)
+
+
+# Calculate how many you have left
+
+ict_pun_with_metadata$to_go<-(ict_pun_remaining$individual_fish_desired-ifelse(is.na(ict_pun_remaining$actual),0,ict_pun_remaining$actual))
+ict_pun_remaining<-na.omit(ict_pun_remaining)
+sum(ict_pun_remaining$actual,na.rm=T)
+sum(ict_pun_remaining$to_go,na.rm=T)
+
+
+# Check that body size is invariant through time
+
+summary(glm(ict_pun_with_metadata$TotalLength_mm~ict_pun_with_metadata$YearCollected.x))
+plot(ict_pun_with_metadata$TotalLength_mm~ict_pun_with_metadata$YearCollected.x)
+summary(glm(ict_pun_with_metadata$TotalLength_mm~ict_pun_with_metadata$Latitude.y))
+plot(ict_pun_with_metadata$TotalLength_mm~ict_pun_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+ict_pun_dailies<-ict_pun_with_metadata %>%
+  group_by(DissectionDate) %>%
+  summarize(actual = n())
+
 
 
 # Calculate how many fish you need to do per day to hit your target

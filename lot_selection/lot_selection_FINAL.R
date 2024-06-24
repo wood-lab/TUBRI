@@ -464,6 +464,9 @@ ict_pun_matrix<-ict_pun_selected %>%
 plot(jitter(ict_pun_selected$Latitude,5)~ict_pun_selected$YearCollected)+
   abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+write.csv(ict_pun_matrix,file="lot_selection/desired_replication/ict_pun_goal.csv")
+
+
 
 # For ICTPUN specifically: most of these fish are fine. For a few, Katie was able to go into the collection and figure out 
 # whether the lots were present and contained fish of an appropriate size. For those, we needed to find replacements 
