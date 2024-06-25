@@ -32,7 +32,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.24.csv")
+pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.25.csv")
 length(pim_vig_today$CatalogNumber)
 
 
@@ -45,7 +45,7 @@ length(pim_vig_with_metadata$CatalogNumber)
 
 # Plot to see where the dissected fish fall
 
-plot(jitter(pim_vig_with_metadata$Latitude.y,1)~pim_vig_with_metadata$YearCollected.y)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+plot(jitter(pim_vig_with_metadata$Latitude.y,30)~jitter(pim_vig_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 
 # Desired level of replication
