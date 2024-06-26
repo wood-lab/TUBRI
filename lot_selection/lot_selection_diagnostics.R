@@ -101,7 +101,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-ict_pun_today<-read.csv("data/Ictalurus_punctatus_Datasheet_2024.06.24.csv")
+ict_pun_today<-read.csv("data/raw/Ictalurus_punctatus_Datasheet_2024.06.26.csv")
 length(ict_pun_today$CatalogNumber)
 
 
