@@ -597,7 +597,7 @@ per_vig_matrix<-per_vig_selected %>%
   group_by(combo) %>%
   summarize(total_request = n())
 
-plot(jitter(per_vig_selected$Latitude,5)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+plot(jitter(per_vig_selected$Latitude,30)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 
 ### CARVEL

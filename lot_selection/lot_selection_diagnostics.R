@@ -101,7 +101,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-ict_pun_today<-read.csv("data/raw/Ictalurus_punctatus_Datasheet_2024.06.26.csv")
+ict_pun_today<-read.csv("data/raw/Ictalurus_punctatus_Datasheet_2024.06.28.csv")
 length(ict_pun_today$CatalogNumber)
 
 
@@ -114,7 +114,7 @@ length(ict_pun_with_metadata$CatalogNumber)
 
 # Plot to see where the dissected fish fall
 
-plot(jitter(ict_pun_with_metadata$Latitude.y,1)~ict_pun_with_metadata$YearCollected.y)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+plot(jitter(ict_pun_with_metadata$Latitude.y,30)~jitter(ict_pun_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
 
 # Desired level of replication
@@ -140,7 +140,7 @@ ict_pun_remaining<-merge(ict_pun_desired, ict_pun_actual, by.x = "combo", by.y =
 
 # Calculate how many you have left
 
-ict_pun_with_metadata$to_go<-(ict_pun_remaining$individual_fish_desired-ifelse(is.na(ict_pun_remaining$actual),0,ict_pun_remaining$actual))
+ict_pun_remaining$to_go<-(ict_pun_remaining$individual_fish_desired-ifelse(is.na(ict_pun_remaining$actual),0,ict_pun_remaining$actual))
 ict_pun_remaining<-na.omit(ict_pun_remaining)
 sum(ict_pun_remaining$actual,na.rm=T)
 sum(ict_pun_remaining$to_go,na.rm=T)
