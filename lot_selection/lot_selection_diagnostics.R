@@ -32,7 +32,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.25.csv")
+pim_vig_today<-read.csv("data/raw/Pimephales_vigilax_Datasheet_2024.06.25.csv")
 length(pim_vig_today$CatalogNumber)
 
 
