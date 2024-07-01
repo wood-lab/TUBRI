@@ -550,6 +550,7 @@ not_ath_matrix<-not_ath_selected %>%
 
 plot(jitter(not_ath_selected$Latitude,5)~not_ath_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+write.csv(not_ath_matrix,file="lot_selection/desired_replication/not_ath_goal.csv")
 
 
 ### PERVIG

@@ -162,6 +162,71 @@ ict_pun_dailies<-ict_pun_with_metadata %>%
 
 
 
+### NOTATH
+
+# You can also do it the old-fashioned way
+
+not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.01.csv")
+length(not_ath_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+not_ath_with_metadata<-merge(not_ath_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(not_ath_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(not_ath_with_metadata$Latitude.y,30)~jitter(not_ath_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# Desired level of replication
+
+not_ath_desired<-read.csv(file="lot_selection/desired_replication/not_ath_goal.csv")
+not_ath_desired<-not_ath_desired[,-1]
+colnames(not_ath_desired)[2]<-"n_lots_desired"
+not_ath_desired$individual_fish_desired<-not_ath_desired$n_lots_desired*4
+sum(not_ath_desired$individual_fish_desired)
+
+
+# Actual level of replication
+
+not_ath_actual<-not_ath_with_metadata %>%
+  group_by(combo) %>%
+  summarize(actual = n())
+
+
+# Merge desired and actual
+
+not_ath_remaining<-merge(not_ath_desired, not_ath_actual, by.x = "combo", by.y = "combo", all.x = TRUE, all.y = TRUE)
+
+
+# Calculate how many you have left
+
+not_ath_remaining$to_go<-(not_ath_remaining$individual_fish_desired-ifelse(is.na(not_ath_remaining$actual),0,not_ath_remaining$actual))
+not_ath_remaining<-na.omit(not_ath_remaining)
+sum(not_ath_remaining$actual,na.rm=T)
+sum(not_ath_remaining$to_go,na.rm=T)
+
+
+# Check that body size is invariant through time
+
+summary(glm(not_ath_with_metadata$TotalLength_mm~not_ath_with_metadata$YearCollected.x))
+plot(not_ath_with_metadata$TotalLength_mm~not_ath_with_metadata$YearCollected.x)
+summary(glm(not_ath_with_metadata$TotalLength_mm~not_ath_with_metadata$Latitude.y))
+plot(not_ath_with_metadata$TotalLength_mm~not_ath_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+not_ath_dailies<-not_ath_with_metadata %>%
+  group_by(DissectionDate) %>%
+  summarize(actual = n())
+
+
+
 # Calculate how many fish you need to do per day to hit your target
 
 working_days_remaining<-41
