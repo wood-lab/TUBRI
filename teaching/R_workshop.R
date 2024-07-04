@@ -60,6 +60,14 @@ hist(pim_vig_data$MONO.IP)
 
 plot(pim_vig_data$MONO.IP~pim_vig_data$YearCollected)
 
+plot(pim_vig_data$MONO.IP~jitter(pim_vig_data$YearCollected,10))
+
+plot(pim_vig_data$TREM.ALLO~pim_vig_data$YearCollected)
+
+plot(pim_vig_data$TREM.ALLO~jitter(pim_vig_data$YearCollected,10))
+
 # Looks like there's a pattern there!  Let's do a simple statistical test to see if it is significant?
 
 summary(lm(pim_vig_data$MONO.IP~pim_vig_data$YearCollected))
+
+summary(lm(pim_vig_data$TREM.ALLO~pim_vig_data$YearCollected))
