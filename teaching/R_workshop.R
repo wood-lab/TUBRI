@@ -3,6 +3,8 @@
 # Written by Chelsea Wood (chelwood@uw.edu)
 # 4 July 2024
 # Hi SuPeR Parasites!!! HELLO
+# Hello my name is IMANI and I am working with DAKI. <3
+# wohooo
 
 # To run a thing in R, you put your cursor on it and hit COMMAND+RETURN (on Mac) or CONTROL+RETURN (on PC).
 # Anything with a # in front of it will not run, because it is annotation - words designed to be human-readable,
