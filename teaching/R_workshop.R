@@ -4,7 +4,6 @@
 # 4 July 2024
 # Hi SuPeR Parasites!!! HELLO
 # Hello my name is IMANI and I am working with DAKI. <3
-# wohooo
 
 # To run a thing in R, you put your cursor on it and hit COMMAND+RETURN (on Mac) or CONTROL+RETURN (on PC).
 # Anything with a # in front of it will not run, because it is annotation - words designed to be human-readable,
@@ -19,14 +18,15 @@ getwd()
 # To get the file structure, open the folder and then "Get info" about that folder. Copy the file structure
 # and paste it below.
 
-setwd("/Users/chelsealwood/Dropbox/Vault/University of Washington/Projects/CAREER/Data/TUBRI")
+setwd("C:/Users/imani/OneDrive/Desktop/TUBRI_Monogenea_Project")
 
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
 # working directory, you'll need to specify them as I have below.
 # The <- command tells R what a thing is called.  So you can read the line below as,
 # Look at this csv file, and name it pim_vig_data.  When I call pim_vig_data, I want you to give me the csv file.
 
-pim_vig_data<-read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv")
+#pim_vig_data<-read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv")
+pim_vig_data<-read.csv("Ictalurus_punctatus_processed_human_readable.csv")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
@@ -45,7 +45,7 @@ pim_vig_data$MONO.IP
 
 # You can also call individual rows, columns, or cells using brackets.
 
-pim_vig_data[1,5]
+pim_vig_data[33,2]
 
 # You can now perform simple data manipulations on the variables.  For example, if I want the total number of 
 # MONO.IP worms we counted in Pimephales vigilax, I can write,
