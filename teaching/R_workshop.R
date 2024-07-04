@@ -1,6 +1,8 @@
 # How to use R
 # A workshop
 # Written by Chelsea Wood (chelwood@uw.edu)
+# 4 July 2024
+# Hi SuPeR Parasites!!!
 
 # To run a thing in R, you put your cursor on it and hit COMMAND+RETURN (on Mac) or CONTROL+RETURN (on PC).
 # Anything with a # in front of it will not run, because it is annotation - words designed to be human-readable,
@@ -41,7 +43,7 @@ pim_vig_data$MONO.IP
 
 # You can also call individual rows, columns, or cells using brackets.
 
-pim_vig_data[,]
+pim_vig_data[1,5]
 
 # You can now perform simple data manipulations on the variables.  For example, if I want the total number of 
 # MONO.IP worms we counted in Pimephales vigilax, I can write,
@@ -56,7 +58,7 @@ mean(pim_vig_data$MONO.IP)
 
 hist(pim_vig_data$MONO.IP)
 
-# Or I can plot the number of MONO.IP over tiem:
+# Or I can plot the number of MONO.IP over time - plot(y~x).
 
 plot(pim_vig_data$MONO.IP~pim_vig_data$YearCollected)
 
@@ -67,6 +69,7 @@ plot(pim_vig_data$TREM.ALLO~pim_vig_data$YearCollected)
 plot(pim_vig_data$TREM.ALLO~jitter(pim_vig_data$YearCollected,10))
 
 # Looks like there's a pattern there!  Let's do a simple statistical test to see if it is significant?
+# A model is an equation that represents the data. Here, our model is y = mx + b.
 
 summary(lm(pim_vig_data$MONO.IP~pim_vig_data$YearCollected))
 
