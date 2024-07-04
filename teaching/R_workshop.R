@@ -2,7 +2,7 @@
 # A workshop
 # Written by Chelsea Wood (chelwood@uw.edu)
 # 4 July 2024
-# Hi SuPeR Parasites!!! HELLO
+# Hi SuPeR Parasites!!! HELLO Hi!
 # Hello my name is IMANI and I am working with DAKI. <3
 # wohooo
 # Desmond check
