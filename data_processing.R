@@ -501,7 +501,14 @@ stuff<-ict_pun_processed_data %>%
   filter(is.na(combo))
 
 
+stuff<-ict_pun_processed_data %>%
+  filter(is.na(CI))
 
+ict_pun_processed_data$CI[ict_pun_processed_data$CatalogNumber=="62094"]<-"control"
+ict_pun_processed_data$CI[ict_pun_processed_data$CatalogNumber=="157299"]<-"control"
+
+stuff<-ict_pun_processed_data %>%
+  filter(is.na(CI))
 
 
 # Make the dataset analyzable
