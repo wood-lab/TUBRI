@@ -382,7 +382,8 @@ ict_pun_processed_data<-cbind.data.frame(ict_pun_with_metadata$CatalogNumber,ict
                                          ict_pun_with_metadata$IndividualFishID,ict_pun_with_metadata$Dissector,
                                          ict_pun_with_metadata$DissectionDate,ict_pun_with_metadata$Sex,
                                          ict_pun_with_metadata$TotalLength_mm,ict_pun_with_metadata$StandardLength_mm,
-                                         ict_pun_with_metadata$weight_mg,ict_pun_with_metadata$combo,
+                                         ict_pun_with_metadata$weight_mg,ict_pun_with_metadata$CI.y,
+                                         ict_pun_with_metadata$combo,
                                          ict_pun_with_metadata$Latitude.y,
                                          ict_pun_with_metadata$Longitude.y,ACAN.OSTR, CEST.COMP, CEST.MEG, 
                                          LEECH.KUT, MONO.IP, MONO.UNK, MYX.GEOM, NEM.CYST, NEM.NMTS, NEM.PHAR, 
@@ -403,9 +404,10 @@ colnames(ict_pun_processed_data)[8]<-"Sex"
 colnames(ict_pun_processed_data)[9]<-"TotalLength_mm"
 colnames(ict_pun_processed_data)[10]<-"StandardLength_mm"
 colnames(ict_pun_processed_data)[11]<-"Weight_mg"
-colnames(ict_pun_processed_data)[12]<-"combo"
-colnames(ict_pun_processed_data)[13]<-"Latitude"
-colnames(ict_pun_processed_data)[14]<-"Longitude"
+colnames(ict_pun_processed_data)[12]<-"CI"
+colnames(ict_pun_processed_data)[13]<-"combo"
+colnames(ict_pun_processed_data)[14]<-"Latitude"
+colnames(ict_pun_processed_data)[15]<-"Longitude"
 
 View(ict_pun_processed_data)
 
