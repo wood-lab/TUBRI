@@ -33,8 +33,8 @@ meta_data$combo<-paste(meta_data$CI,meta_data$decade,sep="_")
 ### PIMVIG
 
 # Download latest file # GET THIS WORKING LATER
-drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"), 
-               path = "data/raw/pim_vig.csv", overwrite = TRUE)
+# drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"), 
+#               path = "data/raw/pim_vig.csv", overwrite = TRUE)
 
 
 # You can also do it the old-fashioned way
@@ -135,9 +135,12 @@ TREM.UNK<-pim_vig_with_metadata$TREM.UNK.CONNECTIVETISSUE+pim_vig_with_metadata$
 
 # Need to fix the masses of fish, because they are one decimal point off.
 
-pim_vig_with_metadata$TotalLength_mm<-(10*pim_vig_with_metadata$TotalLength_mm)
+pim_vig_with_metadata$Weight_mg<-(10*as.numeric(pim_vig_with_metadata$Weight_mg))
 
-per_vig_processed_data<-cbind.data.frame(pim_vig_with_metadata$CatalogNumber,pim_vig_with_metadata$YearCollected.x,
+
+# Now put it all together
+
+pim_vig_processed_data<-cbind.data.frame(pim_vig_with_metadata$CatalogNumber,pim_vig_with_metadata$YearCollected.x,
                               pim_vig_with_metadata$MonthCollected.x,pim_vig_with_metadata$DayCollected.x,
                               pim_vig_with_metadata$IndividualFishID,pim_vig_with_metadata$Dissector_and_Examiner,
                               pim_vig_with_metadata$DissectionDate,pim_vig_with_metadata$Sex,
@@ -155,40 +158,54 @@ per_vig_processed_data<-cbind.data.frame(pim_vig_with_metadata$CatalogNumber,pim
 
 # Name the columns
 
-colnames(per_vig_processed_data)[1]<-"CatalogNumber"
-colnames(per_vig_processed_data)[2]<-"YearCollected"
-colnames(per_vig_processed_data)[3]<-"MonthCollected"
-colnames(per_vig_processed_data)[4]<-"DayCollected"
-colnames(per_vig_processed_data)[5]<-"IndividualFishID"
-colnames(per_vig_processed_data)[6]<-"Dissector_and_Examiner"
-colnames(per_vig_processed_data)[7]<-"DissectionDate"
-colnames(per_vig_processed_data)[8]<-"Sex"
-colnames(per_vig_processed_data)[9]<-"TotalLength_mm"
-colnames(per_vig_processed_data)[10]<-"StandardLength_mm"
-colnames(per_vig_processed_data)[11]<-"Weight_mg"
-colnames(per_vig_processed_data)[12]<-"CI"
-colnames(per_vig_processed_data)[13]<-"combo"
-colnames(per_vig_processed_data)[14]<-"Latitude"
-colnames(per_vig_processed_data)[15]<-"Longitude"
+colnames(pim_vig_processed_data)[1]<-"CatalogNumber"
+colnames(pim_vig_processed_data)[2]<-"YearCollected"
+colnames(pim_vig_processed_data)[3]<-"MonthCollected"
+colnames(pim_vig_processed_data)[4]<-"DayCollected"
+colnames(pim_vig_processed_data)[5]<-"IndividualFishID"
+colnames(pim_vig_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(pim_vig_processed_data)[7]<-"DissectionDate"
+colnames(pim_vig_processed_data)[8]<-"Sex"
+colnames(pim_vig_processed_data)[9]<-"TotalLength_mm"
+colnames(pim_vig_processed_data)[10]<-"StandardLength_mm"
+colnames(pim_vig_processed_data)[11]<-"Weight_mg"
+colnames(pim_vig_processed_data)[12]<-"CI"
+colnames(pim_vig_processed_data)[13]<-"combo"
+colnames(pim_vig_processed_data)[14]<-"Latitude"
+colnames(pim_vig_processed_data)[15]<-"Longitude"
+
+View(pim_vig_processed_data)
+
+
+# Looks like meta-data (CI and combo) are missing for four of the fish
+
+# It looks like meta-data are missing for some of the fish.
+
+stuff<-pim_vig_processed_data %>%
+  filter(is.na(combo))
+
+pim_vig_processed_data$CI[pim_vig_processed_data$CatalogNumber=="157327"]<-"impact"
+pim_vig_processed_data$combo[pim_vig_processed_data$CatalogNumber=="157327"]<-"impact_1984-1993"
+
 
 
 # Make the dataset analyzable
 
-per_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
+pim_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
                                        "MonthCollected", "DayCollected", 
                                        "IndividualFishID", "Dissector_and_Examiner",
                                        "DissectionDate", "Sex", 
                                        "TotalLength_mm", "StandardLength_mm",
                                        "Weight_mg","combo","Latitude","Longitude"))
 
-colnames(per_vig_processed_data_longer)[15]<-"psite_spp"
-colnames(per_vig_processed_data_longer)[16]<-"psite_count"
+colnames(pim_vig_processed_data_longer)[15]<-"psite_spp"
+colnames(pim_vig_processed_data_longer)[16]<-"psite_count"
 
 
 # Export both sheets
 
-write.csv(per_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.06.csv")
-write.csv(per_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.06.csv")
+write.csv(pim_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.06.csv")
+write.csv(pim_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.06.csv")
 
 
 
@@ -377,6 +394,13 @@ TREM.UNK<-ict_pun_with_metadata$TREM.UNKN.Intestine
 #not a parasite, ignore: WORM.UNK<-ict_pun_with_metadata$WORM.UNK.B.intestine+ict_pun_with_metadata$WORM.UNK.Stomach
 
 
+# Need to fix the masses of fish, because they are one decimal point off.
+
+ict_pun_with_metadata$weight_mg<-(10*as.numeric(ict_pun_with_metadata$weight_mg))
+
+
+# Now put it all together
+
 ict_pun_processed_data<-cbind.data.frame(ict_pun_with_metadata$CatalogNumber,ict_pun_with_metadata$YearCollected.x,
                                          ict_pun_with_metadata$MonthCollected.x,ict_pun_with_metadata$DayCollected.x,
                                          ict_pun_with_metadata$IndividualFishID,ict_pun_with_metadata$Dissector,
@@ -495,5 +519,5 @@ colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
 
 # Export both sheets
 
-write.csv(ict_pun_processed_data_longer, file="data/processed/Ictalurus_punctatus_processed_machine_readable.csv")
-write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv")
+write.csv(ict_pun_processed_data_longer, file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.06.csv")
+write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.06")
