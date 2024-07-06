@@ -39,7 +39,7 @@ drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"),
 
 # You can also do it the old-fashioned way
 
-pim_vig_today<-read.csv("data/Pimephales_vigilax_Datasheet_2024.06.25.csv")
+pim_vig_today<-read.csv("data/raw/Pimephales_vigilax_Datasheet_2024.06.25.csv")
 length(pim_vig_today$CatalogNumber)
 
 
@@ -75,11 +75,11 @@ COPE.GRAB<-2*(pim_vig_with_metadata$COPE.GRAB.GILL)
 # not a parasite: CYST.EMPTY<-(pim_vig_with_metadata$CYST.EMPTY.ConnectiveTissue+as.numeric(pim_vig_with_metadata$CYST.EMPTY.Stomach))              
 # not a parasite: CYST.LB<-2*(pim_vig_with_metadata$CYST.LB.EYE+pim_vig_with_metadata$CYST.LB.GILL)                  
 # not a parasite: CYST.UNK<-(pim_vig_with_metadata$CYST.UNK.AnalFin+pim_vig_with_metadata$CYST.UNK.CaudalFin+
-             pim_vig_with_metadata$CYST.UNK.CONNECTIVETISSUES+pim_vig_with_metadata$CYST.UNK.DorsalFin+
-             (2*pim_vig_with_metadata$CYST.UNK.Eye)+pim_vig_with_metadata$CYST.UNK.Flush+
-             pim_vig_with_metadata$CYST.UNK.intestines+as.numeric(pim_vig_with_metadata$CYST.UNK.Kidney)+
-             pim_vig_with_metadata$CYST.UNK.LIVER+(2*pim_vig_with_metadata$CYST.UNK.PectoralFin)+
-             as.numeric(pim_vig_with_metadata$CYST.UNK.PelvicFin)+(2*pim_vig_with_metadata$cyst.unkn.gill))                   
+             #pim_vig_with_metadata$CYST.UNK.CONNECTIVETISSUES+pim_vig_with_metadata$CYST.UNK.DorsalFin+
+             #(2*pim_vig_with_metadata$CYST.UNK.Eye)+pim_vig_with_metadata$CYST.UNK.Flush+
+             #pim_vig_with_metadata$CYST.UNK.intestines+as.numeric(pim_vig_with_metadata$CYST.UNK.Kidney)+
+             #pim_vig_with_metadata$CYST.UNK.LIVER+(2*pim_vig_with_metadata$CYST.UNK.PectoralFin)+
+             #as.numeric(pim_vig_with_metadata$CYST.UNK.PelvicFin)+(2*pim_vig_with_metadata$cyst.unkn.gill))                   
 META.HS<-pim_vig_with_metadata$META.HS.CaudalFin                
 META.UNK<-(pim_vig_with_metadata$META.UNK.AnalFin+pim_vig_with_metadata$META.UNK.CAUDALFIN+
              as.numeric(pim_vig_with_metadata$META.UNK.DorsalFin)+(2*pim_vig_with_metadata$META.UNK.EYE)+
@@ -133,20 +133,26 @@ TREM.UNK<-pim_vig_with_metadata$TREM.UNK.CONNECTIVETISSUE+pim_vig_with_metadata$
 # not a parasite: WORM.A<-pim_vig_with_metadata$WORM.A.Flush                     
 
 
+# Need to fix the masses of fish, because they are one decimal point off.
+
+pim_vig_with_metadata$TotalLength_mm<-(10*pim_vig_with_metadata$TotalLength_mm)
 
 per_vig_processed_data<-cbind.data.frame(pim_vig_with_metadata$CatalogNumber,pim_vig_with_metadata$YearCollected.x,
                               pim_vig_with_metadata$MonthCollected.x,pim_vig_with_metadata$DayCollected.x,
                               pim_vig_with_metadata$IndividualFishID,pim_vig_with_metadata$Dissector_and_Examiner,
                               pim_vig_with_metadata$DissectionDate,pim_vig_with_metadata$Sex,
                               pim_vig_with_metadata$TotalLength_mm,pim_vig_with_metadata$StandardLength_mm,
-                              pim_vig_with_metadata$Weight_mg,pim_vig_with_metadata$combo,
+                              pim_vig_with_metadata$Weight_mg, pim_vig_with_metadata$CI.y,
+                              pim_vig_with_metadata$combo,
                               pim_vig_with_metadata$Latitude.y,
                               pim_vig_with_metadata$Longitude.y,ACANTH.BIGB,ACANTH.BKR,            
                               CEST.COMP,CEST.GODZ,CEST.L,CEST.NTG,CEST.PEA,CEST.UNK,CEST.VIT,COPE.CL,COPE.GRAB,
                               META.HS,META.UNK,MONO.DACT,MONO.GYRO,MONO.LG,MYX.GEOM,MYX.GO,MYX.THEL,
-                              MYXO.BC,MYXO.SBAD,MYXO.UNK,MYXO.UP,NEM.CAP,NEM.CONA,NEM.DICH,NEM.CYST,NEM.LARV,NEM.TRBK,
+                              MYXO.BC,MYXO.SBAD,MYXO.UNK,MYXO.UP,NEM.CAP,NEM.CONA,NEM.DICH,NEM.LARV,NEM.TRBK,
                               NEM.UNK,TREM.BUC,TREM.MET,TREM.METAF,TREM.METAGS,TREM.MS,TREM.NEA,TREM.RNDA,
                               TREM.SSS,TREM.UNK)
+
+
 # Name the columns
 
 colnames(per_vig_processed_data)[1]<-"CatalogNumber"
@@ -160,9 +166,10 @@ colnames(per_vig_processed_data)[8]<-"Sex"
 colnames(per_vig_processed_data)[9]<-"TotalLength_mm"
 colnames(per_vig_processed_data)[10]<-"StandardLength_mm"
 colnames(per_vig_processed_data)[11]<-"Weight_mg"
-colnames(per_vig_processed_data)[12]<-"combo"
-colnames(per_vig_processed_data)[13]<-"Latitude"
-colnames(per_vig_processed_data)[14]<-"Longitude"
+colnames(per_vig_processed_data)[12]<-"CI"
+colnames(per_vig_processed_data)[13]<-"combo"
+colnames(per_vig_processed_data)[14]<-"Latitude"
+colnames(per_vig_processed_data)[15]<-"Longitude"
 
 
 # Make the dataset analyzable
@@ -180,8 +187,8 @@ colnames(per_vig_processed_data_longer)[16]<-"psite_count"
 
 # Export both sheets
 
-write.csv(per_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable.csv")
-write.csv(per_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable.csv")
+write.csv(per_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.06.csv")
+write.csv(per_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.06.csv")
 
 
 
