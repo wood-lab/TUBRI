@@ -528,3 +528,152 @@ colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
 
 write.csv(ict_pun_processed_data_longer, file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.06.csv")
 write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.06")
+
+
+
+
+### NOTATH
+
+
+# You can also do it the old-fashioned way
+
+not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.08.csv")
+length(not_ath_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+not_ath_with_metadata<-merge(not_ath_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(not_ath_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(not_ath_with_metadata$Latitude.y,30)~jitter(not_ath_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+str(not_ath_with_metadata)
+not_ath_headers<-ls(not_ath_with_metadata)
+not_ath_headers<-as.factor(not_ath_headers)
+
+
+# Add parasites across organs and double what needs to be doubled.
+
+CEST.COMP<-not_ath_with_metadata$CEST.COMP.INTESTINE              
+# not a parasite: CEST.CYRC.INTESTINE              
+CEST.HYD<-not_ath_with_metadata$CEST.HYD.INTESTINE               
+CEST.LVS<-not_ath_with_metadata$CEST.LVS.INTESTINE              
+CEST.TRI<-not_ath_with_metadata$cest.tri.intestine               
+COPE.A<-(2*not_ath_with_metadata$COPE.A.GILL)                  
+# not a parasite: CYST.SAC.Skin                    
+# not a parasite: CYST.UNK.ANALFIN                 
+# not a parasite: CYST.UNK.CAUDALFIN              
+# not a parasite: CYST.UNK.GILL                    
+# not a parasite: CYST.UNK.Kidney                  
+# not a parasite: CYST.UNKN.ConnectiveTissue      
+# not a parasite: CYST.UNKN.DORSALFIN              
+# not a parasite: CYST.UNKN.LIVER                  
+# not a parasite: CYST.UNKN.MOUNT                 
+# not a parasite: CYST.UNKN.PECTORALFIN            
+# not a parasite: CYST.UNKN.PelvicFin              
+# not a parasite: cyst.unkn.skin                  
+# not a parasite: CYST.UNKN.VOUCH                                 
+
+### aren't we putting all the monogenes together for now?
+MONO.ALL<-(not_ath_with_metadata$MONO.BULL.FLUSH+(2*not_ath_with_metadata$MONO.BULL.GILL)+
+             (2*not_ath_with_metadata$MONO.DACT.GILL)+(2*not_ath_with_metadata$MONO.NA.Gill)+
+             (2*not_ath_with_metadata$MONO.UNKN.GILL))                 
+
+MYX.ROUND<-(2*not_ath_with_metadata$MYX.ROUND.skin)             
+MYX.SP<-(2*not_ath_with_metadata$MYX.SP.GILL)                
+NEM.BRAN<-(not_ath_with_metadata$NEM.BRAN.FLUSH+not_ath_with_metadata$NEM.BRAN.INTESTINE)              
+NEM.CAP<-not_ath_with_metadata$NEM.CAP.INTESTINE                
+NEM.CYST<-(not_ath_with_metadata$NEM.CYST.CONNECTIVETISSUE+not_ath_with_metadata$NEM.CYST.Intestine+
+             not_ath_with_metadata$nem.cystL.Liver)
+NEM.SPKY<-not_ath_with_metadata$NEM.SPKY.INTESTINE              
+NEM.TFS<-not_ath_with_metadata$NEM.TFS.INTESTINE                
+NEM.TWAS<-not_ath_with_metadata$NEM.TWAS.FLUSH                   
+NEM.UNKN<-not_ath_with_metadata$NEM.UNKN.INTESTINE               
+TREM.CYST<-(not_ath_with_metadata$TREM.CYST.CONNECTIVETISSUE+(2*not_ath_with_metadata$TREM.CYST.EYE)+
+              not_ath_with_metadata$TREM.CYST.FLUSH+(2*not_ath_with_metadata$TREM.CYST.GILL))               
+TREM.GB<-not_ath_with_metadata$TREM.GB.INTESTINE               
+
+### is trem.l.intestine a trem.larv or its own thing?
+TREM.L<-not_ath_with_metadata$TREM.L.INTESTINE                
+
+TREM.LARV<-(not_ath_with_metadata$TREM.LARV.AnalFin+not_ath_with_metadata$trem.larv.CaudalFin+
+              not_ath_with_metadata$TREM.LARV.DorsalFin+(2*not_ath_with_metadata$TREM.LARV.PectoralFin))           
+
+### how are we handling all of these metas?
+
+### why is TREM.META.GONAD repeated twice?
+### note that you get a lot of nas here. Consider na.rm.
+TREM.META<-(not_ath_with_metadata$TREM.META_1.FLUSH+not_ath_with_metadata$TREM.META_2.CONNECTIVETISSUES+
+              not_ath_with_metadata$TREM.META_3.CONNECTIVETISSUES+(2*not_ath_with_metadata$TREM.META_4.EYE)+
+              (2*not_ath_with_metadata$TREM.META_4.GILL)+(2*not_ath_with_metadata$TREM.META_4.SKIN)+
+              (2*not_ath_with_metadata$TREM.META_5.EYE)+(2*not_ath_with_metadata$TREM.META_6.Eye)+
+              (2*not_ath_with_metadata$TREM.META_7.EYE)+not_ath_with_metadata$TREM.META_9.CONNECTIVETISSUE+
+              (2*not_ath_with_metadata$TREM.META.8.EYE)+not_ath_with_metadata$TREM.META.CAUDALFIN+
+              not_ath_with_metadata$TREM.META.CONNECTIVETISSUE+(2*not_ath_with_metadata$TREM.META.EYE)+
+              not_ath_with_metadata$TREM.META.FLUSH+(2*not_ath_with_metadata$TREM.META.GILL)+
+              as.numeric(not_ath_with_metadata$TREM.META.GONAD)+not_ath_with_metadata$TREM.META.GONAD.1+
+              as.numeric(not_ath_with_metadata$TREM.META.Kidney)+not_ath_with_metadata$TREM.META.LIVER+
+              (2*not_ath_with_metadata$TREM.META.PELVICFIN))
+            
+# not a parasite: CYSTNEH<-(2*not_ath_with_metadata$TREM.SMLARV.PECTORALFIN)       
+# not a parasite: UNK.GC.INTESTINE                 
+# not a parasite: UNK.SPK.INTESTINE
+
+
+# Now put it all together
+
+not_ath_processed_data<-cbind.data.frame(not_ath_with_metadata$CatalogNumber,not_ath_with_metadata$YearCollected.x,
+                                         not_ath_with_metadata$MonthCollected.x,not_ath_with_metadata$DayCollected.x,
+                                         not_ath_with_metadata$IndividualFishID,not_ath_with_metadata$Dissector,
+                                         not_ath_with_metadata$DissectionDate,not_ath_with_metadata$Sex,
+                                         not_ath_with_metadata$TotalLength_mm,not_ath_with_metadata$StandardLength_mm,
+                                         not_ath_with_metadata$weight_mg,not_ath_with_metadata$CI.y,
+                                         not_ath_with_metadata$combo,
+                                         not_ath_with_metadata$Latitude.y,
+                                         not_ath_with_metadata$Longitude.y,CEST.COMP,CEST.HYD,CEST.LVS,CEST.TRI,
+                                         COPE.A,MONO.ALL,MYX.ROUND,MYX.SP,NEM.BRAN,NEM.CAP,NEM.CYST,NEM.SPKY,NEM.TFS,
+                                         NEM.TWAS,NEM.UNKN,TREM.CYST,TREM.GB,TREM.L,TREM.LARV,TREM.META)
+
+# Name the columns
+
+colnames(not_ath_processed_data)[1]<-"CatalogNumber"
+colnames(not_ath_processed_data)[2]<-"YearCollected"
+colnames(not_ath_processed_data)[3]<-"MonthCollected"
+colnames(not_ath_processed_data)[4]<-"DayCollected"
+colnames(not_ath_processed_data)[5]<-"IndividualFishID"
+colnames(not_ath_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(not_ath_processed_data)[7]<-"DissectionDate"
+colnames(not_ath_processed_data)[8]<-"Sex"
+colnames(not_ath_processed_data)[9]<-"TotalLength_mm"
+colnames(not_ath_processed_data)[10]<-"StandardLength_mm"
+colnames(not_ath_processed_data)[11]<-"Weight_mg"
+colnames(not_ath_processed_data)[12]<-"CI"
+colnames(not_ath_processed_data)[13]<-"combo"
+colnames(not_ath_processed_data)[14]<-"Latitude"
+colnames(not_ath_processed_data)[15]<-"Longitude"
+
+View(not_ath_processed_data)
+
+
+
+# Make the dataset analyzable
+
+not_ath_processed_data_longer<-melt(not_ath_processed_data,id=c("CatalogNumber", "YearCollected", 
+                                                                "MonthCollected", "DayCollected", 
+                                                                "IndividualFishID", "Dissector_and_Examiner",
+                                                                "DissectionDate", "Sex", 
+                                                                "TotalLength_mm", "StandardLength_mm",
+                                                                "Weight_mg","combo","Latitude","Longitude"))
+
+colnames(not_ath_processed_data_longer)[15]<-"psite_spp"
+colnames(not_ath_processed_data_longer)[16]<-"psite_count"
+
+
+# Export both sheets
+
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.07.06.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable.csv_UPDATED_2024.07.06")

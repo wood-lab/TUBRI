@@ -166,7 +166,7 @@ ict_pun_dailies<-ict_pun_with_metadata %>%
 
 # You can also do it the old-fashioned way
 
-not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.04.csv")
+not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.08.csv")
 length(not_ath_today$CatalogNumber)
 
 
