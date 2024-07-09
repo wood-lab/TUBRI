@@ -667,10 +667,10 @@ not_ath_processed_data_longer<-melt(not_ath_processed_data,id=c("CatalogNumber",
                                                                 "IndividualFishID", "Dissector_and_Examiner",
                                                                 "DissectionDate", "Sex", 
                                                                 "TotalLength_mm", "StandardLength_mm",
-                                                                "Weight_mg","combo","Latitude","Longitude"))
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
 
-colnames(not_ath_processed_data_longer)[15]<-"psite_spp"
-colnames(not_ath_processed_data_longer)[16]<-"psite_count"
+colnames(not_ath_processed_data_longer)[16]<-"psite_spp"
+colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 
 # Export both sheets
