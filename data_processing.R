@@ -204,8 +204,10 @@ colnames(pim_vig_processed_data_longer)[16]<-"psite_count"
 
 # Export both sheets
 
-write.csv(pim_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.06.csv")
-write.csv(pim_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.06.csv")
+write.csv(pim_vig_processed_data_longer, 
+          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
+write.csv(pim_vig_processed_data, 
+          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv")
 
 
 
@@ -527,8 +529,10 @@ colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
 
 # Export both sheets
 
-write.csv(ict_pun_processed_data_longer, file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.06.csv")
-write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.06.csv")
+write.csv(ict_pun_processed_data_longer, 
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+write.csv(ict_pun_processed_data, 
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.10.csv")
 
 
 
@@ -676,5 +680,5 @@ colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.07.06.csv")
-write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable.csv_UPDATED_2024.07.06")
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable.csv")
