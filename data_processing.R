@@ -542,7 +542,7 @@ write.csv(ict_pun_processed_data,
 
 # You can also do it the old-fashioned way
 
-not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.08.csv")
+not_ath_today<-read.csv("data/raw/Notropis_atherinoides_Datasheet_2024.01.10.csv")
 length(not_ath_today$CatalogNumber)
 
 
@@ -583,11 +583,12 @@ COPE.A<-(2*not_ath_with_metadata$COPE.A.GILL)
 # not a parasite: cyst.unkn.skin                  
 # not a parasite: CYST.UNKN.VOUCH                                 
 
-### aren't we putting all the monogenes together for now?
+### This monogene group is provisional. DACT and NA are definitely the same thing. BULL is 
+### also probably NA, but we saw it at a weird angle? Mounting will distinguish among them. 
 MONO.ALL<-(not_ath_with_metadata$MONO.BULL.FLUSH+(2*not_ath_with_metadata$MONO.BULL.GILL)+
-             (2*not_ath_with_metadata$MONO.DACT.GILL)+(2*not_ath_with_metadata$MONO.NA.Gill)+
-             (2*not_ath_with_metadata$MONO.UNKN.GILL))                 
+             (2*not_ath_with_metadata$MONO.DACT.GILL)+(2*not_ath_with_metadata$MONO.NA.Gill))
 
+MONO.UNK<-(2*not_ath_with_metadata$MONO.UNKN.GILL)
 MYX.ROUND<-(2*not_ath_with_metadata$MYX.ROUND.skin)             
 MYX.SP<-(2*not_ath_with_metadata$MYX.SP.GILL)                
 NEM.BRAN<-(not_ath_with_metadata$NEM.BRAN.FLUSH+not_ath_with_metadata$NEM.BRAN.INTESTINE)              
@@ -602,27 +603,43 @@ TREM.CYST<-(not_ath_with_metadata$TREM.CYST.CONNECTIVETISSUE+(2*not_ath_with_met
               not_ath_with_metadata$TREM.CYST.FLUSH+(2*not_ath_with_metadata$TREM.CYST.GILL))               
 TREM.GB<-not_ath_with_metadata$TREM.GB.INTESTINE               
 
-### is trem.l.intestine a trem.larv or its own thing?
+### Katie confirms that TREM.L was only seen once, but is definitely it's own thing.
 TREM.L<-not_ath_with_metadata$TREM.L.INTESTINE                
 
 TREM.LARV<-(not_ath_with_metadata$TREM.LARV.AnalFin+not_ath_with_metadata$trem.larv.CaudalFin+
               not_ath_with_metadata$TREM.LARV.DorsalFin+(2*not_ath_with_metadata$TREM.LARV.PectoralFin))           
 
-### how are we handling all of these metas?
+### Larval trematodes were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen metacercariae in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.META count within a fish (across organs). The code below allows the sum of TREM.META within an individual
+### fish ignore the NAs, and therefore provide a total number of TREM.META regardless of whether one of the organs
+### was "missing".
 
-### why is TREM.META.GONAD repeated twice?
-### note that you get a lot of nas here. Consider na.rm.
-TREM.META<-(not_ath_with_metadata$TREM.META_1.FLUSH+not_ath_with_metadata$TREM.META_2.CONNECTIVETISSUES+
-              not_ath_with_metadata$TREM.META_3.CONNECTIVETISSUES+(2*not_ath_with_metadata$TREM.META_4.EYE)+
-              (2*not_ath_with_metadata$TREM.META_4.GILL)+(2*not_ath_with_metadata$TREM.META_4.SKIN)+
-              (2*not_ath_with_metadata$TREM.META_5.EYE)+(2*not_ath_with_metadata$TREM.META_6.Eye)+
-              (2*not_ath_with_metadata$TREM.META_7.EYE)+not_ath_with_metadata$TREM.META_9.CONNECTIVETISSUE+
-              (2*not_ath_with_metadata$TREM.META.8.EYE)+not_ath_with_metadata$TREM.META.CAUDALFIN+
-              not_ath_with_metadata$TREM.META.CONNECTIVETISSUE+(2*not_ath_with_metadata$TREM.META.EYE)+
-              not_ath_with_metadata$TREM.META.FLUSH+(2*not_ath_with_metadata$TREM.META.GILL)+
-              as.numeric(not_ath_with_metadata$TREM.META.GONAD)+not_ath_with_metadata$TREM.META.GONAD.1+
-              as.numeric(not_ath_with_metadata$TREM.META.Kidney)+not_ath_with_metadata$TREM.META.LIVER+
-              (2*not_ath_with_metadata$TREM.META.PELVICFIN))
+not_ath_with_metadata$TREM.META_4.EYE.DUB<-2*not_ath_with_metadata$TREM.META_4.EYE
+not_ath_with_metadata$TREM.META_4.GILL.DUB<-2*not_ath_with_metadata$TREM.META_4.GILL
+not_ath_with_metadata$TREM.META_4.SKIN.DUB<-2*not_ath_with_metadata$TREM.META_4.SKIN
+not_ath_with_metadata$TREM.META_5.EYE.DUB<-2*not_ath_with_metadata$TREM.META_5.EYE
+not_ath_with_metadata$TREM.META_6.Eye.DUB<-2*not_ath_with_metadata$TREM.META_6.Eye
+not_ath_with_metadata$TREM.META_7.EYE.DUB<-2*not_ath_with_metadata$TREM.META_7.EYE
+not_ath_with_metadata$TREM.META.8.EYE.DUB<-2*not_ath_with_metadata$TREM.META.8.EYE
+not_ath_with_metadata$TREM.META.EYE.DUB<-2*not_ath_with_metadata$TREM.META.EYE
+not_ath_with_metadata$TREM.META.GILL.DUB<-2*not_ath_with_metadata$TREM.META.GILL
+not_ath_with_metadata$TREM.META.PELVICFIN.DUB<-2*not_ath_with_metadata$TREM.META.PELVICFIN
+not_ath_with_metadata$TREM.META.GONAD<-as.numeric(not_ath_with_metadata$TREM.META.GONAD)
+not_ath_with_metadata$TREM.META.Kidney<-as.numeric(not_ath_with_metadata$TREM.META.Kidney)
+
+TREM.META<-rowSums(not_ath_with_metadata[,c("TREM.META_1.FLUSH","TREM.META_2.CONNECTIVETISSUES",
+                                            "TREM.META_3.CONNECTIVETISSUES",
+                                            "TREM.META_4.EYE.DUB","TREM.META_4.GILL.DUB","TREM.META_4.SKIN.DUB",
+                                            "TREM.META_5.EYE.DUB","TREM.META_6.Eye.DUB","TREM.META_7.EYE.DUB",
+                                            "TREM.META_9.CONNECTIVETISSUE","TREM.META.8.EYE.DUB",
+                                            "TREM.META.CAUDALFIN",
+                                            "TREM.META.CONNECTIVETISSUE","TREM.META.EYE.DUB","TREM.META.FLUSH",
+                                            "TREM.META.GILL.DUB","TREM.META.GONAD","TREM.META.Kidney",
+                                            "TREM.META.LIVER",
+                                            "TREM.META.PELVICFIN.DUB")], na.rm=TRUE)
             
 # not a parasite: CYSTNEH<-(2*not_ath_with_metadata$TREM.SMLARV.PECTORALFIN)       
 # not a parasite: UNK.GC.INTESTINE                 
@@ -640,7 +657,8 @@ not_ath_processed_data<-cbind.data.frame(not_ath_with_metadata$CatalogNumber,not
                                          not_ath_with_metadata$combo,
                                          not_ath_with_metadata$Latitude.y,
                                          not_ath_with_metadata$Longitude.y,CEST.COMP,CEST.HYD,CEST.LVS,CEST.TRI,
-                                         COPE.A,MONO.ALL,MYX.ROUND,MYX.SP,NEM.BRAN,NEM.CAP,NEM.CYST,NEM.SPKY,NEM.TFS,
+                                         COPE.A,MONO.ALL,MONO.UNK,MYX.ROUND,MYX.SP,NEM.BRAN,NEM.CAP,NEM.CYST,
+                                         NEM.SPKY,NEM.TFS,
                                          NEM.TWAS,NEM.UNKN,TREM.CYST,TREM.GB,TREM.L,TREM.LARV,TREM.META)
 
 # Name the columns
