@@ -191,12 +191,12 @@ pim_vig_processed_data$combo[pim_vig_processed_data$CatalogNumber=="157327"]<-"i
 
 # Make the dataset analyzable
 
-pim_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
+pim_vig_processed_data_longer<-melt(pim_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
                                        "MonthCollected", "DayCollected", 
                                        "IndividualFishID", "Dissector_and_Examiner",
                                        "DissectionDate", "Sex", 
                                        "TotalLength_mm", "StandardLength_mm",
-                                       "Weight_mg","combo","Latitude","Longitude"))
+                                       "Weight_mg","CI","combo","Latitude","Longitude"))
 
 colnames(pim_vig_processed_data_longer)[15]<-"psite_spp"
 colnames(pim_vig_processed_data_longer)[16]<-"psite_count"
@@ -206,6 +206,7 @@ colnames(pim_vig_processed_data_longer)[16]<-"psite_count"
 
 write.csv(pim_vig_processed_data_longer, file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.06.csv")
 write.csv(pim_vig_processed_data, file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.06.csv")
+
 
 
 
@@ -518,7 +519,7 @@ ict_pun_processed_data_longer<-melt(ict_pun_processed_data,id=c("CatalogNumber",
                                                                 "IndividualFishID", "Dissector_and_Examiner",
                                                                 "DissectionDate", "Sex", 
                                                                 "TotalLength_mm", "StandardLength_mm",
-                                                                "Weight_mg","combo","Latitude","Longitude"))
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
 
 colnames(ict_pun_processed_data_longer)[15]<-"psite_spp"
 colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
@@ -527,7 +528,7 @@ colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.06.csv")
-write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.06")
+write.csv(ict_pun_processed_data, file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.06.csv")
 
 
 
