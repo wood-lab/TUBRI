@@ -1,0 +1,77 @@
+InstitutionCode,CatalogNumber,IndividualCount,ScientificName,Locality,YearCollected,MonthCollected,DayCollected,Collector,CI,decade,IndividualFishID,Dissector,DissectionDate,Sex,TotalLength_mm,StandardLength_mm,weight_mg,Date_Datasheet_completed,NotesOnSpecimenPriorToDissection,ParasitesFound,Skin,BuccalCavity,TREM.CM.BodyCavity,pectoral fin,TREM.META.HET.pectoralfin,CYST.UNK.PelvicFin,MONO.GDAC.PelvicFin,TREM.META.SP.AnalFin,CYST.UNK.AnalFin,TREM.META.SP.CaudalFin,TREM.META.HET.CAUDALFIN,CYST.UNK.CaudalFin,CYST.UNK.DorsalFin,TREM.CM.Gonad,TREM.CM.Liver,TREM.CM.Spleen,TREM.CM.Kidney,TREM.CM.EYE,MYX.EYE.EYE,Heart,FIBER.UNK.STOMACH,TREM.CM.Stomach,TREM.CM.ConnectiveTissue,CYST.UNK.CONNECTIVETISSUE,NEM.BUD.INTESTINE,NEM.UNK.INTESTINE,FIBER.UNK.Intestine,TREM.CM.INT,ACAN.AD.INT,TREM.META.GO,MONO.DACT.Gill,MYX.GL,MONO.UNK.GILL,NEM.BUD.GILL,CYST.UNK.GILL,TREM.CM.Flush,ParasitesVouchered,NEM.BUD.VOUCH,ACAN.AD.INT,TREM.META.GO,TREM.CM.VOUCH,TREM.META.SP.VOUCH,TREM.META.HET.VOUCH,MONO.DACT.VOUCH,MONO.GDAC.VOUCH,MYX.EYE.VOUCH,MYX.GL.VOUCH,CYST.UNKF.VOUCH,CYST.UNK.VOUCH,FIBER.UNK.VOUCH
+TU,100406,400,Hybognathus nuchalis,"Pearl River along left bank just below Pools Bluff Sill, 4 mi. S of Bogalusa.",1976,12,10,"R.D. Suttkus, Heath & Shaffer",impact,1974-1983,100406_01,KL,07/15/2023,F,90,72,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,3,0,0,0,0,0,0,0,0,0
+TU,31296,28,Hybognathus nuchalis,Pearl R.,1963,12,13,Suttkus and Gurring,impact,1954-1963,31296_02,kl,03/27/2024,f,77,62,,,,,0,0,0,0,0,0,0,0,0,1,0,0,0,0,8,0,0,0,0,0,0,0,262,0,0,0,0,0,0,0,3,0,0,0,0,0,,0,0,0,262,0,0,3,0,0,0,0,0,0
+TU,31296,28,Hybognathus nuchalis,Pearl R.,1963,12,13,Suttkus and Gurring,impact,1954-1963,31296_01,gmc cjw,03/27/2024,f,113,89,,,,,0,0,0,0,0,0,0,0,0,0,2,0,0,0,7,0,0,0,0,0,10,5,24,0,0,0,213,0,0,0,0,0,0,0,2,5,,0,0,0,40,0,2,0,0,0,0,0,2,210
+TU,31296,28,Hybognathus nuchalis,Pearl R.,1963,12,13,Suttkus and Gurring,impact,1954-1963,31296_03,DD GMC,03/27/2024,F,105,85,,,,,0,0,0,0,0,0,0,0,0,5,1,0,0,0,2,0,0,0,0,0,0,0,11,0,0,0,4,0,0,0,5,0,3,0,0,0,,0,0,0,12,2,1,4,0,0,0,0,0,4
+TU,31194,14,Hybognathus nuchalis,PEARL R 1.5 MILES EAST BOGALUSA,1963,5,19,Suttkus and Gurring,control,1954-1963,31194_01,ht kl,04/01/2024,na,71,55,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,2,0,0,0,0,0,168,0,0,0,0,0,0,0,14,0,0,0,0,0,,0,0,0,173,0,0,14,0,0,0,0,0,0
+TU,31194,14,Hybognathus nuchalis,PEARL R 1.5 MILES EAST BOGALUSA,1963,5,19,Suttkus and Gurring,control,1954-1963,31194_02,SD CJW,04/02/2024,NA,74,61,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,26,0,0,1,0,0,,1,0,0,0,0,0,14,0,0,0,0,0,0
+TU,31194,14,Hybognathus nuchalis,PEARL R 1.5 MILES EAST BOGALUSA,1963,5,19,Suttkus and Gurring,control,1954-1963,31194_03,SD GMC,04/02/2024,NA,69,52,,,,,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,1,0,0,0,0,25,0,0,0,0,0,,1,0,0,2,1,0,15,0,0,0,0,0,0
+TU,31194,14,Hybognathus nuchalis,PEARL R 1.5 MILES EAST BOGALUSA,1963,5,19,Suttkus and Gurring,control,1954-1963,31194_04,SD DD,04/02/2024,F,84,68,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,NA,0,0,0,0,0,0,0,10,0,0,0,0,0,0,2,0,0,0,0,0,,0,0,0,2,0,0,2,0,0,0,0,6,0
+TU,31296,28,Hybognathus nuchalis,Pearl R.,1963,12,13,Suttkus and Gurring,impact,1954-1963,31296_04,dd ht kl,04/01/2024,f,106,81,,,,,0,0,0,0,0,0,0,2,0,5,0,0,0,0,0,0,0,0,0,0,0,0,66,0,0,0,0,0,0,0,1,0,0,0,0,0,,0,0,0,66,0,0,1,0,0,0,0,0,0
+TU,100905,14,Hybognathus nuchalis,,1977,1,19,SUTTKUS AND SORENOON,,1974-1983,100905_03,HT DD,04/15/2024,F,93,73,,,,,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,74,0,0,0,0,0,0,0,3,0,0,0,0,0,,0,0,0,14,1,0,3,0,0,0,0,0,0
+TU,100905,14,Hybognathus nuchalis,,1977,1,19,SUTTKUS AND SORENOON,,1974-1983,100905_02,SD ACL GMC,04/02/2024,F,115,96,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,7,0,0,0,0,0,0,0,0,0
+TU,100905,14,Hybognathus nuchalis,,1977,1,19,SUTTKUS AND SORENOON,,1974-1983,100905_04,ht cjw,04/15/2024,f,109,84,,,"CYST.NEH present in fins, vouchered as cyst.unkf",,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,9,0,0,0,0,0,0,300,0,0
+TU,100905,14,Hybognathus nuchalis,,1977,1,19,SUTTKUS AND SORENOON,,1974-1983,100905_01,SD ACL GMC,04/02/2024,M,103,83,,,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,2,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,29,0,0,0,0,0,0,0,2,0
+TU,106828,23,Hybognathus nuchalis,,1978,4,20,Suttkus Rohmann,,,106828_01,CLW,07/08/2024,na,47,38,824,07/08/2024,,,0,0,7,0,0,0,0,0,0,0,0,0,0,0,9,0,0,1,0,0,0,0,0,0,0,0,0,129,1,0,0,0,0,0,0,0,,0,1,0,146,0,0,0,0,0,0,0,0,0
+TU,106660,60,Hybognathus nuchalis,Pearl River along left bank opposite Bogalusa Creek,1989,10,12,Suttkus and Caruso,,,156660_01,IJ DJB GMC,07/09/2024,na,65,51,1958,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,4,0,0,0,0,1,,0,0,0,33,0,0,4,0,0,0,0,0,0
+TU,156660,60,Hybognathus nuchalis,Pearl River along left bank opposite Bogalusa Creek,1989,10,12,Suttkus and Caruso,,,156660_02,JT SC DMDM,07/09/2024,F,48,37,728,07/09/2024,,,0,0,0,0,0,24,0,0,2,0,0,25,1,0,3,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,3,0,0,0,0,0,,0,0,0,27,0,0,3,0,0,0,0,0,0
+TU,132494,77,Hybognathus nuchalis,Pearl river along left bank at river mile 54,1983,10,6,Suttkus and Gunning,,,132494_03,DJB GMC,07/09/2024,NA,51,40,1072,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,4,,0,0,0,8,0,0,0,0,0,0,0,0,0
+TU,70511,20,Hybognathus nuchalis,Pearl River just above Pools Bluff Sill,1971,7,15,"Suttkus, Thompson, Cashner",,,70511_03,DJB KC,07/09/2024,NA,44,76,659,07/09/2024,Selected from group of 17 due to size restrictions (3<30mm),,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,,0,0,0,0,0,0,7,0,0,0,0,0,0
+TU,37937,11,Hybognathus nuchalis,Pearl River just above Coburn Creek; 1.4 mi E. of Bogalusa,1965,6,5,Suttkus and Gunning,,,37937_01,SC KL,07/09/2024,NA,86,73,5392,07/09/2024,,,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,1,0,0,0,0,0,0,0,0,0
+TU,132494,77,Hybognathus nuchalis,Pearl river along left bank at river mile 54,1983,10,6,Suttkus and Gunning,,,132494_04,SC DJB GMC,07/09/2024,NA,51,41,1163,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,na,4,0,0,0,0,0,0,0,51,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,55,0,0,0,0,0,0,0,0,0
+TU,106928,23,Hybognathus nuchalis,Pearl River along right bank between mouth of coburn and Bogalusa creek; 1.5 mi E of Bogalusa,1978,4,20,Suttkus and Gunning,,,106828_03,CJW GMC,07/08/2024,F,83,60,6265,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,na,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,1,2,,0,0,0,2,0,0,7,0,0,0,1,0,0
+TU,156672,67,Hybognathus nuchalis,right bank .5 mi below richardson,1989,10,12,Suttkus and Caruso,,,156672_01,DJB DMDM,07/09/2024,NA,58,44,1528,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1,0,0,0,0,0,0,,0,0,1,5,0,0,0,0,0,0,0,0,0
+TU,37937,11,Hybognathus nuchalis,Just above cobcorn creek,1965,6,5,Suttkus and Gunning,,,37937_02,DJB KL,07/09/2024,NA,71,58,2952,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,0,0,0,0,0,0,0,0,0,0
+TU,156672,67,Hybognathus nuchalis,Along right bank 0.5 miles below richardson log,1989,10,12,Suttkus and Caruso,,,156672_02,DJB GMC,07/09/2024,NA,53,41,1136,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0,0,0,0,5,,0,0,0,99,0,0,0,0,0,0,0,0,0
+TU,106828,23,Hybognathus nuchalis,Pearl River along right bank between mouth of coburn and Bogalusa creek; 1.5 mi E of Bogalusa,1978,4,20,Suttkus and Rohman,,,106828_04,DMDM SC GMC,07/08/2024,NA,72,58,3015,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,,0,0,0,0,0,0,5,0,0,0,0,0,0
+TU,106828,23,Hybognathus nuchalis,Pearl River along right bank between mouth of coburn and Bogalusa creek; 1.5 mi E of Bogalusa,1978,4,20,Suttkus and Rohman,,,106828_02,JT DMDM,07/08/2024,F,69,57,2957,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,80,0,0,0,0,0,0,0,0,0,0,0,0,18,,0,0,0,117,0,0,0,0,0,0,0,0,0
+TU,132494,77,Hybognathus nuchalis,Pearl River,1983,10,6,Suttkis and Gunning,,,132494_02,DJB CJW,07/08/24,NA,61,48,2036,07/09/2024,,,0,0,0,0,0,0,0,0,0,2,0,0,0,na,17,0,0,0,0,0,0,0,154,0,0,0,0,0,0,0,0,0,0,0,0,1,,0,0,0,170,0,0,0,0,0,0,0,0,0
+TU,156672,67,Hybognathus nuchalis,Along right bank 0.5 miles below richardson log,1989,10,12,Suttkus and Caruso,,,156672_04,DJB KL,07/09/2024,NA,55,44,1271,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,5,0,0,0,153,0,0,0,0,0,0,0,0,0,0,0,0,13,,0,0,0,177,0,0,0,0,4,0,0,0,0
+TU,37937,11,Hybognathus nuchalis,Pearl River just above Coburn Creek; 1.4 mi E. of Bogalusa,1965,6,5,Suttkus and Gunning,,,37937_04,SC KL,07/09/2024,NA,87,68,5306,07/09/2024,,,0,0,0,,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,24,0,1,0,0,0,0,0,0,0
+TU,156672,67,Hybognathus nuchalis,Along right bank 0.5 miles below richardson log,1989,10,12,Suttkus and Caruso,,,156672_03,DJB CJW,07/09/2024,NA,50,37,848,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,6,0,0,0,0,0,0,0,0,0
+TU,37937,11,Hybognathus nuchalis,"Just above cobcorn creek, 1.4 mi",1965,6,5,Suttkus and Gunning,,,37937_03,SC KL,07/09/2024,NA,93,75,6055,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,131,0,0,0,0,0,0,0,5,0,0,0,0,0,,0,0,0,155,0,0,3,0,0,0,0,0,0
+TU,70511,20,Hybognathus nuchalis,Pearl River just above Pools Bluff Sill,1971,7,15,"Suttkus, Thompson, Cashner",,,70511_04,IJ DMDM,07/08/2024,NA,45,37,761,07/09/2024,Selected from group of 17 due to size restructions (3<30mm),,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,0,0,,0,0,0,0,0,0,6,0,0,2,0,0,0
+TU,132494,77,Hybognathus nuchalis,,1983,10,6,Suttkus and Gunning,,,132494_01,DJB CJW,07/08/24,NA,52,40,1389,07/09/2024,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0
+TU,70511,20,Hybognathus nuchalis,Pearl River just above Pools Bluff Sill,1971,7,15,"Suttkus, Thompson, Cashner",,,70511_01,JT GMC,07/08/2024,NA,49,37,940,07/09/2024,Selected from group of 17 due to size restructions (3<30mm),,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,,0,0,0,0,0,0,4,1,0,0,0,0,0
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TU,,,Hybognathus nuchalis,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

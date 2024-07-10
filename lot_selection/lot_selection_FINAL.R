@@ -75,6 +75,8 @@ lots_MS_lower <- lots_MS_lower %>%
            ScientificName == "Noturus munitus"| 
            ScientificName == "Alosa alabamae")
 
+
+
 # Create a new column to indicate whether you're dealing with control or impact
 
 lots_MS_lower$CI<-vector("character",length(lots_MS_lower$InstitutionCode))
@@ -426,6 +428,8 @@ hyb_nuc_matrix<-hyb_nuc_selected %>%
   summarize(total_request = n())
 
 plot(jitter(hyb_nuc_selected$Latitude,5)~hyb_nuc_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+write.csv(hyb_nuc_matrix,file="lot_selection/desired_replication/hyb_nuc_goal.csv")
 
 
 #ICT_PUN
