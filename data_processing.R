@@ -91,8 +91,22 @@ MONO.DACT<-(2*pim_vig_with_metadata$MONO.DACT.GILL)
 MONO.GYRO<-pim_vig_with_metadata$MONO.GYRO.Flush+(2*pim_vig_with_metadata$MONO.GYRO.Gill)              
 MONO.LG<-2*(pim_vig_with_metadata$MONO.LG.Gill+pim_vig_with_metadata$MONO.LG.PectoralFin)           
 MYX.GEOM<-pim_vig_with_metadata$MYX.GEOM.Flush+pim_vig_with_metadata$MYX.GEOM.Intestines  
-MYX.GO<-(pim_vig_with_metadata$MYX.GO.CONNECTIVETISSUE+(2*pim_vig_with_metadata$MYX.GO.Eye)+
-  as.numeric(pim_vig_with_metadata$MYX.GO.GONAD)+as.numeric(pim_vig_with_metadata$MYX.GO.Kidney))             
+
+### MYX.GO were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen myxozoan cysts in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### MYX.GO count within a fish (across organs). The code below allows the sum of MYX.GO within an individual
+### fish ignore the NAs, and therefore provide a total number of MYX.GO cysts regardless of whether one of the organs
+### was "missing".
+
+pim_vig_with_metadata$MYX.GO.Eye.DUB<-2*pim_vig_with_metadata$MYX.GO.Eye
+pim_vig_with_metadata$MYX.GO.GONAD<-as.numeric(pim_vig_with_metadata$MYX.GO.GONAD)
+pim_vig_with_metadata$MYX.GO.Kidney<-as.numeric(pim_vig_with_metadata$MYX.GO.Kidney)
+
+MYX.GO<-rowSums(pim_vig_with_metadata[,c("MYX.GO.CONNECTIVETISSUE","MYX.GO.Eye.DUB",
+                                            "MYX.GO.GONAD","MYX.GO.Kidney")], na.rm=TRUE)
+            
 MYX.THEL<-(2*pim_vig_with_metadata$MYX.THEL.PectoralFin)+pim_vig_with_metadata$MYXO.THEL.CaudalFin+
   pim_vig_with_metadata$MYXO.THEL.ConnectiveTissue+as.numeric(pim_vig_with_metadata$MYXO.THEL.dorsalFIN)+
   (2*pim_vig_with_metadata$MYXO.THEL.GILL)+pim_vig_with_metadata$myxo.thel.Skin   
@@ -109,21 +123,50 @@ NEM.TRBK<-pim_vig_with_metadata$NEM.TRBK.intestine
 NEM.UNK<-pim_vig_with_metadata$NEM.UNK.Intestine                
 TREM.BUC<-pim_vig_with_metadata$trem.buc.AnalFin+pim_vig_with_metadata$trem.buc.CaudalFin+
   pim_vig_with_metadata$TREM.BUC.DorsalFin+(2*pim_vig_with_metadata$TREM.BUC.PectoralFin)            
-TREM.MET<-pim_vig_with_metadata$TREM.MET.BodyCavity+pim_vig_with_metadata$TREM.MET.CaudalFin+
-  pim_vig_with_metadata$TREM.MET.ConnectiveTissue+(2*pim_vig_with_metadata$TREM.MET.EYE)+
-  pim_vig_with_metadata$TREM.MET.FLUSH+(2*pim_vig_with_metadata$TREM.MET.GILL)+
-  pim_vig_with_metadata$TREM.MET.Intestine+as.numeric(pim_vig_with_metadata$TREM.MET.Kidney)+
-  as.numeric(pim_vig_with_metadata$TREM.MET.LIVER)+as.numeric(pim_vig_with_metadata$TREM.MET.Spleen)+
-  pim_vig_with_metadata$TREM.MET.Stomach   
+
+
+### TREM.MET were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen metacercariae in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.MET count within a fish (across organs). The code below allows the sum of TREM.MET within an individual
+### fish ignore the NAs, and therefore provide a total number of metacercariae regardless of whether one of the organs
+### was "missing".
+
+pim_vig_with_metadata$TREM.MET.EYE.DUB<-2*pim_vig_with_metadata$TREM.MET.EYE
+pim_vig_with_metadata$TREM.MET.GILL.DUB<-2*pim_vig_with_metadata$TREM.MET.GILL
+pim_vig_with_metadata$TREM.MET.Kidney<-as.numeric(pim_vig_with_metadata$TREM.MET.Kidney)
+pim_vig_with_metadata$TREM.MET.LIVER<-as.numeric(pim_vig_with_metadata$TREM.MET.LIVER)
+pim_vig_with_metadata$TREM.MET.Spleen<-as.numeric(pim_vig_with_metadata$TREM.MET.Spleen)
+
+TREM.MET<-rowSums(pim_vig_with_metadata[,c("TREM.MET.BodyCavity","TREM.MET.CaudalFin",
+                                         "TREM.MET.ConnectiveTissue","TREM.MET.EYE.DUB",
+                                         "TREM.MET.FLUSH","TREM.MET.GILL","TREM.MET.Intestine",
+                                         "TREM.MET.Kidney","TREM.MET.LIVER","TREM.MET.Spleen",
+                                         "TREM.MET.Stomach")], na.rm=TRUE)
+
 TREM.METAF<-(2*pim_vig_with_metadata$TREM.MET.AF.PectoralFin)+
   pim_vig_with_metadata$TREM.METAF.AnalFin+pim_vig_with_metadata$trem.metaf.caudalfin+
   (2*pim_vig_with_metadata$TREM.METAF.EYE)+pim_vig_with_metadata$TREM.METAF.FLUSH+
   (2*pim_vig_with_metadata$TREM.METAF.GILL)+(2*as.numeric(pim_vig_with_metadata$TREM.METAF.PelvicFin))
-TREM.METAGS<-pim_vig_with_metadata$TREM.METAGS.AnalFin+pim_vig_with_metadata$TREM.METAGS.CaudalFin+
-  pim_vig_with_metadata$TREM.METAGS.CONNECTIVETISSUE+pim_vig_with_metadata$TREM.METAGS.FLUSH+
-  (2*pim_vig_with_metadata$TREM.METAGS.GILL)+pim_vig_with_metadata$TREM.METAGS.Intestine+
-  as.numeric(pim_vig_with_metadata$TREM.METAGS.Kidney)+as.numeric(pim_vig_with_metadata$TREM.METAGS.Liver)+
-  pim_vig_with_metadata$TREM.METAGS.SKIN+pim_vig_with_metadata$TREM.METAGS.Stomach 
+
+### TREM.METAGS were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen metacercariae in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.METAGS count within a fish (across organs). The code below allows the sum of TREM.METAGS within an individual
+### fish to ignore the NAs, and therefore provide a total number of metacercariae regardless of whether one of the organs
+### was "missing".
+
+pim_vig_with_metadata$TREM.METAGS.GILL.DUB<-2*pim_vig_with_metadata$TREM.METAGS.GILL
+pim_vig_with_metadata$TREM.METAGS.Kidney<-as.numeric(pim_vig_with_metadata$TREM.METAGS.Kidney)
+pim_vig_with_metadata$TREM.METAGS.Liver<-as.numeric(pim_vig_with_metadata$TREM.METAGS.Liver)
+
+TREM.METAGS<-rowSums(pim_vig_with_metadata[,c("TREM.METAGS.AnalFin","TREM.METAGS.CaudalFin",
+                                           "TREM.METAGS.CONNECTIVETISSUE","TREM.METAGS.FLUSH",
+                                           "TREM.METAGS.GILL.DUB","TREM.METAGS.Intestine","TREM.METAGS.Kidney",
+                                           "TREM.METAGS.Liver","TREM.METAGS.SKIN","TREM.METAGS.Stomach")], na.rm=TRUE)
+
 TREM.MS<-pim_vig_with_metadata$TREM.MS.FLUSH                    
 TREM.NEA<-pim_vig_with_metadata$TREM.NEA.CONNECTIVETISSUE+pim_vig_with_metadata$TREM.NEA.FLUSH+
   pim_vig_with_metadata$TREM.NEA.Intestine+pim_vig_with_metadata$TREM.NEA.LIVER                   
@@ -186,6 +229,14 @@ stuff<-pim_vig_processed_data %>%
 
 pim_vig_processed_data$CI[pim_vig_processed_data$CatalogNumber=="157327"]<-"impact"
 pim_vig_processed_data$combo[pim_vig_processed_data$CatalogNumber=="157327"]<-"impact_1984-1993"
+
+stuff<-pim_vig_processed_data %>%
+  filter(is.na(Latitude))
+
+# Found the lat/long in iDigBio
+
+pim_vig_processed_data$Latitude[pim_vig_processed_data$CatalogNumber=="157327"]<-30.19778
+pim_vig_processed_data$Longitude[pim_vig_processed_data$CatalogNumber=="157327"]<--89.65611
 
 
 
