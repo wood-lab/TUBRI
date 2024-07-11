@@ -249,8 +249,8 @@ pim_vig_processed_data_longer<-melt(pim_vig_processed_data,id=c("CatalogNumber",
                                        "TotalLength_mm", "StandardLength_mm",
                                        "Weight_mg","CI","combo","Latitude","Longitude"))
 
-colnames(pim_vig_processed_data_longer)[15]<-"psite_spp"
-colnames(pim_vig_processed_data_longer)[16]<-"psite_count"
+colnames(pim_vig_processed_data_longer)[16]<-"psite_spp"
+colnames(pim_vig_processed_data_longer)[17]<-"psite_count"
 
 
 # Export both sheets
@@ -574,8 +574,8 @@ ict_pun_processed_data_longer<-melt(ict_pun_processed_data,id=c("CatalogNumber",
                                                                 "TotalLength_mm", "StandardLength_mm",
                                                                 "Weight_mg","CI","combo","Latitude","Longitude"))
 
-colnames(ict_pun_processed_data_longer)[15]<-"psite_spp"
-colnames(ict_pun_processed_data_longer)[16]<-"psite_count"
+colnames(ict_pun_processed_data_longer)[16]<-"psite_spp"
+colnames(ict_pun_processed_data_longer)[17]<-"psite_count"
 
 
 # Export both sheets

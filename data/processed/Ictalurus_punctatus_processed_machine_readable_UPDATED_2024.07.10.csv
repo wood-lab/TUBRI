@@ -1,4 +1,4 @@
-"","CatalogNumber","YearCollected","MonthCollected","DayCollected","IndividualFishID","Dissector_and_Examiner","DissectionDate","Sex","TotalLength_mm","StandardLength_mm","Weight_mg","CI","combo","Latitude","psite_spp","psite_count","value"
+"","CatalogNumber","YearCollected","MonthCollected","DayCollected","IndividualFishID","Dissector_and_Examiner","DissectionDate","Sex","TotalLength_mm","StandardLength_mm","Weight_mg","CI","combo","Latitude","Longitude","psite_spp","psite_count"
 "1","31060","1963",8,"30","31060-02","SC KL","6/25/2024",NA,52,41,994,"control","control_1954-1963","30.76222","-89.83111","ACAN.OSTR",0
 "2","31060","1963",8,"30","31060_1","SC GMC","6/25/2024",NA,51,39,875,"control","control_1954-1963","30.76222","-89.83111","ACAN.OSTR",0
 "3","31146","1963",6,"23","31146_01","SC DJB CJW","6/26/2024",NA,42,34,552,"impact","impact_1954-1963","30.75667","-89.82611","ACAN.OSTR",0
