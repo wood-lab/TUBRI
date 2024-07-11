@@ -233,7 +233,7 @@ View(not_ath_dailies)
 
 # You can also do it the old-fashioned way
 
-hyb_nuc_today<-read.csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.10.csv")
+hyb_nuc_today<-read.csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.11.csv")
 length(hyb_nuc_today$CatalogNumber)
 
 
@@ -289,7 +289,7 @@ plot(hyb_nuc_with_metadata$TotalLength_mm~hyb_nuc_with_metadata$Latitude)
 # Create a matrix that shows how many fish you are finishing per day
 
 hyb_nuc_dailies<-hyb_nuc_with_metadata %>%
-  group_by(DissectionDate) %>%
+  group_by(Date_Datasheet_completed) %>%
   summarize(actual = n())
 View(hyb_nuc_dailies)
 
