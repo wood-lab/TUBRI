@@ -37,6 +37,6 @@ View(notroptrim)
 
 #plot only randomly selected fishes
 plot(notroptrim$StandardLength_mm~notroptrim$YearCollected)
-summary(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
-abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
+summary(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected)) 
+ abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
 #WOO!
