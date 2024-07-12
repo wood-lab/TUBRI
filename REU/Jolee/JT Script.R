@@ -14,3 +14,8 @@ library(dbplyr)
 library(ggarrange)
 library(lubridate)
 library(ggplot2)
+
+
+plot_1 <- ggplot(df,
+                 aes(x = , y = )) + geom_boxplot() + xlab("S")  + 
+  ylab("")  + theme_bw()
