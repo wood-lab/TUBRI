@@ -1,0 +1,54 @@
+---
+title: "CAREER Project"
+author: "Connor Whalen"
+date: "2024-07-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Install and load packages 
+```{r}
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("ggeffects")
+install.packages("ggpubr")
+library(ggpubr)
+library(ggeffects)
+library(tidyverse)
+library(readr)
+library(dbplyr)
+library(ggarrange)
+library(lubridate)
+library(ggplot2)
+library(glmmTMB)
+
+```
+
+Import dataset and assign dataframe
+```{r}
+pemvig <-  read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>%
+  janitor::clean_names()
+
+notath <-  read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>%
+  janitor::clean_names()
+
+ictpun <-  read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv") %>%
+  janitor::clean_names()
+```
+
+Preliminary visualization graphs
+```{r}
+ggplot(df_total_no_total,
+       aes(x = sex, y = total_parasite_burden)) + geom_boxplot() + xlab("Sex")  + 
+  ylab("Total Parasites")  + theme_bw()
+```
+
+
+
+
+
+
+
