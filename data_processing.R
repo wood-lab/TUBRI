@@ -751,3 +751,31 @@ colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable.csv")
 write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable.csv")
+
+
+
+
+### Put all the sheets together
+
+pim_vig_processed_data_longer$Fish_sp<-c(rep("Pimephales vigilax",length(pim_vig_processed_data_longer$CatalogNumber)))
+ict_pun_processed_data_longer$Fish_sp<-c(rep("Ictalurus punctatus",length(ict_pun_processed_data_longer$CatalogNumber)))
+not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_ath_processed_data_longer$CatalogNumber)))
+
+full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_data_longer,
+                                          not_ath_processed_data_longer)
+
+full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
+
+life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.07.14.csv",header=T,sep=",")
+life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psite_spp,sep="_")
+
+
+full_dataset_with_LH<-merge(full_dataset, life_histories, by.x = "fish_psite_combo", by.y = "fish_psite_combo", all.x = TRUE)
+
+View(full_dataset_with_LH)
+
+
+# Export the sheet
+
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info.csv")
+
