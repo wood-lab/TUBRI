@@ -30,7 +30,7 @@ meta_data$combo<-paste(meta_data$CI,meta_data$decade,sep="_")
 
 
 
-### PIMVIG
+### PIMVIG: Pimephales vigilax----
 
 # Download latest file # GET THIS WORKING LATER
 # drive_download(as_id("16taxgLRu1-d_t8lT9mHVWOtxZ4MfQPvU7UBWHvLRfaI"), 
@@ -180,6 +180,9 @@ TREM.UNK<-pim_vig_with_metadata$TREM.UNK.CONNECTIVETISSUE+pim_vig_with_metadata$
 
 pim_vig_with_metadata$Weight_mg<-(10*as.numeric(pim_vig_with_metadata$Weight_mg))
 
+# Evaluate relationship between total length and weight.
+ggplot(pim_vig_with_metadata,aes(TotalLength_mm,Weight_mg))+
+  geom_point(size=4)
 
 # Now put it all together
 
@@ -263,7 +266,7 @@ write.csv(pim_vig_processed_data,
 
 
 
-### ICTPUN
+### ICTPUN: Ictalurus punctatus----
 
 
 # You can also do it the old-fashioned way
@@ -452,6 +455,8 @@ TREM.UNK<-ict_pun_with_metadata$TREM.UNKN.Intestine
 
 ict_pun_with_metadata$weight_mg<-(10*as.numeric(ict_pun_with_metadata$weight_mg))
 
+#Revise relationship between fish size and weight
+ggplot(ict_pun_with_metadata,aes(TotalLength_mm,weight_mg))+geom_point(size=4)
 
 # Now put it all together
 
@@ -588,7 +593,7 @@ write.csv(ict_pun_processed_data,
 
 
 
-### NOTATH
+### NOTATH: Notropis atherinoides----
 
 
 # You can also do it the old-fashioned way
@@ -746,6 +751,7 @@ not_ath_processed_data_longer<-melt(not_ath_processed_data,id=c("CatalogNumber",
 colnames(not_ath_processed_data_longer)[16]<-"psite_spp"
 colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
+ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 # Export both sheets
 
