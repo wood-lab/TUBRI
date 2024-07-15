@@ -8,13 +8,46 @@ NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_reada
 
 #Make a subset of only monogeneans
 
-NOTATH_mon <- subset(NOTATH, psite_spp) 
+NOTATH_mon <- subset(NOTATH, psite_spp=="MONO.ALL"|psite_spp=="MONO.UNK") 
+
+#Set a theme for all your plots
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+#Plot
+
+library(ggplot2)
+NOTATH_plot <-ggplot(NOTATH_mon,aes(YearCollected,psite_count,color = CI))+
+  geom_point(size=4)+apatheme
+
+NOTATH_plot
+
+#Make a selection of monogeneans with at least 5 worms per fish. Then we can mount 5 worms per fish to get an idea of how the diversity looks per fish. 
+NOTATH_monb <- subset(NOTATH_mon, psite_count>5) 
+
+#Count how many vouchers per combo
+library(dplyr)
+NOTATH_mon %>% count(combo)
+
+#Look at the distribution of voucher
+library(ggplot2)
+NOTATH_plot <-ggplot(NOTATH_monb,aes(YearCollected,psite_count,color = CI))+
+  geom_point(size=4)+apatheme
+
+NOTATH_plot
+
+#Create data frame with final vouchers 
+
+NOTATH_finalmon <- cbind.data.frame(NOTATH_monb$IndividualFishID,NOTATH_monb$YearCollected,
+                                    NOTATH_monb$combo,NOTATH_monb$psite_count)
 
 
-# importing required libraries 
-library("dplyr") 
+write.csv(NOTATH_finalmon, 
+          file="REU/Imani J/NOTATH_finalmon.csv")
 
-# pick 3 samples of each from data frame 
-NOTATH_select <- NOTATH %>% group_by(col1) %>% sample_n(3) 
-print("Modified DataFrame") 
-print (data_mod)
+
+
+
