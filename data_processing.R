@@ -757,6 +757,15 @@ write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_pro
 
 ### Put all the sheets together
 
+# Start by scaling fish body size within fish species
+
+pim_vig_processed_data_longer$scaled_TL<-scale(pim_vig_processed_data_longer$TotalLength_mm)
+ict_pun_processed_data_longer$scaled_TL<-scale(ict_pun_processed_data_longer$TotalLength_mm)
+not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$TotalLength_mm)
+
+
+# Then make sure that there is a column for the fish species
+
 pim_vig_processed_data_longer$Fish_sp<-c(rep("Pimephales vigilax",length(pim_vig_processed_data_longer$CatalogNumber)))
 ict_pun_processed_data_longer$Fish_sp<-c(rep("Ictalurus punctatus",length(ict_pun_processed_data_longer$CatalogNumber)))
 not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_ath_processed_data_longer$CatalogNumber)))
@@ -773,6 +782,9 @@ life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psi
 full_dataset_with_LH<-merge(full_dataset, life_histories, by.x = "fish_psite_combo", by.y = "fish_psite_combo", all.x = TRUE)
 
 View(full_dataset_with_LH)
+
+colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
+
 
 
 # Export the sheet
