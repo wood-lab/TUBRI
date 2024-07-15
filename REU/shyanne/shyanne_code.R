@@ -114,5 +114,34 @@ vif(model_2)
 model_2_output<-stargazer::stargazer(model_2, type = "text")
 write.table(model_2_output,"REU/shyanne/model_2_output_2024.07.15")
 
-# No need to plot this model, because there are no significant effects.
+
+
+# NOTE: I'm still working on this plot - not yet up and running.
+
+library(ggeffects)
+color_predict<-ggeffect(model_2,c("Parasite_taxonomic_group","CI"))
+
+# Need to exclude Hirudinea because error bars are whacky (probably because we found so few).
+
+color_predict$group
+
+color_plot<-ggplot(color_predict,aes(group,predicted),group=Parasite_taxonomic_group,
+                   linetype=Parasite_taxonomic_group)+
+  geom_point(size=6,pch=21)+
+  geom_errorbar(data=color_predict,mapping=aes(x="CI",ymin=conf.low,ymax=conf.high),width=0.03)+
+  geom_line(aes(group=group,linetype=group))+
+  xlab("treatment")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  scale_linetype_discrete(name = c("parasite taxonomic group"),labels=c("Acanthocephala","Cestoda","Hirudinea",
+                                                                        "Monogenea","Myxozoa","Trematoda"))+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color=c("cadetblue","burlywood4")),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=rev(levels(color_predict$group)))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=14))
+color_plot
 
