@@ -93,7 +93,7 @@ plot(x = body.index.pun,
 # Giving adult and young binary IDs so we can look at life stage compared to parasite burden
 library(dplyr)
 
-    # add a column to identify species as an adult or larval stage
+    ## P.VIG - add a column to identify species as an adult or larval stage
 Pvig.life.stage <- P.vigilax.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
                                                "ACANTH.BKR",
@@ -128,5 +128,9 @@ Pvig.life.stage <- Pvig.life.stage %>%
   mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
 
 
-# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+    # plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
 boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
+
+
+    ## I.PUN - adding columns for life stage and binary code
+
