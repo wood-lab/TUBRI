@@ -33,7 +33,7 @@ N.atherinoides.data <- read.csv("Notropis_atherinoides_processed_machine_readabl
 # pull out weights of each species
 weight.vig <- P.vigilax.data$Weight_mg
 weight.pun <- I.punctatus.data$Weight_mg
-weight.ath <- N.atherinoides.data$Weight_mg # some weights are missing info rather than NAs - pull these out?
+weight.ath <- N.atherinoides.data$Weight_mg
 
 # pull out total lengths of each species
 tot.length.vig <- P.vigilax.data$TotalLength_mm
@@ -60,7 +60,7 @@ boxplot(body.index.pun)
 
 
     #N. atherinoides
-body.index.ath <- (weight.ath / (stan.length.ath ^ 3)) * 100 # code will not work because of weight issue, I believe
+body.index.ath <- (weight.ath / (stan.length.ath ^ 3)) * 100
 
 plot(body.index.ath)
 boxplot(body.index.ath)
@@ -72,6 +72,8 @@ plot(x = P.vigilax.data$YearCollected,
      y = body.index.vig)
 plot(x = I.punctatus.data$YearCollected, 
      y = body.index.pun)
+plot(x = N.atherinoides.data$YearCollected, 
+     y = body.index.ath)
 
 # plot body size by time
     # standard length for body size
@@ -81,6 +83,9 @@ plot(x = P.vigilax.data$YearCollected,
 plot(x = I.punctatus.data$YearCollected, 
      y = I.punctatus.data$StandardLength_mm) #this is how we designed the study though - will show nothing
 
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$StandardLength_mm)
+
     # weight for body size
 plot(x = P.vigilax.data$YearCollected, 
      y = P.vigilax.data$Weight_mg)
@@ -88,17 +93,28 @@ plot(x = P.vigilax.data$YearCollected,
 plot(x = I.punctatus.data$YearCollected, 
      y = I.punctatus.data$Weight_mg)
 
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$Weight_mg)
+
 # plot total parasite burden by time
 plot(x = P.vigilax.data$YearCollected, 
      y = P.vigilax.data$psite_count)
+
 plot(x = I.punctatus.data$YearCollected, 
      y = I.punctatus.data$psite_count)
+
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$psite_count) # more variability than the others
 
 # plot condition factor vs parasite burden in total - may be interesting
 plot(x = body.index.vig,
      y = P.vigilax.data$psite_count)
+
 plot(x = body.index.pun,
      y = I.punctatus.data$psite_count)
+
+plot(x = body.index.ath,
+     y = N.atherinoides.data$psite_count) # more variability than the others
 
 # Giving adult and young binary IDs so we can look at life stage compared to parasite burden
 library(dplyr)
