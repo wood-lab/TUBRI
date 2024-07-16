@@ -148,21 +148,21 @@ Ipun.life.stage <- I.punctatus.data %>%
                                              "TREM.META.UNK"),
                             "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
 
-# removing the species I'm not using
+    # removing the species I'm not using
 Ipun.life.stage <- subset(Ipun.life.stage, !(psite_spp %in% c("NMORPH",
                                                               "TREM.LARV",
                                                               "TREM.MID",
-                                                              "CYST.UNKN", # correct code? What's in the slides
+                                                              "CYST.UNKN", # correct code? This is what is in the slides
                                                               "WORM.UNK.B",
                                                               "TREM.2", # exclude because it's a once-off?
                                                               "LEECH.KUT"
                                                               )))
 
 
-# adding a binary code column that codes "Adult" as 1 and "Larval" as 0
+    # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
 Ipun.life.stage <- Ipun.life.stage %>%
   mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
 
 
-# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+    # plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
 boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
