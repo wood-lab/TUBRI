@@ -8,12 +8,11 @@
 
 library(tidyverse)
 
-ict_pun_data<-read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv")
-
+ict_pun_data<-read.csv("data/processed/Ictalurus_punctatus_processed_human_readable_UPDATED_2024.07.10.csv")
+pim_vig_data <-read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv")
+not_ath_data <-read.csv("data/processed/Notropis_atherinoides_processed_human_readable.csv")
 
 # Let's do some quick data tallies
-
-a<-"shyanne"
 
 tally_up <- ict_pun_data %>%
   group_by(combo) %>%
@@ -33,8 +32,6 @@ plot(ict_pun_data$MONO.IP~ict_pun_data$Latitude)+abline(v=30.76)
 # How about some quick stats?
 
 summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
-
-
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 15 JULY 2024
 
