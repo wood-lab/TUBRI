@@ -134,3 +134,35 @@ boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
 
     ## I.PUN - adding columns for life stage and binary code
 
+Ipun.life.stage <- I.punctatus.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
+                                             "TREM.LG",
+                                             "TREM.META", # is this the same as META.GG - in data as TREM.META.GG
+                                             "META.GG", # is this the same as TREM.META - in data as TREM.META.GG
+                                             "META.UNK", # is this TREM.META.UNK in the data?
+                                             "MYX.TAIL",
+                                             "MYX.GEOM",
+                                             "CYST.MX",
+                                             "CYST.BD",
+                                             "CYST.BLACK",
+                                             "TREM.META.UNK"),
+                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+
+# removing the species I'm not using
+Ipun.life.stage <- subset(Ipun.life.stage, !(psite_spp %in% c("NMORPH",
+                                                              "TREM.LARV",
+                                                              "TREM.MID",
+                                                              "CYST.UNKN", # correct code? What's in the slides
+                                                              "WORM.UNK.B",
+                                                              "TREM.2", # exclude because it's a once-off?
+                                                              "LEECH.KUT"
+                                                              )))
+
+
+# adding a binary code column that codes "Adult" as 1 and "Larval" as 0
+Ipun.life.stage <- Ipun.life.stage %>%
+  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
+
+
+# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
