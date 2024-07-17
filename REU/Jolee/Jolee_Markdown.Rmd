@@ -3,11 +3,11 @@ title: "Jolee_Markdown"
 author: "Connor Whalen, Jolee Thirtyacre"
 date: "2024-07-17"
 output: html_document
-    theme: readable
-    highlight: textmate
-    toc: true
-    toc_float: true
-    toc_depth: 3
+theme: readable
+highlight: textmate
+toc: true
+toc_float: true
+toc_depth: 3
 ---
 
 ## General instructions for R Markdown
@@ -37,10 +37,11 @@ FCF = W/SL^3 *100
 $$
 
 ## Install packages
-```{r install packages, echo=FALSE}
+```{r install packages, eval=FALSE, echo=FALSE}
 install.packages("tidyverse")
 install.packages("janitor")
 install.packages("ggeffects")
+install.packages("rmarkdown")
 ```
 
 ## Load packages
@@ -49,13 +50,12 @@ library(ggeffects)
 library(tidyverse)
 library(readr)
 library(dbplyr)
-library(ggarrange)
 library(lubridate)
 library(ggplot2)
 ```
 
 ## Jolee load datasets
-```{r JT datasets, echo=FALSE}
+```{r JT datasets, eval=FALSE, echo=FALSE}
 setwd("C:/Users/thirt/Documents/TUBRI_JT/data/processed")
 
 P.vigilax.data <- read.csv("Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
@@ -63,11 +63,11 @@ I.punctatus.data <- read.csv("Ictalurus_punctatus_processed_machine_readable_UPD
 N.atherinoides.data <- read.csv("Notropis_atherinoides_processed_machine_readable.csv")
 ```
 
+
 ## Connor load datasets
 ```{r CW datasets, echo=FALSE}
 # Connor's wd assignment and data assignments
-P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% 
-  janitor::clean_names()
+P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
 I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")  %>% 
   janitor::clean_names()
 N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>% 
