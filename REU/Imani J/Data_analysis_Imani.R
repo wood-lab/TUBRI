@@ -101,7 +101,7 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
 
-### Code for monogenean MONO.DACT in ICTPUNct abundance across time and pollution impact----
+### Code for monogenean MONO.DACT in PIMVIG abundance across time and pollution impact----
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
 # working directory, you'll need to specify them as I have below.
 # The <- command tells R what a thing is called.  So you can read the line below as,
@@ -112,7 +112,7 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
 
 library(readr)
 
-ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
@@ -120,11 +120,13 @@ ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_reada
 
 # You can also see your data in the console below by running the name of the dataset.
 
-ICTPUNCT
+PIMVIG
 
 #We made a subset based on our data to include only MONO.IP
 
-ICTPUNCT_MONOIP <- subset(ICTPUNCT, psite_spp == 'MONO.IP')
+PIMVIG_MONO <- subset(PIMVIG, psite_spp == 'MONO.DACT'|psite_spp == 'MONO.GYRO'|psite_spp == 'MONO.LG')
+
+View(PIMVIG_MONO)
 
 #install.packages("ggplot2")
 library(ggplot2)
@@ -139,13 +141,14 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
 #gg plot is plotting function in r, it allows multiple variables within the plot.
 #first part of code is showing what data set I want to be called from. "aes"-- command in r, x is the variable in my data set, y is the monogenes affected in this data set. 
 #Color is showing my third variable in data aset. "+"- indicates adding aesthic to graph. 
-ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
+ggplot(PIMVIG_MONO, aes(x= YearCollected,
                             y=psite_count,
                             ,color=CI,
                             group=CI))+
   geom_point()+ 
-  labs(title = "Counts of Monogeneans over the Years", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
-         "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)
+  labs(title = "Counts of monogenean species in Pimephales vigilax", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
+         "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
+  facet_wrap(~ psite_spp)
 
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
