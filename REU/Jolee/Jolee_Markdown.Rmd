@@ -1,6 +1,6 @@
 ---
 title: "Jolee_Markdown"
-author: "Connor Whalen, Jolee Thirtyacre"
+author: "Jolee Thirtyacre, Connor Whalen"
 date: "2024-07-17"
 output: html_document
 theme: readable
