@@ -12,7 +12,7 @@ toc_depth: 3
 
 ## General instructions for R Markdown
 * For helpful instructions on how to start using R Markdown, visit [this link] (https://fish497.github.io/website/lectures/week_07/intro_rmarkdown.html).
-* To insert code chunks, press command+option+i
+* To insert code chunks, press command+option+i, ctrl+alt+i
 * Anything inside a code chunk will run as normal code, anything outside a code chunk will appear in the document as plain text. 
 
 
