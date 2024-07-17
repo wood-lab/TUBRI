@@ -1,0 +1,66 @@
+Species,Cat_Num,Fish_ID,Location,Group_Decade,TL(mm),SL(mm),Weight(mg),Temperature,Num.Fish.Jar,Notes,Month,Day,Year,State
+Ictalurus_punctatus,28458,28458_01,Pearl River 2mi SE Mc Lain US Hwy 98,1960,91,64,4257,,17,,11,9,1962,LA
+Ictalurus_punctatus,28458,28458_02,Pearl River 2mi SE Mc Lain US Hwy 98,1960,52,39,1090,,17,,11,9,1962,LA
+Ictalurus_punctatus,28458,28458_03,Pearl River 2mi SE Mc Lain US Hwy 98,1960,107,72,6750,,17,,11,9,1962,LA
+Ictalurus_punctatus,28458,28458_04,Pearl River 2mi SE Mc Lain US Hwy 98,1960,100,68,5472,,17,,11,9,1962,LA
+Ictalurus_punctatus,27809,27809_01,"Pear River, 0.5 mi down stream from Richardson, or 1.5 mi SE of Bogalusa",1960,116,83,8833,,74,,2,12,1965,LA
+Ictalurus_punctatus,27809,27809_02,"Pear River, 0.5 mi down stream from Richardson, or 1.5 mi SE of Bogalusa",1960,126,93,12105,,74,,2,12,1965,LA
+Ictalurus_punctatus,27809,27809_03,"Pear River, 0.5 mi down stream from Richardson, or 1.5 mi SE of Bogalusa",1960,94,70,3878,,74,,2,12,1965,LA
+Ictalurus_punctatus,27809,27809_04,"Pear River, 0.5 mi down stream from Richardson, or 1.5 mi SE of Bogalusa",1960,88,60,3272,,74,,2,12,1965,LA
+Ictalurus_punctatus,55972,55972_01,Pearl River at River mile 54; 23 miles SE of Bogalusa,1960,131,101,15035,,27,,1,9,1969,LA
+Ictalurus_punctatus,55972,55972_02,Pearl River at River mile 54; 23 miles SE of Bogalusa,1960,101,83,7612,,27,,1,9,1969,LA
+Ictalurus_punctatus,104687,104687_01,Peael River along left bank at river mile 54; 2.4 mi SE of Bogalusa,1970,117,90,9399,,7,,11,4,1977,LA
+Ictalurus_punctatus,104687,104687_02,Peael River along left bank at river mile 54; 2.4 mi SE of Bogalusa,1970,54,37,998,,7,,11,4,1977,LA
+Ictalurus_punctatus,76740,76740_01,Pearl River just aboce Sill at Pools Bluff,1970,136,108,21200,,11,,4,18,1972,LA
+Ictalurus_punctatus,76740,76740_02,Pearl River just aboce Sill at Pools Bluff,1970,107,84,9457,,11,,4,18,1972,LA
+Ictalurus_punctatus,76740,76740_03,Pearl River just aboce Sill at Pools Bluff,1970,103,81,8254,,11,,4,18,1972,LA
+Ictalurus_punctatus,76740,76740_04,Pearl River just aboce Sill at Pools Bluff,1970,99,78,7074,,11,,4,18,1972,LA
+Ictalurus_punctatus,85042,85042_01,Albama River at Evans upper Bar; River mile135.7,1970,102,75,5709,,68,,12,4,1973,AL
+Ictalurus_punctatus,85042,85042_02,Albama River at Evans upper Bar; River mile135.7,1970,79,56,2925,,68,,12,4,1973,AL
+Ictalurus_punctatus,85042,85042_03,Albama River at Evans upper Bar; River mile135.7,1970,78,58,2232,,68,,12,4,1973,AL
+Ictalurus_punctatus,85042,85042_04,Albama River at Evans upper Bar; River mile135.7,1970,76,58,2492,,68,,12,4,1973,AL
+Ictalurus_punctatus,118276,118276_01,Peae River along Right bank between Coburn and Bogalusa Creek; 1.5 miles E of Bogalusa,1980,62,46,1423,,10,,10,23,1980,LA
+Ictalurus_punctatus,118276,118276_02,Peae River along Right bank between Coburn and Bogalusa Creek; 1.5 miles E of Bogalusa,1980,66,51,1996,,10,,10,23,1980,LA
+Ictalurus_punctatus,118276,118276_03,Peae River along Right bank between Coburn and Bogalusa Creek; 1.5 miles E of Bogalusa,1980,72,51,2040,,10,,10,23,1980,LA
+Ictalurus_punctatus,118276,118276_04,Peae River along Right bank between Coburn and Bogalusa Creek; 1.5 miles E of Bogalusa,1980,75,56,2672,,10,,10,23,1980,LA
+Ictalurus_punctatus,129025,129025_01,Pearl River along left bank at River mile 80,1980,105,79,7081,,7,growth on tail fin,3,24,1983,LA
+Ictalurus_punctatus,129025,129025_02,Pearl River along left bank at River mile 80,1980,69,50,2135,,7,,3,24,1983,LA
+Ictalurus_punctatus,129025,129025_03,Pearl River along left bank at River mile 80,1980,65,46,1607,,7,,3,24,1983,LA
+Ictalurus_punctatus,129025,129025_04,Pearl River along left bank at River mile 80,1980,81,61,3394,,7,,3,24,1983,LA
+Ictalurus_punctatus,145062,145062_01,Red river along right bank at river mile 94,1980,90,67,3623,,17,,3,27,1986,LA
+Ictalurus_punctatus,145062,145062_02,Red river along right bank at river mile 94,1980,51,37,748,,17,,3,27,1986,LA
+Ictalurus_punctatus,185320,185320_01,Pearl River along right bank opposite nim branch,1990,45,35,644,,7,,2,13,1998,MS
+Ictalurus_punctatus,185320,185320_02,Pearl River along right bank opposite nim branch,1990,45,35,605,,7,,2,13,1998,MS
+Ictalurus_punctatus,185320,185320_03,Pearl River along right bank opposite nim branch,1990,52,38,798,,7,,2,13,1998,MS
+Ictalurus_punctatus,185320,185320_04,Pearl River along right bank opposite nim branch,1990,44,32,525,,7,,2,13,1998,MS
+Ictalurus_punctatus,177266,177266_01,Pearl River along left bnk 17.4 mi below pools bluff sill0 station 11a (sand-lower end of bar),1990,79,60,2994,,81,,10,21,1995,MS
+Ictalurus_punctatus,177266,177266_02,Pearl River along left bnk 17.4 mi below pools bluff sill0 station 11a (sand-lower end of bar),1990,83,63,3529,,81,,10,21,1995,MS
+Ictalurus_punctatus,177266,177266_03,Pearl River along left bnk 17.4 mi below pools bluff sill0 station 11a (sand-lower end of bar),1990,83,64,3727,,81,,10,21,1995,MS
+Ictalurus_punctatus,177266,177266_04,Pearl River along left bnk 17.4 mi below pools bluff sill0 station 11a (sand-lower end of bar),1990,61,43,1372,,81,,10,21,1995,MS
+Ictalurus_punctatus,169563,169563_01,Pearl River along left bank at River mile 106,1990,60,43,1383,,269,,3,11,1994,LA
+Ictalurus_punctatus,169563,169563_02,Pearl River along left bank at River mile 106,1990,52,36,894,,269,,3,11,1994,LA
+Ictalurus_punctatus,192119,192119_01,Mississippi River at St. Francisuile on east bank near mouth of Thomas creek,2000,58,42,1204,,28,,3,15,2000,MS
+Ictalurus_punctatus,192119,192119_02,Mississippi River at St. Francisuile on east bank near mouth of Thomas creek,2000,67,52,2133,,28,,3,15,2000,MS
+Ictalurus_punctatus,192119,192119_03,Mississippi River at St. Francisuile on east bank near mouth of Thomas creek,2000,73,55,2434,,28,,3,15,2000,MS
+Ictalurus_punctatus,192119,192119_04,Mississippi River at St. Francisuile on east bank near mouth of Thomas creek,2000,66,49,1579,,28,,3,15,2000,MS
+Ictalurus_punctatus,191093,191093_01,Pearl River along right bank at upper cut off channel,2000,114,83,9011,,4,,7,29,2000,MS
+Ictalurus_punctatus,191093,191093_02,Pearl River along right bank at upper cut off channel,2000,139,99,17141,,4,,7,29,2000,MS
+Ictalurus_punctatus,191093,191093_03,Pearl River along right bank at upper cut off channel,2000,144,110,22600,,4,,7,29,2000,MS
+Ictalurus_punctatus,191093,191093_04,Pearl River along right bank at upper cut off channel,2000,169,126,29100,,4,,7,29,2000,MS
+Ictalurus_punctatus,198074,198074_01,Bayou Segnettebat Pipline Canal,2000,189,142,50400,,4,,9,18,2003,LA
+Ictalurus_punctatus,198074,198074_02,Bayou Segnettebat Pipline Canal,2000,183,134,37000,,4,,9,18,2003,LA
+Notropis_atherinoides,31423,31423_01,Pearl River at River mile 47; 5.7 mi NE of Talisheek Creek,1960,61,51,1157,,3,,9,10,1965,LA
+Notropis_atherinoides,31423,31423_02,Pearl River at River mile 47; 5.7 mi NE of Talisheek Creek,1960,57,46,796,,3,,9,10,1965,LA
+Notropis_atherinoides,31423,31423_03,Pearl River at River mile 47; 5.7 mi NE of Talisheek Creek,1960,54,42,653,,3,,9,10,1965,LA
+Notropis_atherinoides,56083,56083_01,Pearl River just above Sill at Pools Bluff; 4 mi S of Bogalusa,1960,74,58,1805,,7,,9,1,1969,LA
+Notropis_atherinoides,56083,56083_02,Pearl River just above Sill at Pools Bluff; 4 mi S of Bogalusa,1960,66,51,1362,,7,,9,1,1969,LA
+Notropis_atherinoides,56083,56083_03,Pearl River just above Sill at Pools Bluff; 4 mi S of Bogalusa,1960,61,51,1502,,7,,9,1,1969,LA
+Notropis_atherinoides,41834,41834_01,Pearl River just above Coburn Creek 1.5 mi E of Bogalusa,1960,90,71,3353,,38,,10,17,1966,LA
+Notropis_atherinoides,41834,41834_02,Pearl River just above Coburn Creek 1.5 mi E of Bogalusa,1960,51,38,557,,38,,10,17,1966,LA
+Notropis_atherinoides,41834,41834_03,Pearl River just above Coburn Creek 1.5 mi E of Bogalusa,1960,47,36,419,,38,,10,17,1966,LA
+Notropis_atherinoides,28278,28278_01,Pearl River E 1.5 mi SE Foxworth,1960,62,48,1084,,264,,17,10,1962,MS
+Notropis_atherinoides,28278,28278_02,Pearl River E 1.5 mi SE Foxworth,1960,82,65,3104,,264,,17,10,1962,MS
+Notropis_atherinoides,28278,28278_03,Pearl River E 1.5 mi SE Foxworth,1960,78,63,2516,,264,,17,10,1962,MS
+Notropis_atherinoides,54491,54491_01,Long Creek (Peters Creek) 0.5 mi N of Pope Exit From Interstate HWT 55,1960,64,49,1458,,88,,2,10,1968,MS
+Notropis_atherinoides,54491,54491_02,Long Creek (Peters Creek) 0.5 mi N of Pope Exit From Interstate HWT 56,1960,74,56,1956,,88,,2,10,1968,MS
+Notropis_atherinoides,54491,54491_03,Long Creek (Peters Creek) 0.5 mi N of Pope Exit From Interstate HWT 57,1960,81,65,3098,,88,,2,10,1968,MS
