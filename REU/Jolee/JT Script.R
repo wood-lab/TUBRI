@@ -33,16 +33,8 @@ plot_1 <- ggplot(df,
   ylab("")  + theme_bw()
 
 
-
-
 # Jolee's code from another file
 setwd("C:/Users/thirt/Documents/TUBRI_JT/data/processed")
-
-### edited these to also use the tidyverse -- if you add the pipe followed by the clean names commmand, you can
-### call objects directly without using df$column --> this isn't true fully for our datasets since they use the same 
-### column names in each, but in areas where you are specifying a df (like in ggplot), using the tidyverse will 
-### be more straightforwardm -- we can talk more about this on Friday! 
-
 
 P.vigilax.data <- read.csv("Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
 I.punctatus.data <- read.csv("Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
