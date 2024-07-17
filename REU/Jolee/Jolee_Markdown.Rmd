@@ -1,0 +1,34 @@
+---
+title: "Jolee_Markdown"
+author: "Connor Whalen, Jolee Thirtyacre"
+date: "2024-07-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## R Markdown
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. For example: 
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+# Start of actual project code. 
+
+Qestions we are asking: 
+What role does parasitism play in modulating host physiology?
+Is increased parasitism associated with decreased body condition?
+  This is complicated because we are proposing an observational study and the causality that we are attempting to describe can go in both directions. Fish that have high parasitism could be skinner, but also skinner fish could be more susceptible to increased parasitism. We won’t be able to parse this out using our dataset, but it is     still an interesting question worth answering. We just need to be careful to not make any absolute statements        based on this (which is why we use the language ‘associated’ instead of ‘affected by’). 
+There is the element of time that we can incorporate into this as well, which is to say that we could look at body condition over time and see what trends exist. If there are any non-linear trends in body condition through time (meaning it doesn’t just go down or just go up or just stay the same), we can then incorporate the variable of parasite presence/burden to see if there is any correlation between the non-linear changes in body condition and parasite counts. This would basically look like on a graph, you have a big drop in body size followed a period of time later by an increase in parasite presence in these fish, you could say something like skinnier fish are associated with an increased parasite burden, since we would see that some event caused body size to decrease and as a result there was more parasites in the fish. But again we have to be really careful to not imply causation if all we have is correlation. Chelsea said she would be surprised if we noticed this effect, but it could be worth looking at anyway. 
+Is the type of parasite important in determining whether parasitism is associated with decreased body condition?
+Parasites exist in different parts of the body based on what they are: monogenes will always be on the gills, adult trematodes and adult cestodes will always be in the intestines, metacercariae can be most anywhere on the body, etc. 
+To answer this question, we would need to go through the data and identify what parasites are in their adult stage versus their larval stage. This would involve a bit of research into what the different (larval or adult) stages are present for each of the ones we have found. You would then be also able to look at the literature to see where that parasite would live within the fish at that stage in its life cycle, and then we could make commentaries about how different stages/types of parasites could be associated with changes to body condition. For example, if we had a ton of adult cestodes in the intestine and found that fish to have a very bad condition score, we could talk about how adult cestodes require more nutrients based on their big size, etc. 
+Rules for discriminating between adult and larval: 
+For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
+Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
+Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
+
+
