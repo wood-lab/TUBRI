@@ -3,7 +3,10 @@
 #Authors: Imani Jones, Dakeishla Diaz, Chelsea Wood
 
 
-NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+# Set the working directory to where your CSV file is located
+setwd("C:/Users/imani/OneDrive - Tuskegee University/Desktop/TUBRI_Monogenea_Project/Data")
+
+NOTATH <- read_csv("C:/Users/imani/OneDrive - Tuskegee University/Desktop/TUBRI_Monogenea_Project/Data/Processed Data.csv")
 
 
 #Make a subset of only monogeneans
