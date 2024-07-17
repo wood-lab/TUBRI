@@ -1,4 +1,4 @@
-Species,Cat_Num,Fish_ID,Location,Group_Decade,TL(mm),SL(mm),Weight(mg),Temperature,Num.Fish.Jar,Notes,Month,Day,Year,State
+Species,Cat_Num,Fish_ID,Location,Group_Decade,TL,SL,Weight,Temperature,Num.Fish.Jar,Notes,Month,Day,Year,State
 Ictalurus_punctatus,28458,28458_01,Pearl River 2mi SE Mc Lain US Hwy 98,1960,91,64,4257,,17,,11,9,1962,LA
 Ictalurus_punctatus,28458,28458_02,Pearl River 2mi SE Mc Lain US Hwy 98,1960,52,39,1090,,17,,11,9,1962,LA
 Ictalurus_punctatus,28458,28458_03,Pearl River 2mi SE Mc Lain US Hwy 98,1960,107,72,6750,,17,,11,9,1962,LA
