@@ -8,9 +8,13 @@ setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
 library(readr)
 ictpun <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
 View(ictpun)
+ictpunraw<-Ictalurus_punctatus_Datasheet_2024_06_28
+
 
 #rawdata
 View(ictpunraw)
+
+
 
 #plotting ALL
 plot(ictpunraw$StandardLength_mm~ictpunraw$YearCollected)
@@ -28,8 +32,11 @@ abline(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
 
 
 #NOTROPIS ATHERNOIDES
+notropraw<-Notropis_atherinoides_Datasheet_2024_01_10
 
 View(notropraw)
+
+
 
 #plotting ALL
 plot(notropraw$StandardLength_mm~notropraw$YearCollected)
