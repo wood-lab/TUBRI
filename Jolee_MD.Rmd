@@ -1,0 +1,261 @@
+---
+title: "Jolee_Markdown"
+author: "Jolee Thirtyacre, Connor Whalen"
+date: "2024-07-17"
+output: html_document
+
+---
+
+## General instructions for R Markdown
+* For helpful instructions on how to start using R Markdown, visit [this link] (https://fish497.github.io/website/lectures/week_07/intro_rmarkdown.html).
+* To insert code chunks, press command+option+i, ctrl+alt+i
+* Anything inside a code chunk will run as normal code, anything outside a code chunk will appear in the document as plain text. 
+
+
+## Questions we are asking: 
+1. Is increased parasitism associated with decreased body condition?
+* This is complicated because we are proposing an observational study and the causality that we are attempting to describe can go in both directions. Fish that have high parasitism could be skinner, but also skinner fish could be more susceptible to increased parasitism. We won’t be able to parse this out using our dataset, but it is still an interesting question worth answering. We just need to be careful to not make any absolute statements based on this (which is why we use the language ‘associated’ instead of ‘affected by’). 
+* There is the element of time that we can incorporate into this as well, which is to say that we could look at body condition over time and see what trends exist. If there are any non-linear trends in body condition through time (meaning it doesn’t just go down or just go up or just stay the same), we can then incorporate the variable of parasite presence/burden to see if there is any correlation between the non-linear changes in body condition and parasite counts. This would basically look like on a graph, you have a big drop in body size followed a period of time later by an increase in parasite presence in these fish, you could say something like skinnier fish are associated with an increased parasite burden, since we would see that some event caused body size to decrease and as a result there was more parasites in the fish. But again we have to be really careful to not imply causation if all we have is correlation. Chelsea said she would be surprised if we noticed this effect, but it could be worth looking at anyway. 
+2. Is the type of parasite important in determining whether parasitism is associated with decreased body condition?
+* Parasites exist in different parts of the body based on what they are: monogenes will always be on the gills, adult trematodes and adult cestodes will always be in the intestines, metacercariae can be most anywhere on the body, etc. 
+* To answer this question, we would need to go through the data and identify what parasites are in their adult stage versus their larval stage. This would involve a bit of research into what the different (larval or adult) stages are present for each of the ones we have found. You would then be also able to look at the literature to see where that parasite would live within the fish at that stage in its life cycle, and then we could make commentaries about how different stages/types of parasites could be associated with changes to body condition. For example, if we had a ton of adult cestodes in the intestine and found that fish to have a very bad condition score, we could talk about how adult cestodes require more nutrients based on their big size, etc. 
+
+## Methods
+
+### Rules for discriminating between adult and larval: 
+* For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
+* Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
+* Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
+
+### Folson's Condition Factor Equation:
+$$
+FCF = W/SL^3 *100
+$$
+
+## Install packages
+```{r install packages, eval=FALSE, echo=FALSE}
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("ggeffects")
+install.packages("rmarkdown")
+```
+
+## Load packages
+```{r load packages, echo=FALSE}
+library(ggeffects)
+library(tidyverse)
+library(readr)
+library(dbplyr)
+library(lubridate)
+library(ggplot2)
+```
+
+## Jolee load datasets
+```{r JT datasets,eval=FALSE, echo=FALSE}
+setwd("C:/Users/thirt/Documents/TUBRI_JT/data/processed")
+
+P.vigilax.data <- read.csv("Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
+I.punctatus.data <- read.csv("Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+N.atherinoides.data <- read.csv("Notropis_atherinoides_processed_machine_readable.csv")
+```
+
+
+## Connor load datasets
+```{r CW datasets, echo=FALSE}
+# Connor's wd assignment and data assignments
+
+pvigax <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
+I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")  %>% 
+  janitor::clean_names()
+N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>% 
+  janitor::clean_names()
+```
+
+
+## Calculate Fulton's Condition Factor using above equation
+```{r calculate FCF, echo=FALSE}
+body.index.vig <- ((P.vigilax.data$weight_mg/((P.vigilax.data$standard_length_mm)^3)))*(100)
+body.index.ath <- ((N.atherinoides.data$weight_mg/((N.atherinoides.data$standard_length_mm)^3)))*(100)
+body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_length_mm)^3)))*(100)
+```
+
+## Plot body indexes 
+```{r plot FCF, echo=TRUE}
+plot(body.index.vig)
+boxplot(body.index.vig)
+
+plot(body.index.pun)
+boxplot(body.index.pun)
+
+plot(body.index.ath)
+boxplot(body.index.ath)
+```
+
+### plots to look at associations to see if there's anything (preliminary) ###
+```{r exploratory plots, echo=TRUE}
+## plot condition factor by time
+plot(x = P.vigilax.data$YearCollected, 
+     y = body.index.vig)
+plot(x = I.punctatus.data$YearCollected, 
+     y = body.index.pun)
+plot(x = N.atherinoides.data$YearCollected, 
+     y = body.index.ath)
+
+## plot body size by time
+  # standard length for body size
+plot(x = P.vigilax.data$YearCollected, 
+     y = P.vigilax.data$StandardLength_mm) #this is how we designed the study though - will show nothing
+
+plot(x = I.punctatus.data$YearCollected, 
+     y = I.punctatus.data$StandardLength_mm) #this is how we designed the study though - will show nothing
+
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$StandardLength_mm)
+
+ # weight for body size
+plot(x = P.vigilax.data$YearCollected, 
+     y = P.vigilax.data$Weight_mg)
+
+plot(x = I.punctatus.data$YearCollected, 
+     y = I.punctatus.data$Weight_mg)
+
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$Weight_mg)
+
+# plot total parasite burden by time
+plot(x = P.vigilax.data$YearCollected, 
+     y = P.vigilax.data$psite_count)
+
+plot(x = I.punctatus.data$YearCollected, 
+     y = I.punctatus.data$psite_count)
+
+plot(x = N.atherinoides.data$YearCollected, 
+     y = N.atherinoides.data$psite_count) # more variability than the others
+
+# plot condition factor vs parasite burden in total - may be interesting
+plot(x = body.index.vig,
+     y = P.vigilax.data$psite_count)
+
+plot(x = body.index.pun,
+     y = I.punctatus.data$psite_count)
+
+plot(x = body.index.ath,
+     y = N.atherinoides.data$psite_count) # more variability than the others
+```
+
+
+## Giving adult and young binary IDs so we can look at life stage compared to parasite burden
+
+### P.VIG - add a column to identify species as an adult or larval stage
+```{r p.vig a/l stage, echo=FALSE}
+Pvig.life.stage <- P.vigilax.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
+                                               "ACANTH.BKR",
+                                               "NEM.CONA",
+                                               "NEM.DICH",
+                                               "NEM.LARV",
+                                               "NEM.TRBK",
+                                               "NEM.UNK",
+                                               "CEST.GODZ",
+                                               "CEST.NTG",
+                                               "CEST.L",
+                                               "CEST.VIT",
+                                               "CEST.UNK",
+                                               "MONO.GYRO",
+                                               "MONO.DACT",
+                                               "MONO.LG",
+                                               "TREM.RNDA",
+                                               "TREM.UNK"),
+                            "Adult", "Larval"))
+
+    # removing the species I'm not using
+Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
+                                                      "COPE.GRAB",
+                                                      "CYST.EMPTY",
+                                                      "CYST.NEH",
+                                                      "CYST.NP",
+                                                      "WORM.A")))
+
+
+    # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
+Pvig.life.stage <- Pvig.life.stage %>%
+  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
+
+
+    
+```
+
+### I.PUN - adding columns for life stage and binary code
+```{r i. pun a/l stage, echo=FALSE}
+Ipun.life.stage <- I.punctatus.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
+                                             "TREM.LG",
+                                             "TREM.META", # is this the same as META.GG - in data as TREM.META.GG
+                                             "META.GG", # is this the same as TREM.META - in data as TREM.META.GG
+                                             "META.UNK", # is this TREM.META.UNK in the data?
+                                             "MYX.TAIL",
+                                             "MYX.GEOM",
+                                             "CYST.MX",
+                                             "CYST.BD",
+                                             "CYST.BLACK",
+                                             "TREM.META.UNK"),
+                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+
+    # removing the species I'm not using
+Ipun.life.stage <- subset(Ipun.life.stage, !(psite_spp %in% c("NMORPH",
+                                                              "TREM.LARV",
+                                                              "TREM.MID",
+                                                              "CYST.UNKN", # correct code? This is what is in the slides
+                                                              "WORM.UNK.B",
+                                                              "TREM.2", # exclude because it's a once-off?
+                                                              "LEECH.KUT"
+                                                              )))
+
+
+    # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
+Ipun.life.stage <- Ipun.life.stage %>%
+  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
+
+
+    
+
+```
+
+### N.ATH - adding columns for life stage and binary code
+```{r n. ath a/l stage, echo=FALSE}
+Nath.life.stage <- N.atherinoides.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST", # go through and check to see if dataset has any other not in the slides
+                                             "TREM.LARV",
+                                             "TREM.META",
+                                             "MYX.SP", # MYX.SP.GILL?
+                                             "MYX.DIAT",
+                                             "MYX.ROUND",
+                                             "CYST.UNA", # include?
+                                             "CYST.UNK", # include?
+                                             "TREM.CYST"), 
+                            
+                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+
+# removing the species I'm not using
+Nath.life.stage <- subset(Nath.life.stage, !(psite_spp %in% c("CYST.NEH",
+                                                              "COPE.A",
+                                                              "CYST.SAC"
+)))
+
+
+# adding a binary code column that codes "Adult" as 1 and "Larval" as 0
+Nath.life.stage <- Nath.life.stage %>%
+  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0))
+
+```
+
+### Plot life stage data 
+```{r life stage plots, echo=TRUE}
+# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+boxplot(Nath.life.stage$BinaryCode, body.index.ath)
+# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
+# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
+```
+
