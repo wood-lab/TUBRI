@@ -153,3 +153,7 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
+
+library(readr)
+NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+
