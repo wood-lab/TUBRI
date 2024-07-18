@@ -2,17 +2,21 @@
 title: "Jolee_Markdown"
 author: "Jolee Thirtyacre, Connor Whalen"
 date: "2024-07-17"
-output: html_document
-theme: readable
-highlight: textmate
-toc: true
-toc_float: true
-toc_depth: 3
+output:
+  html_document:
+    theme: readable
+    highlight: textmate
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
 
-## General instructions for R Markdown
+### General instructions for R Markdown
 * For helpful instructions on how to start using R Markdown, visit [this link] (https://fish497.github.io/website/lectures/week_07/intro_rmarkdown.html).
-* To insert code chunks, press command+option+i
+* To insert code chunks, press command+option+i (mac), ctrl+alt+i (windows)
 * Anything inside a code chunk will run as normal code, anything outside a code chunk will appear in the document as plain text. 
 
 
@@ -26,17 +30,19 @@ toc_depth: 3
 
 ## Methods
 
-### Rules for discriminating between adult and larval: 
+#### Rules for discriminating between adult and larval: 
 * For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
 * Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
 * Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
 
-### Folson's Condition Factor Equation:
+#### Folson's Condition Factor Equation:
 $$
 FCF = W/SL^3 *100
 $$
 
-## Install packages
+## Code for Analyses
+
+#### Install packages
 ```{r install packages, eval=FALSE, echo=FALSE}
 install.packages("tidyverse")
 install.packages("janitor")
@@ -44,18 +50,19 @@ install.packages("ggeffects")
 install.packages("rmarkdown")
 ```
 
-## Load packages
-```{r load packages, echo=FALSE}
+#### Load packages
+```{r load packages, echo=TRUE}
 library(ggeffects)
 library(tidyverse)
+library(ggpubr)
 library(readr)
 library(dbplyr)
 library(lubridate)
 library(ggplot2)
 ```
 
-## Jolee load datasets
-```{r JT datasets, echo=FALSE}
+#### Jolee load datasets
+```{r JT datasets, eval=FALSE, echo=FALSE}
 setwd("C:/Users/thirt/Documents/TUBRI_JT/data/processed")
 
 P.vigilax.data <- read.csv("Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
@@ -64,9 +71,10 @@ N.atherinoides.data <- read.csv("Notropis_atherinoides_processed_machine_readabl
 ```
 
 
-## Connor load datasets
-```{r CW datasets,eval=FALSE, echo=FALSE}
+#### Connor load datasets
+```{r CW datasets, echo=FALSE}
 # Connor's wd assignment and data assignments
+
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
 I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")  %>% 
   janitor::clean_names()
@@ -75,15 +83,15 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
 ```
 
 
-## Calculate Fulton's Condition Factor using above equation
-```{r calculate FCF, echo=FALSE}
+### Calculate Fulton's Condition Factor using above equation
+```{r calculate FCF, echo=TRUE}
 body.index.vig <- ((P.vigilax.data$weight_mg/((P.vigilax.data$standard_length_mm)^3)))*(100)
 body.index.ath <- ((N.atherinoides.data$weight_mg/((N.atherinoides.data$standard_length_mm)^3)))*(100)
 body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_length_mm)^3)))*(100)
 ```
 
-## Plot body indexes 
-```{r plot FCF, echo=TRUE}
+### Plot body indexes 
+```{r plot FCF, echo=FALSE}
 plot(body.index.vig)
 boxplot(body.index.vig)
 
@@ -94,63 +102,91 @@ plot(body.index.ath)
 boxplot(body.index.ath)
 ```
 
-### plots to look at associations to see if there's anything (preliminary) ###
-```{r exploratory plots, echo=TRUE}
+### plots to look at associations to see if there's anything (preliminary)
+```{r exploratory plots}
 ## plot condition factor by time
-plot(x = P.vigilax.data$YearCollected, 
-     y = body.index.vig)
-plot(x = I.punctatus.data$YearCollected, 
-     y = body.index.pun)
-plot(x = N.atherinoides.data$YearCollected, 
-     y = body.index.ath)
+IP.y.fcf <- ggplot(I.punctatus.data, 
+       aes(x = year_collected, y = body.index.pun)) + geom_boxplot() + xlab("Year")  + 
+  ylab("FCF")  + theme_bw()
+
+NA.y.fcf <- ggplot(N.atherinoides.data, 
+       aes(x = year_collected, y = body.index.ath)) + geom_boxplot() + xlab("Year")  + 
+  ylab("FCF")  + theme_bw()
+
+PV.y.fcf <- ggplot(P.vigilax.data, 
+       aes(x = year_collected, y = body.index.vig)) + geom_boxplot() + xlab("Year")  + 
+  ylab("FCF")  + theme_bw()
+
+ggarrange(IP.y.fcf, NA.y.fcf, PV.y.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 
 ## plot body size by time
   # standard length for body size
-plot(x = P.vigilax.data$YearCollected, 
-     y = P.vigilax.data$StandardLength_mm) #this is how we designed the study though - will show nothing
+IP.y.sl <- ggplot(I.punctatus.data, 
+       aes(x = year_collected, y = standard_length_mm)) + geom_boxplot() + xlab("Year")  + 
+  ylab("standard length")  + theme_bw()
 
-plot(x = I.punctatus.data$YearCollected, 
-     y = I.punctatus.data$StandardLength_mm) #this is how we designed the study though - will show nothing
+NA.y.sl <- ggplot(N.atherinoides.data, 
+       aes(x = year_collected, y = standard_length_mm)) + geom_boxplot() + xlab("Year")  + 
+  ylab("standard length")  + theme_bw()
 
-plot(x = N.atherinoides.data$YearCollected, 
-     y = N.atherinoides.data$StandardLength_mm)
+PV.y.sl <- ggplot(P.vigilax.data, 
+       aes(x = year_collected, y = standard_length_mm)) + geom_boxplot() + xlab("Year")  + 
+  ylab("standard length")  + theme_bw()
+
+ggarrange(IP.y.sl, NA.y.sl, PV.y.sl, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 
  # weight for body size
-plot(x = P.vigilax.data$YearCollected, 
-     y = P.vigilax.data$Weight_mg)
+IP.y.w <- ggplot(I.punctatus.data, 
+       aes(x = year_collected, y = weight_mg)) + geom_boxplot() + xlab("Year")  + 
+  ylab("weight")  + theme_bw()
 
-plot(x = I.punctatus.data$YearCollected, 
-     y = I.punctatus.data$Weight_mg)
+NA.y.w <- ggplot(N.atherinoides.data, 
+       aes(x = year_collected, y = weight_mg)) + geom_boxplot() + xlab("Year")  + 
+  ylab("weight")  + theme_bw()
 
-plot(x = N.atherinoides.data$YearCollected, 
-     y = N.atherinoides.data$Weight_mg)
+PV.y.w <- ggplot(P.vigilax.data, 
+       aes(x = year_collected, y = weight_mg)) + geom_boxplot() + xlab("Year")  + 
+  ylab("weight")  + theme_bw()
+
+ggarrange(IP.y.w, NA.y.w, PV.y.w, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 
 # plot total parasite burden by time
-plot(x = P.vigilax.data$YearCollected, 
-     y = P.vigilax.data$psite_count)
+IP.y.psc <- ggplot(I.punctatus.data, 
+       aes(x = year_collected, y = psite_count)) + geom_boxplot() + xlab("Year")  + 
+  ylab("psite count")  + theme_bw()
 
-plot(x = I.punctatus.data$YearCollected, 
-     y = I.punctatus.data$psite_count)
+NA.y.psc <- ggplot(N.atherinoides.data, 
+       aes(x = year_collected, y = psite_count)) + geom_boxplot() + xlab("Year")  + 
+  ylab("psite count")  + theme_bw()
 
-plot(x = N.atherinoides.data$YearCollected, 
-     y = N.atherinoides.data$psite_count) # more variability than the others
+PV.y.psc <- ggplot(P.vigilax.data, 
+       aes(x = year_collected, y = psite_count)) + geom_boxplot() + xlab("Year")  + 
+  ylab("psite count")  + theme_bw()
+
+ggarrange(IP.y.psc, NA.y.psc, PV.y.psc, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+# more variability than the others
 
 # plot condition factor vs parasite burden in total - may be interesting
-plot(x = body.index.vig,
-     y = P.vigilax.data$psite_count)
+IP.psc.fcf <- ggplot(I.punctatus.data, 
+       aes(x = body.index.pun, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("psite count")  + theme_bw()
 
-plot(x = body.index.pun,
-     y = I.punctatus.data$psite_count)
+NA.psc.fcf <- ggplot(N.atherinoides.data, 
+       aes(x = body.index.ath, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("psite count")  + theme_bw()
 
-plot(x = body.index.ath,
-     y = N.atherinoides.data$psite_count) # more variability than the others
+PV.psc.fcf <- ggplot(P.vigilax.data, 
+       aes(x = body.index.vig, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("psite count")  + theme_bw()
+
+ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+# more variability than the others
 ```
 
 
 ## Giving adult and young binary IDs so we can look at life stage compared to parasite burden
-
 ### P.VIG - add a column to identify species as an adult or larval stage
-```{r p.vig a/l stage, echo=FALSE}
+```{r p.vig a/l stage}
 Pvig.life.stage <- P.vigilax.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
                                                "ACANTH.BKR",
@@ -189,7 +225,7 @@ Pvig.life.stage <- Pvig.life.stage %>%
 ```
 
 ### I.PUN - adding columns for life stage and binary code
-```{r i. pun a/l stage, echo=FALSE}
+```{r i. pun a/l stage}
 Ipun.life.stage <- I.punctatus.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
                                              "TREM.LG",
@@ -225,7 +261,7 @@ Ipun.life.stage <- Ipun.life.stage %>%
 ```
 
 ### N.ATH - adding columns for life stage and binary code
-```{r n. ath a/l stage, echo=FALSE}
+```{r n. ath a/l stage}
 Nath.life.stage <- N.atherinoides.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST", # go through and check to see if dataset has any other not in the slides
                                              "TREM.LARV",
@@ -254,17 +290,11 @@ Nath.life.stage <- Nath.life.stage %>%
 
 ### Plot life stage data 
 ```{r life stage plots, echo=TRUE}
-# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Nath.life.stage$BinaryCode, body.index.ath)
-# plot condition factor vs binary code for life stage (aka "stag-specific parasite stuff")
+# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
 ```
-
-
-
-
-
-
 

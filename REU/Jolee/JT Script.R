@@ -17,6 +17,7 @@ library(ggarrange)
 library(lubridate)
 library(ggplot2)
 
+setwd("/Users/connorwhalen/Desktop/UW/TUBRI")
 
 # Connor's wd assignment and data assignments
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% 
