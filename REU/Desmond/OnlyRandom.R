@@ -8,9 +8,13 @@ setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
 library(readr)
 ictpun <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
 View(ictpun)
+ictpunraw<-Ictalurus_punctatus_Datasheet_2024_06_28
+
 
 #rawdata
 View(ictpunraw)
+
+
 
 #plotting ALL
 plot(ictpunraw$StandardLength_mm~ictpunraw$YearCollected)
@@ -28,8 +32,11 @@ abline(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
 
 
 #NOTROPIS ATHERNOIDES
+notropraw<-Notropis_atherinoides_Datasheet_2024_01_10
 
 View(notropraw)
+
+
 
 #plotting ALL
 plot(notropraw$StandardLength_mm~notropraw$YearCollected)
@@ -50,8 +57,10 @@ abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
 
 #SIZE DATA FROM FULLY RESELECTED FISHES
 
-desmond_data <- Google_Converted_Boyd_Data_Sheet1
-View(desmond_data)
+install.packages("googlesheets4")
+library(googlesheets4)
+desmond_data <- read_sheet("https://docs.google.com/spreadsheets/d/1Ix7ZkoTA7AZDOnA3Rqmxt8cB9hPGSwEiwbmCek9uUOQ/edit?gid=0#gid=0") #paste the URL of the google sheet, then follow the prompts
+gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this code can only read the spreadsheet! follow prompts and ALLOW tidyverse to see your spreadsheets
 
 #main research question: how did body length change over time?
 library(ggplot2)
@@ -64,7 +73,7 @@ SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
   ylab("Standard Length in mm")+
   theme_minimal()+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-SL_time
+ SL_time
 
 #plotting only ictalurus 
 ict_only <- ggplot(subset(desmond_data, Species %in% "Ictalurus_punctatus"), aes(Year,SL))+
