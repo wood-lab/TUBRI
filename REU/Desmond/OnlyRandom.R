@@ -57,8 +57,9 @@ abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
 
 #SIZE DATA FROM FULLY RESELECTED FISHES
 
-desmond_data <- Google_Converted_Boyd_Data_Sheet1
-View(desmond_data)
+library(googlesheets4)
+desmond_data_2 <- read_sheet("https://docs.google.com/spreadsheets/d/1Ix7ZkoTA7AZDOnA3Rqmxt8cB9hPGSwEiwbmCek9uUOQ/edit?gid=0#gid=0")
+gs4_auth(scopes="spreadsheets.editonly")
 
 #main research question: how did body length change over time?
 library(ggplot2)
@@ -71,7 +72,7 @@ SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
   ylab("Standard Length in mm")+
   theme_minimal()+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-SL_time
+ SL_time
 
 #plotting only ictalurus 
 ict_only <- ggplot(subset(desmond_data, Species %in% "Ictalurus_punctatus"), aes(Year,SL))+
