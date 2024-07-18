@@ -10,10 +10,13 @@ output:
     toc_float: true
     toc_depth: 3
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
 
-## General instructions for R Markdown
+### General instructions for R Markdown
 * For helpful instructions on how to start using R Markdown, visit [this link] (https://fish497.github.io/website/lectures/week_07/intro_rmarkdown.html).
-* To insert code chunks, press command+option+i, ctrl+alt+i
+* To insert code chunks, press command+option+i (mac), ctrl+alt+i (windows)
 * Anything inside a code chunk will run as normal code, anything outside a code chunk will appear in the document as plain text. 
 
 
@@ -27,17 +30,19 @@ output:
 
 ## Methods
 
-### Rules for discriminating between adult and larval: 
+#### Rules for discriminating between adult and larval: 
 * For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
 * Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
 * Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
 
-### Folson's Condition Factor Equation:
+#### Folson's Condition Factor Equation:
 $$
 FCF = W/SL^3 *100
 $$
 
-## Install packages
+## Code for Analyses
+
+#### Install packages
 ```{r install packages, eval=FALSE, echo=FALSE}
 install.packages("tidyverse")
 install.packages("janitor")
@@ -45,8 +50,8 @@ install.packages("ggeffects")
 install.packages("rmarkdown")
 ```
 
-## Load packages
-```{r load packages, echo=FALSE}
+#### Load packages
+```{r load packages, echo=TRUE}
 library(ggeffects)
 library(tidyverse)
 library(ggpubr)
@@ -56,7 +61,7 @@ library(lubridate)
 library(ggplot2)
 ```
 
-## Jolee load datasets
+#### Jolee load datasets
 ```{r JT datasets, eval=FALSE, echo=FALSE}
 setwd("C:/Users/thirt/Documents/TUBRI_JT/data/processed")
 
@@ -66,7 +71,7 @@ N.atherinoides.data <- read.csv("Notropis_atherinoides_processed_machine_readabl
 ```
 
 
-## Connor load datasets
+#### Connor load datasets
 ```{r CW datasets, echo=FALSE}
 # Connor's wd assignment and data assignments
 
@@ -78,15 +83,15 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
 ```
 
 
-## Calculate Fulton's Condition Factor using above equation
-```{r calculate FCF, echo=FALSE}
+### Calculate Fulton's Condition Factor using above equation
+```{r calculate FCF, echo=TRUE}
 body.index.vig <- ((P.vigilax.data$weight_mg/((P.vigilax.data$standard_length_mm)^3)))*(100)
 body.index.ath <- ((N.atherinoides.data$weight_mg/((N.atherinoides.data$standard_length_mm)^3)))*(100)
 body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_length_mm)^3)))*(100)
 ```
 
-## Plot body indexes 
-```{r plot FCF, echo=TRUE}
+### Plot body indexes 
+```{r plot FCF, echo=FALSE}
 plot(body.index.vig)
 boxplot(body.index.vig)
 
@@ -97,8 +102,8 @@ plot(body.index.ath)
 boxplot(body.index.ath)
 ```
 
-### plots to look at associations to see if there's anything (preliminary) ###
-```{r exploratory plots, echo=TRUE}
+### plots to look at associations to see if there's anything (preliminary)
+```{r exploratory plots}
 ## plot condition factor by time
 IP.y.fcf <- ggplot(I.punctatus.data, 
        aes(x = year_collected, y = body.index.pun)) + geom_boxplot() + xlab("Year")  + 
@@ -180,9 +185,8 @@ ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bo
 
 
 ## Giving adult and young binary IDs so we can look at life stage compared to parasite burden
-
 ### P.VIG - add a column to identify species as an adult or larval stage
-```{r p.vig a/l stage, echo=FALSE}
+```{r p.vig a/l stage}
 Pvig.life.stage <- P.vigilax.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
                                                "ACANTH.BKR",
@@ -221,7 +225,7 @@ Pvig.life.stage <- Pvig.life.stage %>%
 ```
 
 ### I.PUN - adding columns for life stage and binary code
-```{r i. pun a/l stage, echo=FALSE}
+```{r i. pun a/l stage}
 Ipun.life.stage <- I.punctatus.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
                                              "TREM.LG",
@@ -257,7 +261,7 @@ Ipun.life.stage <- Ipun.life.stage %>%
 ```
 
 ### N.ATH - adding columns for life stage and binary code
-```{r n. ath a/l stage, echo=FALSE}
+```{r n. ath a/l stage}
 Nath.life.stage <- N.atherinoides.data %>%
   mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST", # go through and check to see if dataset has any other not in the slides
                                              "TREM.LARV",
