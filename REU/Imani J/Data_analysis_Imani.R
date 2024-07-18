@@ -156,4 +156,8 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
 
 library(readr)
 NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+View(NOTATH)
 
+library(readr)
+NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+View(NOTATH)
