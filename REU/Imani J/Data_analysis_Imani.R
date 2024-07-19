@@ -94,17 +94,23 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
                                 ,color=CI,
                                 group=CI))+
   geom_point()+ 
-  labs(title = "Counts of Monogeneans over the Years", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
+  labs(title = "Counts of Monogeneans in ICTPUNCT", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
          "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)
 
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
 
+install.packages("stats")
+install.packages("lme4")
+install.packages("DHARMa")
+install.packages("glmmTMB")
+
 library(stats)
 library(lme4)
 library(DHARMa)
 library(glmmTMB)
+
 
 #Is linear, no quadratic term. The diagnostics are terrible.
 glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
