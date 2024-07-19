@@ -99,9 +99,19 @@ notrop_only
 
 #MODELS FOR RESELECTED FISHES
 
+#subset data
+ict_desmond <- subset(desmond_data, Species == "Ictalurus_punctatus")
+View(ict_desmond)
+notrop_desmond <- subset(desmond_data, Species == "Notropis_atherinoides")
+View(notrop_desmond)
+
 #Ictalurus punctatus
-ict_model <- lm(SL~Year, data= desmond_data)
+ict_model <- lm(SL~Year, data= ict_desmond)
 summary(ict_model)
 #the model summary shows that there is not a very good fit of this model to the data (low R-sq value), and that there is no significant slope (pvalue, or Pr>t, is much greater than 0.05). 
+
+#Notropis
+notrop_model <- lm(SL~Year, data= notrop_desmond)
+summary(notrop_model)
 
 #we'll make the same type of model for notropis, but since we don't have a ton of data yet, we'll wait!
