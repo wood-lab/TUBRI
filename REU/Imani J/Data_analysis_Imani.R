@@ -143,7 +143,7 @@ tab_model(glmmonoip1, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for aste
 library(ggeffects)
 plot_model(glmmonoip1)
 
-mydf <- ggpredict(glmmonoip2, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+mydf <- ggpredict(glmmonoip1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
 
 apatheme=theme_bw()+
   theme(panel.grid.major=element_blank(),
@@ -154,7 +154,7 @@ apatheme=theme_bw()+
 
 
 plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Monogenean abundance')+
+  labs(x = 'Year', y = 'Ligictaluridus pricei abundance')+
   apatheme
 
 
@@ -321,12 +321,13 @@ apatheme=theme_bw()+
 
 
 plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Monogenean abundance')+
+  labs(x = 'Year', y = 'Dactylogyrus abundance')+
   apatheme
 
 
-=======
->>>>>>> ec261d1ab222ab9d0149708c793e9d98b6e77570
+
+# Analaysis for Notropis atherinoides----
+
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
@@ -336,15 +337,6 @@ NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_reada
 View(NOTATH)
 
 library(readr)
-
-
-
-
-
-
-
-
-NOTATH plot 
 
 NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
 NOTATH_MONOS <- subset(NOTATH, psite_spp == "MONO.UNK"| psite_spp == "MONO.ALL")
@@ -365,3 +357,65 @@ library (ggplot2)
     labs(title = "Counts of monogenean species in Notrophis Anthernoides", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
            "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
     facet_wrap(~ psite_spp)
+  
+
+# Models
+  
+  library(stats)
+  library(lme4)
+  library(DHARMa)
+  library(glmmTMB)
+  
+  #Is linear, no quadratic term. The diagnostics are terrible.
+  glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
+  glm_notathmono2 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
+  
+  #Models have good gianostics
+  glm_notathmono1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
+  glm_notathmono2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
+  
+  #Model selection. The lower the AIC, the better the model is.
+  AIC(glm_notathmono1,glm_notathmono2)
+  
+  #After evaluating AIC, this one is the best.
+  glm_notathmono1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+  
+  
+  summary(glmmonodact1)
+  
+  #Evaluate residuals
+  library(DHARMa)
+  library(MASS)
+  
+  par(mfrow = c(2, 2))
+  s=simulateResiduals(fittedModel=glm_notathmono2,n=250)
+  s$scaledResiduals
+  plot(s)
+  
+  #Generate table
+  
+  library(sjPlot)
+  library(sjmisc)
+  library(sjlabelled)
+  tab_model(glm_notathmono2, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
+  
+  
+  ## final plot with predictions and CI
+  library(ggeffects)
+  plot_model(glm_notathmono2)
+  
+  mydf <- ggpredict(glm_notathmono2, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+  
+  apatheme=theme_bw()+
+    theme(panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          panel.border=element_blank(),
+          axis.line=element_line(),
+          text=element_text(family='Times'))
+  
+  
+  plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
+    labs(x = 'Year', y = 'Monogenean abundance')+
+    apatheme
+  
+  
