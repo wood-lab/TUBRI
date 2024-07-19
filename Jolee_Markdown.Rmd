@@ -184,6 +184,7 @@ PV.psc.fcf <- ggplot(P.vigilax.data,
 
 ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 # more variability than the others
+
 ```
 
 
@@ -303,8 +304,11 @@ body.index.pun.stage <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_l
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Nath.life.stage$BinaryCode, body.index.ath)
 
+ggplot(Nath.life.stage, 
+       aes(x = LifeStage, y = body.index.ath.stage)) + geom_boxplot()
+
 NA.bc.fcf <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
-       aes(x = as.factor(BinaryCode), y = body.index.ath)) + xlab("Life Stage")  + geom_boxplot() +
+       aes(x = as.factor(BinaryCode), y = body.index.ath.stage)) + xlab("Life Stage")  + geom_boxplot() +
   ylab("Fulton's Condition Factor")  + theme_bw()
 
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
@@ -324,7 +328,35 @@ PV.bc.fcf <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots
 ggarrange(IP.bc.fcf, NA.bc.fcf, PV.bc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 # more variability than the others
 
+# plot condition factor vs ci category
+IP.ci.fcf <- ggplot(I.punctatus.data, 
+       aes(x = body.index.pun, y = ci)) + geom_jitter() + xlab("FCF")  + 
+  ylab("CI")  + theme_bw()
 
+NA.ci.fcf <- ggplot(N.atherinoides.data, 
+       aes(x = body.index.ath, y = ci)) + geom_jitter() + xlab("FCF")  + 
+  ylab("CI")  + theme_bw()
+
+PV.ci.fcf <- ggplot(P.vigilax.data, 
+       aes(x = body.index.vig, y = ci)) + geom_jitter() + xlab("FCF")  + 
+  ylab("CI")  + theme_bw()
+
+ggarrange(IP.ci.fcf, NA.ci.fcf, PV.ci.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+
+# plot life stage vs ci category
+IP.psc.fcf <- ggplot(I.punctatus.data, 
+       aes(x = body.index.pun, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("CI")  + theme_bw()
+
+NA.psc.fcf <- ggplot(N.atherinoides.data, 
+       aes(x = body.index.ath, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("CI")  + theme_bw()
+
+PV.psc.fcf <- ggplot(P.vigilax.data, 
+       aes(x = body.index.vig, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+  ylab("psite count")  + theme_bw()
+
+ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 ```
 
 ## Models
@@ -340,14 +372,19 @@ We want to run a general linear model to test the research questions:
 ```{r model}
 # Question 1 (lm)
 summary(FCF_psite_ath_lm <- lm(body.index.ath ~ psite_count, 
-                               data = N.atherinoides.data))
+                               data = Nath.life.stage))
 
-plot(FCF_psite_ath)
+plot(FCF_psite_ath_lm)
 # Question 1 (ANOVA)
-summary(FCF_psite_ath_ANOVA <- aov(body.index.ath ~ factor(binary), data = N.atherinoides.data))
+summary(FCF_psite_ath_ANOVA <- aov(body.index.ath ~ factor(psite_count), data = Nath.life.stage))
 plot(FCF_psite_ath_ANOVA)
 
 # Question 2
+summary(FCF_al_ath_lm <- lm(body.index.ath ~ BinaryCode, 
+                               data = Nath.life.stage))
+
+plot(FCF_al_ath_lm)
+
 
 ```
 
