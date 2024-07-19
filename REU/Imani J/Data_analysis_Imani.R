@@ -66,7 +66,7 @@ ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_reada
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
-# View(ICTPUNCT)
+ #View(ICTPUNCT)
 
 # You can also see your data in the console below by running the name of the dataset.
 
@@ -101,67 +101,6 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
 
-library(stats)
-library(lme4)
-library(DHARMa)
-library(glmmTMB)
-
-
-#Good model dianostics
-glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1, data = ICTPUNCT_MONOIP)
-
-#Model dianostics worse than nbinom1
-glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom2, data = ICTPUNCT_MONOIP)
-
-#bad plot
-glmmonoip3 <- glmmTMB(psite_count ~ poly(YearCollected,3)*CI+(1|CatalogNumber),family=nbinom1, data = ICTPUNCT_MONOIP)
-
-#bad model diagnostics
-glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1, data = ICTPUNCT_MONOIP)
-glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom2, data = ICTPUNCT_MONOIP)
-
-#the one with lowest AIC is glmmonoip2 with nbinom1
-AIC(glmmonoip2,glmmonoip3)
-
-#Take a look at your results
-summary(glmmonoip2)
-
-#Evaluate residuals
-library(DHARMa)
-library(MASS)
-
-par(mfrow = c(2, 2))
-s=simulateResiduals(fittedModel=glmmonoip2,n=250)
-s$scaledResiduals
-plot(s)
-
-#Generate table of results
-
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-tab_model(glmmonoip2, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
-
-
-## final plot with predictions and CI
-library(ggeffects)
-plot_model(glmmonoip2)
-
-mydf <- ggpredict(glmmonoip2, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
-
-apatheme=theme_bw()+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        text=element_text(family='Times'))
-
-
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Monogenean abundance')+
-  apatheme
-
-
 ### Code for monogenean MONO.DACT in PIMVIG abundance across time and pollution impact----
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
 # working directory, you'll need to specify them as I have below.
@@ -180,6 +119,10 @@ PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable
 # View(ICTPUNCT)
 
 # You can also see your data in the console below by running the name of the dataset.
+
+
+
+
 
 PIMVIG
 
@@ -211,6 +154,7 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
          "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
   facet_wrap(~ psite_spp)
 
+<<<<<<< HEAD
 
 # Pimvig mono.dact
 
@@ -329,6 +273,8 @@ plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
   apatheme
 
 
+=======
+>>>>>>> ec261d1ab222ab9d0149708c793e9d98b6e77570
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
@@ -338,5 +284,32 @@ NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_reada
 View(NOTATH)
 
 library(readr)
+
+
+
+
+
+
+
+
+NOTATH plot 
+
 NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
-View(NOTATH)
+NOTATH_MONOS <- subset(NOTATH, psite_spp == "MONO.UNK"| psite_spp == "MONO.ALL")
+
+library (ggplot2)
+
+  apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+  ggplot(NOTATH_MONOS, aes(x= YearCollected,
+                          y=psite_count,
+                          ,color=CI,
+                          group=CI))+
+    geom_point()+ 
+    labs(title = "Counts of monogenean species in Notrophis Anthernoides", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
+           "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
+    facet_wrap(~ psite_spp)
