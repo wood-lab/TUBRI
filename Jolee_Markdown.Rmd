@@ -293,9 +293,9 @@ Nath.life.stage <- Nath.life.stage %>%
 
 ### Altered code to allow ggplot to work
 ```{r FCF calculated using new dataframe, echo=TRUE}
-body.index.vig <- ((P.vigilax.data$weight_mg/((P.vigilax.data$standard_length_mm)^3)))*(100)
+body.index.vig <- ((Pvig.life.stage$weight_mg/((Pvig.life.stage$standard_length_mm)^3)))*(100)
 body.index.ath <- ((Nath.life.stage$weight_mg/((Nath.life.stage$standard_length_mm)^3)))*(100)
-body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_length_mm)^3)))*(100)
+body.index.pun <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)
 ```
 
 ### Plot life stage data 
@@ -303,13 +303,27 @@ body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_lengt
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Nath.life.stage$BinaryCode, body.index.ath)
 
-NA.bc.fcf <- ggplot(Nath.life.stage, 
-       aes(x = BinaryCode, y = body.index.ath)) + xlab("Life Stage")  + geom_boxplot() +
+NA.bc.fcf <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = as.factor(BinaryCode), y = body.index.ath)) + xlab("Life Stage")  + geom_boxplot() +
   ylab("Fulton's Condition Factor")  + theme_bw()
 
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
+
+IP.bc.fcf <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = as.factor(BinaryCode), y = body.index.pun)) + xlab("Life Stage")  + geom_boxplot() +
+  ylab("Fulton's Condition Factor")  + theme_bw()
+
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
+
+PV.bc.fcf <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = as.factor(BinaryCode), y = body.index.vig)) + xlab("Life Stage")  + geom_boxplot() +
+  ylab("Fulton's Condition Factor")  + theme_bw()
+
+ggarrange(IP.bc.fcf, NA.bc.fcf, PV.bc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+# more variability than the others
+
+
 ```
 
