@@ -66,7 +66,7 @@ ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_reada
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
-# View(ICTPUNCT)
+ #View(ICTPUNCT)
 
 # You can also see your data in the console below by running the name of the dataset.
 
@@ -120,6 +120,10 @@ PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable
 
 # You can also see your data in the console below by running the name of the dataset.
 
+
+
+
+
 PIMVIG
 
 #We made a subset based on our data to include only MONO.IP
@@ -159,5 +163,32 @@ NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_reada
 View(NOTATH)
 
 library(readr)
+
+
+
+
+
+
+
+
+NOTATH plot 
+
 NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
-View(NOTATH)
+NOTATH_MONOS <- subset(NOTATH, psite_spp == "MONO.UNK"| psite_spp == "MONO.ALL")
+
+library (ggplot2)
+
+  apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+  ggplot(NOTATH_MONOS, aes(x= YearCollected,
+                          y=psite_count,
+                          ,color=CI,
+                          group=CI))+
+    geom_point()+ 
+    labs(title = "Counts of monogenean species in Notrophis Anthernoides", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
+           "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
+    facet_wrap(~ psite_spp)
