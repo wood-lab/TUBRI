@@ -61,7 +61,7 @@ install.packages("googlesheets4")
 library(googlesheets4)
 desmond_data <- read_sheet("https://docs.google.com/spreadsheets/d/1Ix7ZkoTA7AZDOnA3Rqmxt8cB9hPGSwEiwbmCek9uUOQ/edit?gid=0#gid=0") #paste the URL of the google sheet, then follow the prompts
 gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this code can only read the spreadsheet! follow prompts and ALLOW tidyverse to see your spreadsheets
-View(desmond_data)
+
 #main research question: how did body length change over time?
 library(ggplot2)
 
@@ -86,6 +86,16 @@ ict_only <- ggplot(subset(desmond_data, Species %in% "Ictalurus_punctatus"), aes
 ict_only
 
 #above, I added a line based on a linear model that represents the data! In this case, it is super simple. We can see there isn't a strong trend in any direction in this data for ictalurus, so let's take a closer look at a linear model for this data. 
+
+#plotting only notropis
+notrop_only <- ggplot(subset(desmond_data, Species %in% "Notropis_atherinoides"), aes(Year,SL))+
+  geom_point(size=4)+
+  xlab("Year collected")+
+  ylab("Standard Length in mm")+
+  geom_smooth(method = "lm", formula = y ~ x)+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+notrop_only
 
 #MODELS FOR RESELECTED FISHES
 
