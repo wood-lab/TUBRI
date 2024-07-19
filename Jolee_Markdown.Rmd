@@ -85,7 +85,7 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
 # Connor's wd assignment and data assignments
 
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
-I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")  %>% 
+I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")  %>%
   janitor::clean_names()
 N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>% 
   janitor::clean_names()
@@ -312,7 +312,7 @@ body.index.pun.stage <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_l
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Nath.life.stage$BinaryCode, body.index.ath)
 
-NA.bc.fcf <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
        aes(x = as.factor(BinaryCode), y = body.index.ath.stage)) + xlab("Life Stage")  + geom_boxplot() +
   ylab("Fulton's Condition Factor")  + theme_bw()
 
@@ -345,9 +345,10 @@ We want to run a general linear model to test the research questions:
   - does FCF increase as adult or larval parasite presence increases?
 
 ### Run linear model to test above questions
+#### add bcf as 
 ```{r model}
 # Question 1 (lm)
-summary(FCF_psite_ath_lm <- lm(body.index.ath ~ psite_count, 
+summary(FCF_psite_ath_lm <- lm(body.index.ath.stage ~ psite_count, 
                                data = Nath.life.stage))
 
 plot(FCF_psite_ath_lm)
