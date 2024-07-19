@@ -4,12 +4,9 @@
 # 4 July 2024
 # Hi SuPeR Parasites!!! HELLO Hi!
 # Hello my name is IMANI and I am working with DAKI. <3
-<<<<<<< HEAD
-=======
 # wohooo
 # Desmond check
 # Desmond second try
->>>>>>> 5b5be37e84f107cdc6a5732b645837d35c2d2430
 
 # To run a thing in R, you put your cursor on it and hit COMMAND+RETURN (on Mac) or CONTROL+RETURN (on PC).
 # Anything with a # in front of it will not run, because it is annotation - words designed to be human-readable,
