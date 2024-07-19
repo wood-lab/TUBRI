@@ -94,7 +94,7 @@ body.index.pun <- ((I.punctatus.data$weight_mg/((I.punctatus.data$standard_lengt
 ```
 
 ### Plot body indexes 
-```{r plot FCF, echo=FALSE}
+```{r plot FCF, eval = FALSE, echo=FALSE}
 plot(body.index.vig)
 boxplot(body.index.vig)
 
@@ -106,7 +106,7 @@ boxplot(body.index.ath)
 ```
 
 ### plots to look at associations to see if there's anything (preliminary)
-```{r exploratory plots}
+```{r exploratory plots, echo=FALSE, eval=FALSE}
 ## plot condition factor by time
 IP.y.fcf <- ggplot(I.punctatus.data, 
        aes(x = year_collected, y = body.index.pun)) + geom_boxplot() + xlab("Year")  + 
@@ -168,18 +168,21 @@ PV.y.psc <- ggplot(P.vigilax.data,
 
 ggarrange(IP.y.psc, NA.y.psc, PV.y.psc, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 # more variability than the others
+```
 
+#### preliminary body condition index plots
+```{r exploratory plots, echo=FALSE, eval=FALSE}
 # plot condition factor vs parasite burden in total - may be interesting
 IP.psc.fcf <- ggplot(I.punctatus.data, 
-       aes(x = body.index.pun, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+       aes(x = body.index.pun, y = psite_count, fill = ci)) + geom_boxplot() + xlab("FCF")  + 
   ylab("psite count")  + theme_bw()
 
 NA.psc.fcf <- ggplot(N.atherinoides.data, 
-       aes(x = body.index.ath, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+       aes(x = body.index.ath, y = psite_count, fill = ci)) + geom_boxplot() + xlab("FCF")  + 
   ylab("psite count")  + theme_bw()
 
 PV.psc.fcf <- ggplot(P.vigilax.data, 
-       aes(x = body.index.vig, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
+       aes(x = body.index.vig, y = psite_count, fill = ci)) + geom_boxplot() + xlab("FCF")  + 
   ylab("psite count")  + theme_bw()
 
 ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
@@ -304,9 +307,6 @@ body.index.pun.stage <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_l
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
 boxplot(Nath.life.stage$BinaryCode, body.index.ath)
 
-ggplot(Nath.life.stage, 
-       aes(x = LifeStage, y = body.index.ath.stage)) + geom_boxplot()
-
 NA.bc.fcf <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
        aes(x = as.factor(BinaryCode), y = body.index.ath.stage)) + xlab("Life Stage")  + geom_boxplot() +
   ylab("Fulton's Condition Factor")  + theme_bw()
@@ -328,35 +328,6 @@ PV.bc.fcf <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots
 ggarrange(IP.bc.fcf, NA.bc.fcf, PV.bc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 # more variability than the others
 
-# plot condition factor vs ci category
-IP.ci.fcf <- ggplot(I.punctatus.data, 
-       aes(x = body.index.pun, y = ci)) + geom_jitter() + xlab("FCF")  + 
-  ylab("CI")  + theme_bw()
-
-NA.ci.fcf <- ggplot(N.atherinoides.data, 
-       aes(x = body.index.ath, y = ci)) + geom_jitter() + xlab("FCF")  + 
-  ylab("CI")  + theme_bw()
-
-PV.ci.fcf <- ggplot(P.vigilax.data, 
-       aes(x = body.index.vig, y = ci)) + geom_jitter() + xlab("FCF")  + 
-  ylab("CI")  + theme_bw()
-
-ggarrange(IP.ci.fcf, NA.ci.fcf, PV.ci.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-
-# plot life stage vs ci category
-IP.psc.fcf <- ggplot(I.punctatus.data, 
-       aes(x = body.index.pun, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
-  ylab("CI")  + theme_bw()
-
-NA.psc.fcf <- ggplot(N.atherinoides.data, 
-       aes(x = body.index.ath, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
-  ylab("CI")  + theme_bw()
-
-PV.psc.fcf <- ggplot(P.vigilax.data, 
-       aes(x = body.index.vig, y = psite_count)) + geom_boxplot() + xlab("FCF")  + 
-  ylab("psite count")  + theme_bw()
-
-ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
 ```
 
 ## Models
