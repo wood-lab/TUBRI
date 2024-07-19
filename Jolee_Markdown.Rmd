@@ -59,6 +59,7 @@ library(readr)
 library(dbplyr)
 library(lubridate)
 library(ggplot2)
+library(glmmTMB)
 ```
 
 #### Jolee load datasets
@@ -84,7 +85,6 @@ I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machi
 N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>% 
   janitor::clean_names()
 ```
-
 
 ### Calculate Fulton's Condition Factor using above equation
 ```{r calculate FCF, echo=TRUE}
@@ -326,4 +326,32 @@ ggarrange(IP.bc.fcf, NA.bc.fcf, PV.bc.fcf, common.legend = TRUE, legend = "botto
 
 
 ```
+
+## Models
+We want to run a general linear model to test the research questions:
+1. Is body condition associated with incresaed total parasite burden?
+  - is there a linear association between increading body condition and increasing parasite burden?
+  - does FCF increase as parasite burden increases?
+2. Is body condition associated with infection with adult or larval stages of parasites?
+  - is there a linear association between increasing body condition and increasing abundance of larval or adult parasites in the host?
+  - does FCF increase as adult or larval parasite presence increases?
+
+### Run linear model to test above questions
+```{r model}
+# Question 1 (lm)
+summary(FCF_psite_ath_lm <- lm(body.index.ath ~ psite_count, 
+                      data = N.atherinoides.data, family = 'nbinom2'))
+plot(FCF_psite_ath)
+# Question 1 (ANOVA)
+summary(FCF_psite_ath_ANOVA <- aov(body.index.ath ~ factor(psite_count), data = N.atherinoides.data))
+plot(FCF_psite_ath_ANOVA)
+
+# Question 2
+
+```
+
+
+
+
+
 
