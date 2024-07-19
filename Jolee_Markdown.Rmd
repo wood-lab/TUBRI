@@ -63,7 +63,7 @@ library(glmmTMB)
 ```
 
 #### Jolee load datasets
-```{r JT datasets, echo=FALSE}
+```{r JT datasets, eval=FALSE, echo=FALSE}
 setwd("C:/Users/thirt/Documents/TUBRI_JT")
 
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% 
@@ -76,7 +76,7 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
 
 
 #### Connor load datasets
-```{r CW datasets, eval=FALSE, echo=FALSE}
+```{r CW datasets, echo=FALSE}
 # Connor's wd assignment and data assignments
 
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
@@ -293,9 +293,9 @@ Nath.life.stage <- Nath.life.stage %>%
 
 ### Altered code to allow ggplot to work
 ```{r FCF calculated using new dataframe, echo=TRUE}
-body.index.vig <- ((Pvig.life.stage$weight_mg/((Pvig.life.stage$standard_length_mm)^3)))*(100)
-body.index.ath <- ((Nath.life.stage$weight_mg/((Nath.life.stage$standard_length_mm)^3)))*(100)
-body.index.pun <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)
+body.index.vig.stage <- ((Pvig.life.stage$weight_mg/((Pvig.life.stage$standard_length_mm)^3)))*(100)
+body.index.ath.stage <- ((Nath.life.stage$weight_mg/((Nath.life.stage$standard_length_mm)^3)))*(100)
+body.index.pun.stage <- ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)
 ```
 
 ### Plot life stage data 
@@ -340,10 +340,11 @@ We want to run a general linear model to test the research questions:
 ```{r model}
 # Question 1 (lm)
 summary(FCF_psite_ath_lm <- lm(body.index.ath ~ psite_count, 
-                      data = N.atherinoides.data, family = 'nbinom2'))
+                               data = N.atherinoides.data))
+
 plot(FCF_psite_ath)
 # Question 1 (ANOVA)
-summary(FCF_psite_ath_ANOVA <- aov(body.index.ath ~ factor(psite_count), data = N.atherinoides.data))
+summary(FCF_psite_ath_ANOVA <- aov(body.index.ath ~ factor(binary), data = N.atherinoides.data))
 plot(FCF_psite_ath_ANOVA)
 
 # Question 2
