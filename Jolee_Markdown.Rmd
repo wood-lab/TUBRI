@@ -35,9 +35,14 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 * Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
 * Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
 
-#### Folson's Condition Factor Equation:
+#### Fulton's Condition Factor Equation:
+| Variable | Definition                                  |
+|----------|---------------------------------------------|
+| K        | Fulton's Condition Factor (<1=good, >1=bad) |
+| W        | weight of host fish (in grams)              |
+| SL       | standard length of fish (in millimeters)    |
 $$
-FCF = W/SL^3 *100
+K = W/SL^3 *100
 $$
 
 ## Code for Analyses
