@@ -101,6 +101,64 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
 
+library(stats)
+library(lme4)
+library(DHARMa)
+library(glmmTMB)
+
+#Is linear, no quadratic term. The diagnostics are terrible.
+glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+
+#Models have good gianostics
+glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
+
+#Model selection. The lower the AIC, the better the model is.
+AIC(glmmonoip1,glmmonoip2)
+
+#After evaluating AIC, this one is the best.
+glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+
+
+summary(glmmonodact1)
+
+#Evaluate residuals
+library(DHARMa)
+library(MASS)
+
+par(mfrow = c(2, 2))
+s=simulateResiduals(fittedModel=glmmonoip1,n=250)
+s$scaledResiduals
+plot(s)
+
+#Generate table
+
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+tab_model(glmmonoip1, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
+
+
+## final plot with predictions and CI
+library(ggeffects)
+plot_model(glmmonoip1)
+
+mydf <- ggpredict(glmmonoip2, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+
+apatheme=theme_bw()+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        text=element_text(family='Times'))
+
+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
+  labs(x = 'Year', y = 'Monogenean abundance')+
+  apatheme
+
+
+
 ### Code for monogenean MONO.DACT in PIMVIG abundance across time and pollution impact----
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
 # working directory, you'll need to specify them as I have below.
@@ -154,7 +212,6 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
          "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
   facet_wrap(~ psite_spp)
 
-<<<<<<< HEAD
 
 # Pimvig mono.dact
 
@@ -180,15 +237,10 @@ summary(glmmonodact1)
 library(DHARMa)
 library(MASS)
 
-s=stdres(glmmonodact1,arg="response")
-plot(s)
-
 par(mfrow = c(2, 2))
 s=simulateResiduals(fittedModel=glmmonodact1,n=250)
 s$scaledResiduals
 plot(s)
-
-diagnostics(glmmsurv, ask=FALSE)
 
 #Generate table
 
