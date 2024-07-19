@@ -277,7 +277,7 @@ write.csv(pim_vig_processed_data,
 
 # You can also do it the old-fashioned way
 
-ict_pun_today<-read.csv("data/raw/Ictalurus_punctatus_Datasheet_2024.06.28.csv")
+ict_pun_today<-read.csv("data/raw/Ictalurus_punctatus_Datasheet_2024.07.19.csv")
 length(ict_pun_today$CatalogNumber)
 
 
@@ -452,6 +452,7 @@ TREM.LG<-ict_pun_with_metadata$TREM.LG.DORSALFIN+ict_pun_with_metadata$TREM.LG.F
 TREM.LIP<-ict_pun_with_metadata$TREM.LIP.Intestine              
 TREM.MEGICT<-ict_pun_with_metadata$TREM.MEGICT.FLUSH+ict_pun_with_metadata$TREM.MEGICT.Intestine+
   ict_pun_with_metadata$TREM.MEGICT.Stomach             
+TREM.PHYLS<-ict_pun_with_metadata$TREM.PHYLS.URINARYBLADDER
 TREM.SMILE<-ict_pun_with_metadata$TREM.SMILE.Intestine             
 TREM.UNK<-ict_pun_with_metadata$TREM.UNKN.Intestine                    
 #not a parasite, ignore: WORM.UNK<-ict_pun_with_metadata$WORM.UNK.B.intestine+ict_pun_with_metadata$WORM.UNK.Stomach
@@ -598,9 +599,9 @@ colnames(ict_pun_processed_data_longer)[17]<-"psite_count"
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, 
-          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.19.csv")
 write.csv(ict_pun_processed_data, 
-          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.10.csv")
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.19.csv")
 
 
 
@@ -831,5 +832,5 @@ colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.19.csv")
 
