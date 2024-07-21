@@ -67,23 +67,8 @@ library(ggplot2)
 library(glmmTMB)
 ```
 
-#### Jolee load datasets
-```{r JT datasets, eval=FALSE, echo=FALSE}
-setwd("C:/Users/thirt/Documents/TUBRI_JT")
-
-P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv") %>% 
-  janitor::clean_names()
-I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv") %>% 
-  janitor::clean_names()
-N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv") %>% 
-  janitor::clean_names()
-```
-
-
-#### Connor load datasets
+#### Load datasets
 ```{r CW datasets, echo=FALSE}
-# Connor's wd assignment and data assignments
-
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
 I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.19.csv")  %>%
   janitor::clean_names()
@@ -91,20 +76,25 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
   janitor::clean_names()
 ```
 
-## Giving adult and young binary IDs so we can look at life stage compared to parasite burden
-### P.VIG - add a column to identify species as an adult or larval stage
+## Giving adult and larval IDs so we can look at life stage compared to parasite burden
+### P.VIG - add columns to identify species as an adult or larval stage and new column for total parasite count
 ```{r p.vig a/l stage}
 Pvig.life.stage <- P.vigilax.data %>%
-  mutate(LifeStage = ifelse(
-    rowSums(select(., "acanth_bigb", 
+  mutate(adult = rowSums(select(., 
+                      "acanth_bigb", 
                       "acanth_bkr",
                       "nem_cona",
+                      "nem_cap",
                       "nem_dich",
                       "nem_larv",
                       "nem_trbk",
                       "nem_unk",
                       "cest_godz",
+                      "cest_comp",
                       "cest_ntg",
+                      "cope_cl",
+                      "cope_grab",
+                      "cest_pea",
                       "cest_l",
                       "cest_vit",
                       "cest_unk",
@@ -112,70 +102,107 @@ Pvig.life.stage <- P.vigilax.data %>%
                       "mono_dact",
                       "mono_lg",
                       "trem_rnda",
-                      "trem_unk")) > 0,
-    "Adult",
-    "Larval"))
-
-# you don't need to remove things like cyst_unk because they are already excluded from this dataset 
-
-    # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
-Pvig.life.stage <- Pvig.life.stage %>%
-  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
-  janitor::clean_names() %>%
-  mutate(binary_code = as.integer(binary_code))
+                      "trem_unk"))) %>%
+  mutate(larval = rowSums(select(.,
+                      "meta_hs",
+                      "meta_unk", 
+                      "myx_go",
+                      "myx_geom",
+                      "myxo_bc",
+                      "myx_thel",
+                      "myxo_sbad",
+                      "myxo_unk",
+                      "myxo_up",
+                      "trem_met",
+                      "trem_sss",
+                      "trem_buc",
+                      "trem_metaf",
+                      "trem_metags",
+                      "trem_ms",
+                      "trem_nea"))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>%
+  janitor::clean_names()
 
 ```
 
-### I.PUN - adding columns for life stage and binary code
+### I.PUN - add columns to identify species as an adult or larval stage and new column for total parasite count
 ```{r i. pun a/l stage}
 Ipun.life.stage <- I.punctatus.data %>%
-   mutate(life_stage = ifelse(
-    rowSums(select(., "nem_cyst",
+  mutate(larval = rowSums(select(., 
+                      "nem_cyst",
                       "trem_meta_gg",
                       "trem_meta_unk",
-                      "trem_lg", 
+                      "trem_lg",
+                      "nem_cyst",
                       "myx_tail",
-                      "myx_geom")) > 0,
-  "Larval", 
-  "Adult")) # switching because there are more adults than larvae - less code to write
-
-cols_to_remove <- c("nmorph",
-                    "trem_2", # exclude because it's a once-off?
-                    "leech_kut")
-
-   # removing the species I'm not using -- i also removed all the other ones listed that were not in the database
-Ipun.life.stage <- Ipun.life.stage %>%
-  select(-all_of(cols_to_remove))
-   
-    # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
-Ipun.life.stage <- Ipun.life.stage %>%
-  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
-  janitor::clean_names() %>%
-  mutate(binary_code = as.integer(binary_code))
+                      "myx_geom"))) %>%
+  mutate(adult = rowSums(select(.,
+                      "acan_ostr",
+                      "cest_comp",
+                      "cest_meg",
+                      "leech_kut",
+                      "nem_nmts",
+                      "mono_ip",
+                      "mono_unk",
+                      "nem_phar",
+                      "nem_pty",
+                      "nem_sp",
+                      "nem_taf",
+                      "nem_unk",
+                      "nmorph",
+                      "trem_2",
+                      "trem_allo",
+                      "trem_ble",
+                      "trem_crep",
+                      "trem_f",
+                      "trem_lip",
+                      "trem_megict",
+                      "trem_smile",
+                      "trem_unk"))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>%
+  janitor::clean_names()
 ```
 
-### N.ATH - adding columns for life stage and binary code
+### N.ATH - add columns to identify species as an adult or larval stage and new column for total parasite count
 ```{r n. ath a/l stage}
 Nath.life.stage <- N.atherinoides.data %>%
-   mutate(life_stage = ifelse(
-    rowSums(select(., "nem_cyst",
+  mutate(larval = rowSums(select(., 
+                      "nem_cyst",
                       "trem_larv",
                       "trem_meta",
                       "myx_sp", 
                       "myx_round",
-                      "trem_cyst")) > 0,
-  "Larval", 
-  "Adult")) # switching because there are more adults than larvae - less code to write
-
-# removing the species I'm not using
-cols_to_remove <- c("cope_a")
-
-# adding a binary code column that codes "Adult" as 1 and "Larval" as 0
-Nath.life.stage <- Nath.life.stage %>%
-  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
-  janitor::clean_names() %>%
-  mutate(binary_code = as.integer(binary_code))
-
+                      "trem_cyst"))) %>%#
+  mutate(adult = rowSums(select(.,
+                      "cest_comp",
+                      "cest_hyd",
+                      "cest_lvs",
+                      "cest_tri",
+                      "cope_a",
+                      "mono_all",
+                      "mono_unk",
+                      "nem_bran",
+                      "nem_cap",
+                      "nem_spky",
+                      "nem_tfs",
+                      "nem_twas",
+                      "nem_unkn",
+                      "trem_gb",
+                      "trem_l"))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>%
+  janitor::clean_names()
 ```
 
 ### Calculating Fulton's Condition Factor
@@ -192,71 +219,6 @@ Ipun.life.stage <- Ipun.life.stage %>%
   mutate(body.index.pun = ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)) %>%
   janitor::clean_names()
 
-```
-
-### plots to look at associations to see if there's anything (preliminary)
-```{r exploratory plots, echo=FALSE, eval=FALSE}
-## plot condition factor by time
-IP.y.fcf <- ggplot(Ipun.life.stage, 
-       aes(x = year_collected, y = body_index_pun)) + geom_point() + xlab("Year")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
-
-NA.y.fcf <- ggplot(Nath.life.stage, 
-       aes(x = year_collected, y = body_index_ath)) + geom_point() + xlab("Year")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
-
-PV.y.fcf <- ggplot(Pvig.life.stage, 
-       aes(x = year_collected, y = body_index_vig)) + geom_point() + xlab("Year")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.y.fcf, NA.y.fcf, PV.y.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-
-## plot body size by time
-  # standard length for body size
-IP.y.sl <- ggplot(Ipun.life.stage, 
-       aes(x = year_collected, y = standard_length_mm)) + geom_point() + xlab("Year")  + 
-  ylab("standard length")  + theme_bw() + stat_smooth(method=lm)
-
-NA.y.sl <- ggplot(Nath.life.stage, 
-       aes(x = year_collected, y = standard_length_mm)) + geom_point() + xlab("Year")  + 
-  ylab("standard length")  + theme_bw() + stat_smooth(method=lm)
-
-PV.y.sl <- ggplot(Pvig.life.stage, 
-       aes(x = year_collected, y = standard_length_mm)) + geom_point() + xlab("Year")  + 
-  ylab("standard length")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.y.sl, NA.y.sl, PV.y.sl, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-
- # weight for body size
-IP.y.w <- ggplot(Ipun.life.stage, 
-       aes(x = year_collected, y = weight_mg)) + geom_point() + xlab("Year")  + 
-  ylab("weight")  + theme_bw() + stat_smooth(method=lm)
-
-NA.y.w <- ggplot(Nath.life.stage, 
-       aes(x = year_collected, y = weight_mg)) + geom_point() + xlab("Year")  + 
-  ylab("weight")  + theme_bw() + stat_smooth(method=lm)
-
-PV.y.w <- ggplot(Pvig.life.stage, 
-       aes(x = year_collected, y = weight_mg)) + geom_point() + xlab("Year")  + 
-  ylab("weight")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.y.w, NA.y.w, PV.y.w, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-
-# plot total parasite burden by time
-IP.y.psc <- ggplot(Ipun.life.stage, 
-       aes(x = year_collected, y = psite_count)) + geom_point() + xlab("Year")  + 
-  ylab("psite count")  + theme_bw() + stat_smooth(method=lm)
-
-NA.y.psc <- ggplot(Nath.life.stage, 
-       aes(x = year_collected, y = psite_count)) + geom_point() + xlab("Year")  + 
-  ylab("psite count")  + theme_bw() + stat_smooth(method=lm)
-
-PV.y.psc <- ggplot(Pvig.life.stage, 
-       aes(x = year_collected, y = psite_count)) + geom_point() + xlab("Year")  + 
-  ylab("psite count")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.y.psc, NA.y.psc, PV.y.psc, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
-# more variability than the others
 ```
 
 #### preliminary body condition index plots
@@ -282,27 +244,33 @@ ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bo
 ### Plot life stage data 
 ```{r life stage plots, echo=TRUE}
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-boxplot(Nath.life.stage$BinaryCode, body.index.ath)
+NA.bc.a <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = adult, y = body_index_ath)) + xlab("Adult")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-NA.bc.fcf <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
-       aes(x = life_stage, y = body_index_ath)) + xlab("Life Stage")  + geom_boxplot() +
-  ylab("Fulton's Condition Factor")  + theme_bw()
-
-# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-boxplot(Ipun.life.stage$BinaryCode, body.index.pun)
-
-IP.bc.fcf <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
-       aes(x = life_stage, y = body_index_pun)) + xlab("Life Stage")  + geom_boxplot() +
-  ylab("Fulton's Condition Factor")  + theme_bw()
+NA.bc.l <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = larval, y = body_index_ath)) + xlab("Larval")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-boxplot(Pvig.life.stage$BinaryCode, body.index.vig)
+IP.bc.a <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = adult, y = body_index_pun)) + xlab("Adult")  + geom_point() + 
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-PV.bc.fcf <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
-       aes(x = life_stage, y = body_index_vig)) + xlab("Life Stage")  + geom_boxplot() +
-  ylab("Fulton's Condition Factor")  + theme_bw()
+IP.bc.l <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = larval, y = body_index_pun)) + xlab("Larval")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-ggarrange(IP.bc.fcf, NA.bc.fcf, PV.bc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+PV.bc.a <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = adult, y = body_index_vig)) + xlab("Adult")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
+
+PV.bc.l <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
+       aes(x = larval, y = body_index_vig)) + xlab("Larval")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
+
+ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D", "E", "F"))
 # more variability than the others
 
 ## double check sex, weights
@@ -334,7 +302,7 @@ $$
 # Question 1 (ANOVA)
 summary(FCF_ath_ANOVA <- aov(body_index_ath ~ factor(psite_count), data = Nath.life.stage))
 
-plot(FCF_psite_ath_ANOVA)
+plot(FCF_ath_ANOVA)
 
 
 ```
