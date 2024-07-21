@@ -34,6 +34,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 * For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
 * Anything labeled as META or CYST are considered larval, as metacercaria and cysts are by definition non-final adult forms of parasites.  
 * Anything labeled as TREM, NEM, ACANTH, MONO, COPE, or CEST are considered adults of those groups, as we were able to ID them to larger taxonomic groups because they were not in cysts. 
+* lists in the code below are the complete lists of which parasites are considered adult or larval
 
 #### Fulton's Condition Factor Equation:
 | Variable | Definition                                  |
