@@ -95,106 +95,86 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
 ### P.VIG - add a column to identify species as an adult or larval stage
 ```{r p.vig a/l stage}
 Pvig.life.stage <- P.vigilax.data %>%
-  mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
-                                               "ACANTH.BKR",
-                                               "NEM.CONA",
-                                               "NEM.DICH",
-                                               "NEM.LARV",
-    ### need to modify this code to                                            "NEM.TRBK",
-    ### account for the parasites                                           "NEM.UNK",
-    ### having their own column now                                           "CEST.GODZ",
-                                               "CEST.NTG",
-                                               "CEST.L",
-                                               "CEST.VIT",
-                                               "CEST.UNK",
-                                               "MONO.GYRO",
-                                               "MONO.DACT",
-                                               "MONO.LG",
-                                               "TREM.RNDA",
-                                               "TREM.UNK"),
-                            "Adult", "Larval"))
+  mutate(LifeStage = ifelse(
+    rowSums(select(., "acanth_bigb", 
+                      "acanth_bkr",
+                      "nem_cona",
+                      "nem_dich",
+                      "nem_larv",
+                      "nem_trbk",
+                      "nem_unk",
+                      "cest_godz",
+                      "cest_ntg",
+                      "cest_l",
+                      "cest_vit",
+                      "cest_unk",
+                      "mono_gyro",
+                      "mono_dact",
+                      "mono_lg",
+                      "trem_rnda",
+                      "trem_unk")) > 0,
+    "Adult",
+    "Larval"))
 
-    # removing the species I'm not using
-Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
-                                                      "COPE.GRAB",
-                                                      "CYST.EMPTY",
-                                                      "CYST.NEH",
-                                                      "CYST.NP",
-                                                      "WORM.A")))
-
+# you don't need to remove things like cyst_unk because they are already excluded from this dataset 
 
     # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
 Pvig.life.stage <- Pvig.life.stage %>%
-  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0)) %>%
-  janitor::clean_names()
+  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
+  janitor::clean_names() %>%
+  mutate(binary_code = as.integer(binary_code))
 
-
-    
 ```
 
 ### I.PUN - adding columns for life stage and binary code
 ```{r i. pun a/l stage}
 Ipun.life.stage <- I.punctatus.data %>%
-  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
-                                             "TREM.LG",
-                                             "TREM.META", # is this the same as META.GG - in data as TREM.META.GG
-                                             "META.GG", # is this the same as TREM.META - in data as TREM.META.GG
-                                             "META.UNK", # is this TREM.META.UNK in the data?
-                                             "MYX.TAIL",
-                                             "MYX.GEOM",
-                                             "CYST.MX",
-                                             "CYST.BD",
-                                             "CYST.BLACK",
-                                             "TREM.META.UNK"),
-                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+   mutate(life_stage = ifelse(
+    rowSums(select(., "nem_cyst",
+                      "trem_meta_gg",
+                      "trem_meta_unk",
+                      "trem_lg", 
+                      "myx_tail",
+                      "myx_geom")) > 0,
+  "Larval", 
+  "Adult")) # switching because there are more adults than larvae - less code to write
 
-    # removing the species I'm not using
-Ipun.life.stage <- subset(Ipun.life.stage, !(psite_spp %in% c("NMORPH",
-                                                              "TREM.LARV",
-                                                              "TREM.MID",
-                                                              "CYST.UNKN", # correct code? This is what is in the slides
-                                                              "WORM.UNK.B",
-                                                              "TREM.2", # exclude because it's a once-off?
-                                                              "LEECH.KUT"
-                                                              )))
+cols_to_remove <- c("nmorph",
+                    "trem_2", # exclude because it's a once-off?
+                    "leech_kut")
 
-
+   # removing the species I'm not using -- i also removed all the other ones listed that were not in the database
+Ipun.life.stage <- Ipun.life.stage %>%
+  select(-all_of(cols_to_remove))
+   
     # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
 Ipun.life.stage <- Ipun.life.stage %>%
-  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0)) %>%
-  janitor::clean_names()
-
-
-    
-
+  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
+  janitor::clean_names() %>%
+  mutate(binary_code = as.integer(binary_code))
 ```
 
 ### N.ATH - adding columns for life stage and binary code
 ```{r n. ath a/l stage}
 Nath.life.stage <- N.atherinoides.data %>%
-  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST", # go through and check to see if dataset has any other not in the slides
-                                             "TREM.LARV",
-                                             "TREM.META",
-                                             "MYX.SP", # MYX.SP.GILL?
-                                             "MYX.DIAT",
-                                             "MYX.ROUND",
-                                             "CYST.UNA", # include?
-                                             "CYST.UNK", # include?
-                                             "TREM.CYST"), 
-                            
-                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+   mutate(life_stage = ifelse(
+    rowSums(select(., "nem_cyst",
+                      "trem_larv",
+                      "trem_meta",
+                      "myx_sp", 
+                      "myx_round",
+                      "trem_cyst")) > 0,
+  "Larval", 
+  "Adult")) # switching because there are more adults than larvae - less code to write
 
 # removing the species I'm not using
-Nath.life.stage <- subset(Nath.life.stage, !(psite_spp %in% c("CYST.NEH",
-                                                              "COPE.A",
-                                                              "CYST.SAC"
-)))
-
+cols_to_remove <- c("cope_a")
 
 # adding a binary code column that codes "Adult" as 1 and "Larval" as 0
 Nath.life.stage <- Nath.life.stage %>%
-  mutate(BinaryCode = ifelse(LifeStage == "Adult", 1, 0)) %>%
-  janitor::clean_names()
+  mutate(binary_code = ifelse(life_stage == "Adult", 1, 0)) %>%
+  janitor::clean_names() %>%
+  mutate(binary_code = as.integer(binary_code))
 
 ```
 
