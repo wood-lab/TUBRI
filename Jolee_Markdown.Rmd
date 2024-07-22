@@ -245,29 +245,29 @@ ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bo
 ### Plot life stage data 
 ```{r life stage plots, echo=TRUE}
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-NA.bc.a <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+NA.bc.a <- ggplot(Nath.life.stage,
        aes(x = adult, y = body_index_ath)) + xlab("Adult")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-NA.bc.l <- ggplot(Nath.life.stage, # plot doesn't show the two different plots, just the same one twice
+NA.bc.l <- ggplot(Nath.life.stage,
        aes(x = larval, y = body_index_ath)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-IP.bc.a <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
+IP.bc.a <- ggplot(Ipun.life.stage,
        aes(x = adult, y = body_index_pun)) + xlab("Adult")  + geom_point() + 
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-IP.bc.l <- ggplot(Ipun.life.stage, # plot doesn't show the two different plots, just the same one twice
+IP.bc.l <- ggplot(Ipun.life.stage, 
        aes(x = larval, y = body_index_pun)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
 # plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
-PV.bc.a <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
+PV.bc.a <- ggplot(Pvig.life.stage, 
        aes(x = adult, y = body_index_vig)) + xlab("Adult")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-PV.bc.l <- ggplot(Pvig.life.stage, # plot doesn't show the two different plots, just the same one twice
+PV.bc.l <- ggplot(Pvig.life.stage,
        aes(x = larval, y = body_index_vig)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
@@ -281,8 +281,8 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, common.legend = 
 
 ## Models
 We want to run a general linear model to test the research questions:
-1. Is body condition associated with incresaed total parasite burden?
-  - is there a linear association between increading body condition and increasing parasite burden?
+1. Is body condition associated with increased total parasite burden?
+  - is there a linear association between increasing body condition and increasing parasite burden?
   - does FCF increase as parasite burden increases?
 2. Is body condition associated with infection with adult or larval stages of parasites?
   - is there a linear association between increasing body condition and increasing abundance of larval or adult parasites in the host?
