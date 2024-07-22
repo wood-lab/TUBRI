@@ -171,9 +171,6 @@ plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
 # The <- command tells R what a thing is called.  So you can read the line below as,
 # Look at this csv file, and name it pim_vig_data.  When I call pim_vig_data, I want you to give me the csv file.
 
-#pim_vig_data<-read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv")
-#pim_vig_data<-read.csv("Pimephales_vigilax_processed_machine_readable")
-
 library(readr)
 
 PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
@@ -184,13 +181,9 @@ PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable
 
 # You can also see your data in the console below by running the name of the dataset.
 
-
-
-
-
 PIMVIG
 
-#We made a subset based on our data to include only MONO.IP
+#We made a subset based on our data to include only monogeneans
 
 PIMVIG_MONO <- subset(PIMVIG, psite_spp == 'MONO.DACT'|psite_spp == 'MONO.GYRO'|psite_spp == 'MONO.LG')
 
@@ -219,23 +212,27 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
   facet_wrap(~ psite_spp)
 
 
-# Pimvig mono.dact
+# Make a subset only for Pimvig mono.dact
 
 PIMVIG_MONOdact <- subset(PIMVIG, psite_spp == 'MONO.DACT')
 
+View(PIMVIG_MONOdact)
 
 library(stats)
 library(lme4)
 library(DHARMa)
 library(glmmTMB)
 
-glmmonodact1 <- glm(psite_count ~ YearCollected*CI,family=nbinom1, data = PIMVIG_MONOdact)
-glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOdact)
-glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=poisson,data = PIMVIG_MONOdact)
+#Model passed diagnostics test
+glmmonodact <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = PIMVIG_MONOdact)
+
+# Did not pass KS Test. The Kolmogorov-Smirnov Test is a type of non-parametric test of the equality of discontinuous and continuous a 1D probability distribution that is used to compare the sample with the reference probability test (known as one-sample K-S Test) or among two samples (known as two-sample K-S test). A K-S Test quantifies the distance between the cumulative distribution function of the given reference distribution and the empirical distributions of given two samples, or between the empirical distribution of given two samples.
+glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=poisson,data = PIMVIG_MONOdact)
 
 #Best one
-glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOdact)
+glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOdact)
 
+AIC(glmmonodact,glmmonodact1)
 
 summary(glmmonodact1)
 
@@ -247,14 +244,6 @@ par(mfrow = c(2, 2))
 s=simulateResiduals(fittedModel=glmmonodact1,n=250)
 s$scaledResiduals
 plot(s)
-
-#Generate table
-
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-tab_model(glmmonodact1, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
-
 
 ## final plot with predictions and CI
 library(ggeffects)
