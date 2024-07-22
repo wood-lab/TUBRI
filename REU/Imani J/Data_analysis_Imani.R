@@ -251,22 +251,27 @@ plot_model(glmmonodact1)
 
 mydf <- ggpredict(glmmonodact1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
 
-apatheme=theme_bw()+
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         panel.border=element_blank(),
-        axis.line=element_line(),
-        text=element_text(family='Times'))
+        axis.line=element_line())
 
-
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Monogenean abundance')+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+  labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
   apatheme
+
+dev.off()
+
+
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Dactylogyrus_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Dactylogyrus_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
+
 
 
 # Pimvig mono.gyro
 
-PIMVIG_MONOgyro <- subset(PIMVIG, psite_spp == 'MONO.GYRO')
+PIMVIG_MONOgyro <- subset(PIMVIG, psite_spp == 'MONO.GYRO'|psite_spp == 'MONO.LG')
 
 library(stats)
 library(lme4)
@@ -274,38 +279,31 @@ library(DHARMa)
 library(glmmTMB)
 
 
-glmmonodact1 <- glm(psite_count ~ YearCollected*CI,family=nbinom1, data = PIMVIG_MONOgyro)
-glmmonodact1 <- glm(psite_count ~ YearCollected*CI,family=quasipoisson, data = PIMVIG_MONOgyro)
+#Model passed diagnostics test
+glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = PIMVIG_MONOgyro)
 
+# Did not pass KS Test. The Kolmogorov-Smirnov Test is a type of non-parametric test of the equality of discontinuous and continuous a 1D probability distribution that is used to compare the sample with the reference probability test (known as one-sample K-S Test) or among two samples (known as two-sample K-S test). A K-S Test quantifies the distance between the cumulative distribution function of the given reference distribution and the empirical distributions of given two samples, or between the empirical distribution of given two samples.
+glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=poisson,data = PIMVIG_MONOgyro)
 
+#Best one
+glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOgyro)
+
+summary(glmmonogyro1)
 
 #Evaluate residuals
 library(DHARMa)
 library(MASS)
-
-s=stdres(glmmonodact1,arg="response")
-plot(s)
 
 par(mfrow = c(2, 2))
 s=simulateResiduals(fittedModel=glmmonogyro1,n=250)
 s$scaledResiduals
 plot(s)
 
-diagnostics(glmmsurv, ask=FALSE)
-
-#Generate table
-
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-tab_model(glmmonodact1, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
-
-
 ## final plot with predictions and CI
 library(ggeffects)
-plot_model(glmmonodact1)
+plot_model(glmmonogyro1)
 
-mydf <- ggpredict(glmmonodact1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+mydf <- ggpredict(glmmonogyro1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
 
 apatheme=theme_bw()+
   theme(panel.grid.major=element_blank(),
@@ -315,9 +313,13 @@ apatheme=theme_bw()+
         text=element_text(family='Times'))
 
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Dactylogyrus abundance')+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+  labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
   apatheme
+
+
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Gyrodactylus_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Gyrodactylus_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
 
 
 
