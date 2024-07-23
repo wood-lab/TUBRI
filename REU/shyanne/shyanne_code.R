@@ -95,6 +95,7 @@ library(lme4)
 model_2<-glmer.nb(psite_count~CI*Parasite_taxonomic_group+(1|Fish_sp.x/psite_spp.x)+
                     offset(log(scaled_TL_mm)),data=full_data,family="nbinom")
 
+
 # At some point, you should probably control for season
 # (1|MonthCollected)
 
