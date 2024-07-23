@@ -54,6 +54,8 @@ install.packages("tidyverse")
 install.packages("janitor")
 install.packages("ggeffects")
 install.packages("rmarkdown")
+install.packages("caret")
+install.packages("tibble")
 ```
 
 #### Load packages
@@ -61,6 +63,8 @@ install.packages("rmarkdown")
 library(ggeffects)
 library(tidyverse)
 library(ggpubr)
+library(caret)
+library(tibble)
 library(readr)
 library(dbplyr)
 library(lubridate)
@@ -68,11 +72,13 @@ library(ggplot2)
 library(glmmTMB)
 ```
 
-#### Load datasets
+#### Load datasets 
+# --- standardize body condtion across all three species --> scale, centering and scaling
 ```{r CW datasets, echo=FALSE}
 P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names()
 I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.19.csv")  %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  mutate(day_collected = as.integer(day_collected))
 N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_human_readable.csv") %>% 
   janitor::clean_names()
 ```
@@ -222,6 +228,18 @@ Ipun.life.stage <- Ipun.life.stage %>%
 
 ```
 
+#### Combine datasets and scale data 
+```{r}
+na_ip_pv_combined <- bind_rows(Nath.life.stage, Pvig.life.stage, Ipun.life.stage, .id = "dataset")
+na_ip_pv_pp <- preProcess(na_ip_pv_combined, method = c("center", "scale"))
+na_ip_pv_scaled <- predict(na_ip_pv_pp, na_ip_pv_combined)
+notath_scaled <- na_ip_pv_scaled %>% filter(dataset == "1")
+pimvig_scaled <- na_ip_pv_scaled %>% filter(dataset == "2")
+ictpun_scaled <- na_ip_pv_scaled %>% filter(dataset == "3")
+```
+
+
+```{r}
 #### preliminary body condition index plots
 ```{r exploratory plots, echo=FALSE, eval=FALSE}
 # plot condition factor vs parasite burden in total - may be interesting
