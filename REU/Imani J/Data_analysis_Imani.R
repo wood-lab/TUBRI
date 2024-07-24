@@ -113,37 +113,29 @@ library(glmmTMB)
 
 
 #Is linear, no quadratic term. The diagnostics are terrible.
-glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+#Best one
+glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
 
 #Models have good gianostics
-glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
-glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
+glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
 
 #Model selection. The lower the AIC, the better the model is.
 AIC(glmmonoip1,glmmonoip2)
 
 #After evaluating AIC, this one is the best.
-glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
 
 
-summary(glmmonodact1)
+summary(glmmonoip1)
 
 #Evaluate residuals
 library(DHARMa)
 library(MASS)
 
-par(mfrow = c(2, 2))
 s=simulateResiduals(fittedModel=glmmonoip1,n=250)
 s$scaledResiduals
 plot(s)
-
-#Generate table
-
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-tab_model(glmmonoip1, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
-
 
 ## final plot with predictions and CI
 library(ggeffects)
@@ -159,9 +151,15 @@ apatheme=theme_bw()+
         text=element_text(family='Times'))
 
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-  labs(x = 'Year', y = 'Ligictaluridus pricei abundance')+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+  labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
   apatheme
+
+dev.off()
+
+
+ggsave(file="REU/Imani J/Model plots/ICTPUNCT_Ligictaluridus pricei _modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+ggsave(file="REU/Imani J/Model plots/ICTPUNCT_Ligictaluridus pricei _modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
 
 
 
@@ -330,10 +328,6 @@ ggsave(file="REU/Imani J/Model plots/PIMVIG_Gyrodactylus_modelplot.pdf", width=1
 #y=label for y axis. color= represents the legend or key of labels.
 
 library(readr)
-NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
-View(NOTATH)
-
-library(readr)
 
 NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
 NOTATH_MONOS <- subset(NOTATH, psite_spp == "MONO.UNK"| psite_spp == "MONO.ALL")
@@ -363,45 +357,39 @@ library (ggplot2)
   library(DHARMa)
   library(glmmTMB)
   
-  #Is linear, no quadratic term. The diagnostics are terrible.
-  glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
-  glm_notathmono2 <- glmmTMB(psite_count ~ YearCollected*CI+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
+  #Is linear, no quadratic term. Good diagnostics
+  glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
+  glm_notathmono2 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
   
-  #Models have good gianostics
-  glm_notathmono1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
-  glm_notathmono2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
+  #Model has good gianostics
+  glm_notathmono3 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
+  
+  #Model has bad gianostics
+  glm_notathmono2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = NOTATH_MONOS)
   
   #Model selection. The lower the AIC, the better the model is.
-  AIC(glm_notathmono1,glm_notathmono2)
+  AIC(glm_notathmono1,glm_notathmono2,glm_notathmono3)
   
   #After evaluating AIC, this one is the best.
-  glm_notathmono1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+  glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
   
   
-  summary(glmmonodact1)
+  summary(glm_notathmono1)
   
   #Evaluate residuals
   library(DHARMa)
   library(MASS)
   
   par(mfrow = c(2, 2))
-  s=simulateResiduals(fittedModel=glm_notathmono2,n=250)
+  s=simulateResiduals(fittedModel=glm_notathmono1,n=250)
   s$scaledResiduals
   plot(s)
-  
-  #Generate table
-  
-  library(sjPlot)
-  library(sjmisc)
-  library(sjlabelled)
-  tab_model(glm_notathmono2, show.df = FALSE, show.aic = TRUE) #p.style = "a" #for asterics
-  
   
   ## final plot with predictions and CI
   library(ggeffects)
   plot_model(glm_notathmono2)
   
-  mydf <- ggpredict(glm_notathmono2, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+  mydf <- ggpredict(glm_notathmono1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
   
   apatheme=theme_bw()+
     theme(panel.grid.major=element_blank(),
@@ -411,8 +399,12 @@ library (ggplot2)
           text=element_text(family='Times'))
   
   
-  plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6)+
-    labs(x = 'Year', y = 'Monogenean abundance')+
+  plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+    labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
     apatheme
+  
+  
+  ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+  ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
   
   
