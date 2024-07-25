@@ -850,7 +850,7 @@ MONO.GDAC<-hyb_nuc_today_with_metadata$MONO.GDAC.PelvicFin+(2*hyb_nuc_today_with
 MYX.AK<-as.numeric(hyb_nuc_today_with_metadata$MYX.AK.GallBladder)              
 MYX.EYE<-(2*hyb_nuc_today_with_metadata$MYX.EYE.EYE)+hyb_nuc_today_with_metadata$MYX.EYE.intestine                
 MYX.FI<-hyb_nuc_today_with_metadata$MYX.FI.CaudalFin                 
-MYX.FI<-(2*hyb_nuc_today_with_metadata$myx.gc.gill)                     
+MYX.GC<-(2*hyb_nuc_today_with_metadata$myx.gc.gill)                     
 MYX.GL<-(2*hyb_nuc_today_with_metadata$MYX.GL.gill)                     
 MYX.OT<-(2*hyb_nuc_today_with_metadata$myx.ot.gill)+(2*hyb_nuc_today_with_metadata$MYX.OT.Skin)                      
 MYX.TIN<-(2*hyb_nuc_today_with_metadata$MYX.TIN.GILL)                     
@@ -941,7 +941,7 @@ hyb_nuc_processed_data<-cbind.data.frame(hyb_nuc_today_with_metadata$CatalogNumb
                                          hyb_nuc_today_with_metadata$Latitude,
                                          hyb_nuc_today_with_metadata$Longitude,
                                          ACAN.AD,CEST.BB,CEST.UNK,COPE.POOD,META.UNK,MONO.DACT,MONO.GDAC,
-                                         MYX.AK,MYX.EYE,MYX.FI,MYX.FI,MYX.GL,MYX.OT,MYX.TIN,NEM.BUD,NEM.DAFT,
+                                         MYX.AK,MYX.EYE,MYX.FI,MYX.GC,MYX.GL,MYX.OT,MYX.TIN,NEM.BUD,NEM.DAFT,
                                          NEM.UNK,TREM.ASS,TREM.BC,TREM.CM,TREM.DIPLO,TREM.META,TREM.META.ES,
                                          TREM.META.GO,TREM.META.HET,TREM.META.SP,TREM.META.UNK,TREM.NS,TREM.UNK)
 
@@ -993,6 +993,80 @@ View(hyb_nuc_processed_data)
 #ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 
+# It looks like meta-data are missing for some of the fish.
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(is.na(CI))
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="17623")
+
+hyb_nuc_processed_data$CatalogNumber[hyb_nuc_processed_data$CatalogNumber=="17623"]<-"175623"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="175623")
+
+hyb_nuc_processed_data$CI[hyb_nuc_processed_data$IndividualFishID=="175623_04"]<-"impact"
+hyb_nuc_processed_data$combo[hyb_nuc_processed_data$IndividualFishID=="175623_04"]<-"impact_1994-2003"
+hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$IndividualFishID=="175623_04"]<-"30.75417"
+hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$IndividualFishID=="175623_04"]<-"-89.82694"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="175623")
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(is.na(CI))
+
+hyb_nuc_processed_data$CatalogNumber[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"156660"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="156660")
+
+hyb_nuc_processed_data$CI[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"control"
+hyb_nuc_processed_data$combo[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"control_1984-1993"
+hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"30.76528"
+hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"-89.83222"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="156660")
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(is.na(CI))
+
+hyb_nuc_processed_data$CatalogNumber[hyb_nuc_processed_data$IndividualFishID=="106828_03"]<-"106828"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="106828")
+
+hyb_nuc_processed_data$CI[hyb_nuc_processed_data$IndividualFishID=="106828_03"]<-"control"
+hyb_nuc_processed_data$combo[hyb_nuc_processed_data$IndividualFishID=="106828_03"]<-"control_1974-1983"
+hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$IndividualFishID=="106828_03"]<-"30.76805"
+hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$IndividualFishID=="106828_03"]<-"-89.83083"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="106828")
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(is.na(CI))
+
+hyb_nuc_processed_data$CatalogNumber[hyb_nuc_processed_data$CatalogNumber=="184748"]<-"184784"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="184784")
+
+hyb_nuc_processed_data$CI[hyb_nuc_processed_data$CatalogNumber=="184784"]<-"impact"
+hyb_nuc_processed_data$combo[hyb_nuc_processed_data$CatalogNumber=="184784"]<-"impact_1994-2003"
+hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$CatalogNumber=="184784"]<-"30.74195"
+hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$CatalogNumber=="184784"]<-"-89.82528"
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(CatalogNumber=="184784")
+
+stuff<-hyb_nuc_processed_data %>%
+  filter(is.na(CI))
+
+
+
 # Make the dataset analyzable
 
 hyb_nuc_processed_data_longer<-melt(hyb_nuc_processed_data,id=c("CatalogNumber", "YearCollected", 
@@ -1004,6 +1078,7 @@ hyb_nuc_processed_data_longer<-melt(hyb_nuc_processed_data,id=c("CatalogNumber",
 
 colnames(hyb_nuc_processed_data_longer)[16]<-"psite_spp"
 colnames(hyb_nuc_processed_data_longer)[17]<-"psite_count"
+
 
 # Export both sheets
 
