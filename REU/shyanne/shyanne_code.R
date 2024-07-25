@@ -127,7 +127,7 @@ vif(model_2)
 model_2_output<-stargazer::stargazer(model_2, type = "text")
 write.table(model_2_output,"REU/shyanne/model_2_output_2024.07.15")
 
-
+read.table("REU/shyanne/model_2_output_2024.07.15")
 
 # Now let's plot it
 
