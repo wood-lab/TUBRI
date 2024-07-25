@@ -233,7 +233,7 @@ View(not_ath_dailies)
 
 # You can also do it the old-fashioned way
 
-hyb_nuc_today<-read.csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.23.csv")
+hyb_nuc_today<-read.csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.25.csv")
 length(hyb_nuc_today$CatalogNumber)
 
 

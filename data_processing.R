@@ -798,6 +798,221 @@ write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_pro
 
 
 
+### HYBNUC: Hybognathus nuchalis----
+
+
+# You can also do it the old-fashioned way
+
+hyb_nuc_today<-read.csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.25.csv")
+length(hyb_nuc_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+hyb_nuc_today_with_metadata<-merge(hyb_nuc_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(hyb_nuc_today$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(hyb_nuc_today_with_metadata$Latitude,30)~jitter(hyb_nuc_today_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+str(hyb_nuc_today_with_metadata)
+hyb_nuc_headers<-ls(hyb_nuc_today_with_metadata)
+hyb_nuc_headers<-as.factor(hyb_nuc_headers)
+
+
+# Add parasites across organs and double what needs to be doubled.
+
+ACAN.AD<-hyb_nuc_today_with_metadata$ACAN.AD.INTestine                
+CEST.BB<-hyb_nuc_today_with_metadata$CEST.BB.INTESTINE               
+CEST.UNK<-hyb_nuc_today_with_metadata$CEST.UNK.INTESTINE
+COPE.POOD<-(2*hyb_nuc_today_with_metadata$COPE.POOD.Gill)                   
+# not a parasite: CYST.UNK.AnalFin                 
+# not a parasite: CYST.UNK.CaudalFin              
+# not a parasite: CYST.UNK.CONNECTIVETISSUE        
+# not a parasite: CYST.UNK.DorsalFin               
+# not a parasite: CYST.UNK.EYE                    
+# not a parasite: CYST.UNK.GILL                    
+# not a parasite: CYST.UNK.Intestine               
+# not a parasite: cyst.unk.kidney                 
+# not a parasite: cyst.unk.liver                   
+# not a parasite: CYST.UNK.PelvicFin               
+# not a parasite: CYST.UNK.SKIN                   
+# not a parasite: CYST.UNKF.VOUCH                 
+# not a parasite: FIBER.UNK.Intestine             
+# not a parasite: FIBER.UNK.STOMACH                
+# not a parasite: FIBER.UNK.VOUCH                  
+META.UNK<-(2*hyb_nuc_today_with_metadata$META.UNK.EYE)+hyb_nuc_today_with_metadata$META.UNK.Flush+
+  hyb_nuc_today_with_metadata$meta.unk.INTESTINE               
+MONO.DACT<-(2*hyb_nuc_today_with_metadata$MONO.DACT.Gill)                   
+MONO.GDAC<-hyb_nuc_today_with_metadata$MONO.GDAC.PelvicFin+(2*hyb_nuc_today_with_metadata$MONO.UNK.GILL)                    
+MYX.AK<-as.numeric(hyb_nuc_today_with_metadata$MYX.AK.GallBladder)              
+MYX.EYE<-(2*hyb_nuc_today_with_metadata$MYX.EYE.EYE)+hyb_nuc_today_with_metadata$MYX.EYE.intestine                
+MYX.FI<-hyb_nuc_today_with_metadata$MYX.FI.CaudalFin                 
+MYX.FI<-(2*hyb_nuc_today_with_metadata$myx.gc.gill)                     
+MYX.GL<-(2*hyb_nuc_today_with_metadata$MYX.GL.gill)                     
+MYX.OT<-(2*hyb_nuc_today_with_metadata$myx.ot.gill)+(2*hyb_nuc_today_with_metadata$MYX.OT.Skin)                      
+MYX.TIN<-(2*hyb_nuc_today_with_metadata$MYX.TIN.GILL)                     
+
+# free-living?
+NEM.BUD<-(2*hyb_nuc_today_with_metadata$NEM.BUD.GILL)+(hyb_nuc_today_with_metadata$NEM.BUD.INTESTINE)                
+NEM.DAFT<-hyb_nuc_today_with_metadata$NEM.DAFT.CONNECTIVETISSUE       
+NEM.UNK<-hyb_nuc_today_with_metadata$NEM.UNK.INTESTINE                
+TREM.ASS<-hyb_nuc_today_with_metadata$TREM.ASS.ConnectiveTissue+hyb_nuc_today_with_metadata$TREM.ASS.Flush+
+  hyb_nuc_today_with_metadata$TREM.ASS.INTESTINE+as.numeric(hyb_nuc_today_with_metadata$TREM.ASS.LIVER)                 
+TREM.BC<-hyb_nuc_today_with_metadata$TREM.BC.CAUDALFIN+hyb_nuc_today_with_metadata$trem.bc.dorsalfin+
+  (2*hyb_nuc_today_with_metadata$trem.bc.skin)                     
+
+
+### Larval trematodes were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen metacercariae in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.CM count within a fish (across organs). The code below allows the sum of TREM.CM within an individual
+### fish ignore the NAs, and therefore provide a total number of TREM.META regardless of whether one of the organs
+### was "missing".
+
+hyb_nuc_today_with_metadata$TREM.CM.EYE.DUB<-2*hyb_nuc_today_with_metadata$TREM.CM.EYE
+hyb_nuc_today_with_metadata$TREM.CM.GILL.DUB<-2*hyb_nuc_today_with_metadata$TREM.CM.GILL
+hyb_nuc_today_with_metadata$TREM.CM.AnalFin<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.AnalFin)
+hyb_nuc_today_with_metadata$TREM.CM.BodyCavity<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.BodyCavity)
+hyb_nuc_today_with_metadata$TREM.CM.ConnectiveTissue<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.ConnectiveTissue)
+hyb_nuc_today_with_metadata$TREM.CM.Flush<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Flush)
+hyb_nuc_today_with_metadata$TREM.CM.Gonad<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Gonad)
+hyb_nuc_today_with_metadata$TREM.CM.INTESTINE<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.INTESTINE)
+hyb_nuc_today_with_metadata$TREM.CM.Kidney<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Kidney)
+hyb_nuc_today_with_metadata$TREM.CM.Liver<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Liver)
+hyb_nuc_today_with_metadata$TREM.CM.Spleen<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Spleen)
+hyb_nuc_today_with_metadata$TREM.CM.Stomach<-as.numeric(hyb_nuc_today_with_metadata$TREM.CM.Stomach)
+
+
+TREM.CM<-rowSums(hyb_nuc_today_with_metadata[,c("TREM.CM.AnalFin","TREM.CM.BodyCavity",
+                                            "TREM.CM.ConnectiveTissue",
+                                            "TREM.CM.EYE.DUB","TREM.CM.Flush","TREM.CM.GILL.DUB",
+                                            "TREM.CM.Gonad","TREM.CM.INTESTINE","TREM.CM.Kidney",
+                                            "TREM.CM.Liver","TREM.CM.Spleen",
+                                            "TREM.CM.Stomach")], na.rm=TRUE)
+
+TREM.DIPLO<-(2*hyb_nuc_today_with_metadata$TREM.DIPLO.EYE)                   
+
+# is this different from all the other TREM.METAs?
+TREM.META<-hyb_nuc_today_with_metadata$TREM.META.ES.CAUDALFIN          
+
+TREM.META.ES<-(2*hyb_nuc_today_with_metadata$TREM.META.ES.eye)                 
+TREM.META.GO<-(2*hyb_nuc_today_with_metadata$TREM.META.GO.Eye)+(2*hyb_nuc_today_with_metadata$TREM.META.GO.GILL)+
+  hyb_nuc_today_with_metadata$TREM.META.GO.INTESTINE    
+
+
+### Larval trematodes were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen metacercariae in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.META.HET count within a fish (across organs). The code below allows the sum of TREM.META.HET within an individual
+### fish ignore the NAs, and therefore provide a total number of TREM.META regardless of whether one of the organs
+### was "missing".
+
+hyb_nuc_today_with_metadata$TREM.META.HET.pectoralfin.DUB<-2*hyb_nuc_today_with_metadata$TREM.META.HET.pectoralfin
+hyb_nuc_today_with_metadata$TREM.META.HET.PELVICFIN.DUB<-2*hyb_nuc_today_with_metadata$TREM.META.HET.PELVICFIN
+hyb_nuc_today_with_metadata$TREM.META.HET.SKIN.DUB<-2*hyb_nuc_today_with_metadata$TREM.META.HET.SKIN
+
+TREM.META.HET<-rowSums(hyb_nuc_today_with_metadata[,c("TREM.META.HET.pectoralfin.DUB","TREM.META.HET.PELVICFIN.DUB",
+                                                "TREM.META.HET.SKIN.DUB",
+                                                "TREM.META.HET.ANALFIN","TREM.META.HET.CAUDALFIN")], na.rm=TRUE)
+
+TREM.META.SP<-hyb_nuc_today_with_metadata$TREM.META.SP.AnalFin+hyb_nuc_today_with_metadata$TREM.META.SP.CaudalFin+
+  hyb_nuc_today_with_metadata$TREM.META.SP.DorsalFin+(2*hyb_nuc_today_with_metadata$TREM.META.SP.pectoral.fin)+
+  (2*hyb_nuc_today_with_metadata$TREM.META.SP.PelvicFin)           
+TREM.META.UNK<-(2*hyb_nuc_today_with_metadata$TREM.META.UNK.EYE)                
+TREM.NS<-hyb_nuc_today_with_metadata$TREM.NS.INTESTINE               
+TREM.UNK<-(2*hyb_nuc_today_with_metadata$TREM.UNK.EYE)+hyb_nuc_today_with_metadata$TREM.UNK.Flush+
+  (2*hyb_nuc_today_with_metadata$TREM.UNK.GILL)+as.numeric(hyb_nuc_today_with_metadata$TREM.UNK.Liver)
+
+
+# Now put it all together
+
+hyb_nuc_processed_data<-cbind.data.frame(hyb_nuc_today_with_metadata$CatalogNumber,hyb_nuc_today_with_metadata$YearCollected.x,
+                                         hyb_nuc_today_with_metadata$MonthCollected.x,hyb_nuc_today_with_metadata$DayCollected.x,
+                                         hyb_nuc_today_with_metadata$IndividualFishID,hyb_nuc_today_with_metadata$Dissector,
+                                         hyb_nuc_today_with_metadata$DissectionDate,hyb_nuc_today_with_metadata$Sex,
+                                         hyb_nuc_today_with_metadata$TotalLength_mm,hyb_nuc_today_with_metadata$StandardLength_mm,
+                                         hyb_nuc_today_with_metadata$weight_mg,hyb_nuc_today_with_metadata$CI.y,
+                                         hyb_nuc_today_with_metadata$combo,
+                                         hyb_nuc_today_with_metadata$Latitude,
+                                         hyb_nuc_today_with_metadata$Longitude,
+                                         ACAN.AD,CEST.BB,CEST.UNK,COPE.POOD,META.UNK,MONO.DACT,MONO.GDAC,
+                                         MYX.AK,MYX.EYE,MYX.FI,MYX.FI,MYX.GL,MYX.OT,MYX.TIN,NEM.BUD,NEM.DAFT,
+                                         NEM.UNK,TREM.ASS,TREM.BC,TREM.CM,TREM.DIPLO,TREM.META,TREM.META.ES,
+                                         TREM.META.GO,TREM.META.HET,TREM.META.SP,TREM.META.UNK,TREM.NS,TREM.UNK)
+
+# Name the columns
+
+colnames(hyb_nuc_processed_data)[1]<-"CatalogNumber"
+colnames(hyb_nuc_processed_data)[2]<-"YearCollected"
+colnames(hyb_nuc_processed_data)[3]<-"MonthCollected"
+colnames(hyb_nuc_processed_data)[4]<-"DayCollected"
+colnames(hyb_nuc_processed_data)[5]<-"IndividualFishID"
+colnames(hyb_nuc_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(hyb_nuc_processed_data)[7]<-"DissectionDate"
+colnames(hyb_nuc_processed_data)[8]<-"Sex"
+colnames(hyb_nuc_processed_data)[9]<-"TotalLength_mm"
+colnames(hyb_nuc_processed_data)[10]<-"StandardLength_mm"
+colnames(hyb_nuc_processed_data)[11]<-"Weight_mg"
+colnames(hyb_nuc_processed_data)[12]<-"CI"
+colnames(hyb_nuc_processed_data)[13]<-"combo"
+colnames(hyb_nuc_processed_data)[14]<-"Latitude"
+colnames(hyb_nuc_processed_data)[15]<-"Longitude"
+
+View(hyb_nuc_processed_data)
+
+#Remove #VALUE! entries from Weight_mg with "NA"
+#not_ath_processed_data <- not_ath_processed_data %>%
+#  mutate(Weight_mg = recode(Weight_mg,
+#                            "#VALUE!" = "NA"))
+
+#Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
+# ggplot(hyb_nuc_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+
+# Evaluate ratio between total length and weight to inform decision about which numbers must be multiplied by ten. For this, divide length by weight
+# not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
+
+
+# All incorrect weights that must be multiplied by 10 have a ratio below 3 which does not make sense. See the data below to confirm. The weights have a decimal point which should not be the case.
+# lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
+# View(lenweighb)
+
+# Therefore, multiply all weights with LenWeig higher than 3 by 10
+
+#not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
+#                                           as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
+#                                           as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
+#)
+
+
+#Re-evaluate relationship between TotalLength_mm and Weight_mg. Now it is fixed.
+#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+
+
+# Make the dataset analyzable
+
+hyb_nuc_processed_data_longer<-melt(hyb_nuc_processed_data,id=c("CatalogNumber", "YearCollected", 
+                                                                "MonthCollected", "DayCollected", 
+                                                                "IndividualFishID", "Dissector_and_Examiner",
+                                                                "DissectionDate", "Sex", 
+                                                                "TotalLength_mm", "StandardLength_mm",
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
+
+colnames(hyb_nuc_processed_data_longer)[16]<-"psite_spp"
+colnames(hyb_nuc_processed_data_longer)[17]<-"psite_count"
+
+# Export both sheets
+
+write.csv(hyb_nuc_processed_data_longer, file="data/processed/Hybognathus_nuchalis_processed_machine_readable.csv")
+write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_processed_human_readable.csv")
+
+
+
+
 ### Put all the sheets together----
 
 # Start by scaling fish body size within fish species
