@@ -294,6 +294,73 @@ hyb_nuc_dailies<-hyb_nuc_with_metadata %>%
 View(hyb_nuc_dailies)
 
 
+
+### PERVIG
+
+# You can also do it the old-fashioned way
+
+per_vig_today<-read.csv("data/raw/Percina_vigil_Datasheet - Sheet1_2024.07.25.csv")
+length(per_vig_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+per_vig_with_metadata<-merge(per_vig_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(per_vig_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(per_vig_with_metadata$Latitude.y,30)~jitter(per_vig_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# Desired level of replication
+
+per_vig_desired<-read.csv(file="lot_selection/desired_replication/per_vig_goal.csv")
+per_vig_desired<-per_vig_desired[,-1]
+colnames(per_vig_desired)[3]<-"n_lots_desired"
+per_vig_desired$individual_fish_desired<-per_vig_desired$n_lots_desired*2
+per_vig_desired$combo<-paste(per_vig_desired$CI,per_vig_desired$decade,sep="_")
+sum(per_vig_desired$individual_fish_desired)
+
+
+# Actual level of replication
+
+per_vig_actual<-per_vig_with_metadata %>%
+  group_by(combo) %>%
+  summarize(actual = n())
+
+
+# Merge desired and actual
+
+per_vig_remaining<-merge(per_vig_desired, per_vig_actual, by.x = "combo", by.y = "combo", all.x = TRUE, all.y = TRUE)
+
+
+# Calculate how many you have left
+
+per_vig_remaining$to_go<-(per_vig_remaining$individual_fish_desired-ifelse(is.na(per_vig_remaining$actual),0,per_vig_remaining$actual))
+per_vig_remaining<-na.omit(per_vig_remaining)
+sum(per_vig_remaining$actual,na.rm=T)
+sum(per_vig_remaining$to_go,na.rm=T)
+
+
+# Check that body size is invariant through time
+
+summary(glm(per_vig_with_metadata$TotalLength_mm~per_vig_with_metadata$YearCollected.x))
+plot(per_vig_with_metadata$TotalLength_mm~per_vig_with_metadata$YearCollected.x)
+summary(glm(per_vig_with_metadata$TotalLength_mm~per_vig_with_metadata$Latitude.y))
+plot(per_vig_with_metadata$TotalLength_mm~per_vig_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+per_vig_dailies<-per_vig_with_metadata %>%
+  group_by(DissectionDate) %>%
+  summarize(actual = n())
+View(per_vig_dailies)
+
+
 # Calculate how many fish you need to do per day to hit your target
 
 working_days_remaining<-41

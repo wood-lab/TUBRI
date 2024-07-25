@@ -604,6 +604,8 @@ per_vig_matrix<-per_vig_selected %>%
 
 plot(jitter(per_vig_selected$Latitude,30)~per_vig_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+write.csv(per_vig_matrix,file="lot_selection/desired_replication/per_vig_goal.csv")
+
 
 ### CARVEL
 # Katie went through all in-bounds PERVIG, CARVEL, ICTPUN, and PIMVIG and found all valid lots (i.e., present, big enough)
