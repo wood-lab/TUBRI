@@ -1,20 +1,14 @@
+#SuPeR PARASITES SUMMER 2024
+#"TITLE OF PROJECT"
+#Code written by Gabby Commisso and Desmond Boyd
+
+
 setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
-
-
-#SIZE DATA FROM DISSECTED FISHES
-#ICTALURUS PUNCTATUS
-
-#processed data
-library(readr)
-ictpun <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
-View(ictpun)
+#################################################################SIZE DATA FROM DISSECTED FISHES
+#############################ictalurus
+#loading in dada
 ictpunraw<-Ictalurus_punctatus_Datasheet_2024_06_28
-
-
-#rawdata
 View(ictpunraw)
-
-
 
 #plotting ALL
 plot(ictpunraw$StandardLength_mm~ictpunraw$YearCollected)
@@ -26,17 +20,15 @@ View(ictpuntrim)
 
 #plot only randomly selected fishes
 plot(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected)
+
+#create model and add regression line
 summary(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
 abline(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
 
-
-
-#NOTROPIS ATHERNOIDES
+################################notropis
+#loading in data
 notropraw<-Notropis_atherinoides_Datasheet_2024_01_10
-
 View(notropraw)
-
-
 
 #plotting ALL
 plot(notropraw$StandardLength_mm~notropraw$YearCollected)
@@ -48,14 +40,27 @@ View(notroptrim)
 
 #plot only randomly selected fishes
 plot(notroptrim$StandardLength_mm~notroptrim$YearCollected)
+
+#create model and add regression line
 summary(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected)) 
 abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
-#yay! it looks like we have a strong trend in decreasing body size for notropis fishes
+
+#############################hybog
+#loading in data
+hybograw <-Hybognathus_nuchalis_Datasheet_2024_07_25
+View(hybograw)
+
+#plotting ALL
+plot(hybograw$StandardLength_mm~hybograw$YearCollected)
+
+#create model and add regression line
+summary(lm(hybograw$StandardLength_mm~hybograw$YearCollected)) 
+abline(lm(hybograw$StandardLength_mm~hybograw$YearCollected))
+#nearly every fish was selected for size; even still there is a significant size decrease
 
 
 
-
-#SIZE DATA FROM FULLY RESELECTED FISHES
+#######################################################SIZE DATA FROM FULLY RESELECTED FISHES
 
 install.packages("googlesheets4")
 library(googlesheets4)
@@ -65,9 +70,10 @@ gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this c
 #main research question: how did body length change over time?
 library(ggplot2)
 
+View(desmond_data)
 #plotting both species together
 SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
-  scale_color_manual(values=c("#0571b0","#ca0020"))+
+  scale_color_manual(values=c("#FCD12A", "#0571b0","#ca0020"))+
   geom_point(size=4)+
   xlab("Year collected")+
   ylab("Standard Length in mm")+
@@ -85,8 +91,6 @@ ict_only <- ggplot(subset(desmond_data, Species %in% "Ictalurus_punctatus"), aes
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 ict_only
 
-#above, I added a line based on a linear model that represents the data! In this case, it is super simple. We can see there isn't a strong trend in any direction in this data for ictalurus, so let's take a closer look at a linear model for this data. 
-
 #plotting only notropis
 notrop_only <- ggplot(subset(desmond_data, Species %in% "Notropis_atherinoides"), aes(Year,SL))+
   geom_point(size=4)+
@@ -97,21 +101,73 @@ notrop_only <- ggplot(subset(desmond_data, Species %in% "Notropis_atherinoides")
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 notrop_only
 
-#MODELS FOR RESELECTED FISHES
+#plotting only hybog
+hybog_only <- ggplot(subset(desmond_data, Species %in% "Hybognathus_nuchalis"), aes(Year,SL))+
+  geom_point(size=4)+
+  xlab("Year collected")+
+  ylab("Standard Length in mm")+
+  geom_smooth(method = "lm", formula = y ~ x)+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+hybog_only
 
-#subset data
+
+##################################################WHAT ABOUT WEIGHT:LENGTH RATIO?
+##########subset data
+#ictalurus
 ict_desmond <- subset(desmond_data, Species == "Ictalurus_punctatus")
+ict_desmond$weight_to_sl <- ict_desmond$Weight/ict_desmond$SL
 View(ict_desmond)
+#notropis
 notrop_desmond <- subset(desmond_data, Species == "Notropis_atherinoides")
+notrop_desmond$weight_to_sl <- notrop_desmond$Weight/notrop_desmond$SL
 View(notrop_desmond)
+#hybog
+hybog_desmond <- subset(desmond_data, Species == "Hybognathus_nuchalis")
+hybog_desmond$weight_to_sl <- hybog_desmond$Weight/hybog_desmond$SL
+View(hybog_desmond)
 
-#Ictalurus punctatus
+#########plots
+#ictalurus
+ict_w2SL_only <- ggplot(ict_desmond, aes(Year,weight_to_sl))+
+  geom_point(size=4)+
+  xlab("Year collected")+
+  ylab("Weight/Length Ratio")+
+  geom_smooth(method = "lm", formula = y ~ x)+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+ict_w2SL_only
+
+#notropis
+notrop_w2SL_only <- ggplot(notrop_desmond, aes(Year,weight_to_sl))+
+  geom_point(size=4)+
+  xlab("Year collected")+
+  ylab("Weight/Length Ratio")+
+  geom_smooth(method = "lm", formula = y ~ x)+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+notrop_w2SL_only
+
+#hybog
+hybog_w2SL_only <- ggplot(hybog_desmond, aes(Year,weight_to_sl))+
+  geom_point(size=4)+
+  xlab("Year collected")+
+  ylab("Weight/Length Ratio")+
+  geom_smooth(method = "lm", formula = y ~ x)+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+hybog_w2SL_only
+
+##################################################MODELS FOR RESELECTED FISHES
+#ictalurus
 ict_model <- lm(SL~Year, data= ict_desmond)
 summary(ict_model)
 #the model summary shows that there is not a very good fit of this model to the data (low R-sq value), and that there is no significant slope (pvalue, or Pr>t, is much greater than 0.05). 
 
-#Notropis
+#notropis
 notrop_model <- lm(SL~Year, data= notrop_desmond)
 summary(notrop_model)
 
-#we'll make the same type of model for notropis, but since we don't have a ton of data yet, we'll wait!
+#hybog
+hybog_model <- lm(SL~Year, data= hybog_desmond)
+summary(hybog_model)
