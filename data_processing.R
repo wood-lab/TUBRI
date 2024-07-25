@@ -1095,6 +1095,7 @@ write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_proc
 pim_vig_processed_data_longer$scaled_TL<-scale(pim_vig_processed_data_longer$TotalLength_mm)
 ict_pun_processed_data_longer$scaled_TL<-scale(ict_pun_processed_data_longer$TotalLength_mm)
 not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$TotalLength_mm)
+hyb_nuc_processed_data_longer$scaled_TL<-scale(hyb_nuc_processed_data_longer$TotalLength_mm)
 
 
 # Then make sure that there is a column for the fish species
@@ -1102,9 +1103,10 @@ not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$Tot
 pim_vig_processed_data_longer$Fish_sp<-c(rep("Pimephales vigilax",length(pim_vig_processed_data_longer$CatalogNumber)))
 ict_pun_processed_data_longer$Fish_sp<-c(rep("Ictalurus punctatus",length(ict_pun_processed_data_longer$CatalogNumber)))
 not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_ath_processed_data_longer$CatalogNumber)))
+hyb_nuc_processed_data_longer$Fish_sp<-c(rep("Hybognathus nuchalis",length(hyb_nuc_processed_data_longer$CatalogNumber)))
 
 full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_data_longer,
-                                          not_ath_processed_data_longer)
+                                          not_ath_processed_data_longer,hyb_nuc_processed_data_longer)
 
 full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
 
@@ -1122,5 +1124,5 @@ colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.19.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv")
 
