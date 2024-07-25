@@ -70,6 +70,7 @@ library(dbplyr)
 library(lubridate)
 library(ggplot2)
 library(glmmTMB)
+library(DHARMa)
 ```
 
 #### Load datasets 
@@ -169,6 +170,7 @@ Ipun.life.stage <- I.punctatus.data %>%
                       "trem_megict",
                       "trem_smile",
                       "trem_unk"))) %>%
+  select(-nmorph, -leech_kut) %>% 
   mutate(adult = as.integer(adult)) %>% 
   mutate(larval = as.integer(larval)) %>%
   mutate(psite_count = rowSums(select(.,
@@ -349,15 +351,18 @@ Nath.life.stage <- N.atherinoides.data %>%
 ```{r FCF calculated, echo=TRUE}
 Nath.life.stage <- Nath.life.stage %>%
   mutate(body.index.ath = ((Nath.life.stage$weight_mg/((Nath.life.stage$standard_length_mm)^3)))*(100)) %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  filter(sex != "MA" & sex != "")
 
 Pvig.life.stage <- Pvig.life.stage %>%
   mutate(body.index.vig = ((Pvig.life.stage$weight_mg/((Pvig.life.stage$standard_length_mm)^3)))*(100)) %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  filter(sex != "MA" & sex != "")
 
 Ipun.life.stage <- Ipun.life.stage %>%
   mutate(body.index.pun = ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)) %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  filter(sex != "MA" & sex != "")
 
 ```
 
@@ -562,8 +567,114 @@ plot(FCF_ath_al_anova)
 
 ```
 
+# Full dataset analyses
+
+#### Import dataset 
+- make sure you name all these new datasets and frames sometheing different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
+```{r full dataset import, echo=TRUE}
+
+```
+
+### Split everything into adult or larval based on the designations from initial analyses. Remove all non-concern cases of parasites (leech, nematomorph)
+```{r adult vs larval splits}
+
+```
+
+- this is your code from before --> you could use this as a template for doing these analyses again with the new dataset
+- use the distinctions we mapped out in the analyses above for what is adult or larval, since I think we have made some changes since this last one 
+```{r}
+Ipun.life.stage <- I.punctatus.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST",
+                                             "TREM.LG",
+                                             "TREM.META", # is this the same as META.GG - in data as TREM.META.GG
+                                             "META.GG", # is this the same as TREM.META - in data as TREM.META.GG
+                                             "META.UNK", # is this TREM.META.UNK in the data?
+                                             "MYX.TAIL",
+                                             "MYX.GEOM",
+                                             "CYST.MX",
+                                             "CYST.BD",
+                                             "CYST.BLACK",
+                                             "TREM.META.UNK"),
+                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+    # removing the species I'm not using
+Ipun.life.stage <- subset(Ipun.life.stage, !(psite_spp %in% c("NMORPH",
+                                                              "TREM.LARV",
+                                                              "TREM.MID",
+                                                              "CYST.UNKN", # correct code? This is what is in the slides
+                                                              "WORM.UNK.B",
+                                                              "TREM.2", # exclude because it's a once-off?
+                                                              "LEECH.KUT"
+                                                              )))
+
+Nath.life.stage <- N.atherinoides.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("NEM.CYST", # go through and check to see if dataset has any other not in the slides
+                                             "TREM.LARV",
+                                             "TREM.META",
+                                             "MYX.SP", # MYX.SP.GILL?
+                                             "MYX.DIAT",
+                                             "MYX.ROUND",
+                                             "CYST.UNA", # include?
+                                             "CYST.UNK", # include?
+                                             "TREM.CYST"), 
+                            
+                            "Larval", "Adult")) # switching because there are more adults than larvae - less code to write
+# removing the species I'm not using
+Nath.life.stage <- subset(Nath.life.stage, !(psite_spp %in% c("CYST.NEH",
+                                                              "COPE.A",
+                                                              "CYST.SAC"
+)))
+
+Pvig.life.stage <- P.vigilax.data %>%
+  mutate(LifeStage = ifelse(psite_spp %in% c("ACANTH.BIGB", 
+                                               "ACANTH.BKR",
+                                               "NEM.CONA",
+                                               "NEM.DICH",
+                                               "NEM.LARV",
+                                               "NEM.TRBK",
+                                               "NEM.UNK",
+                                               "CEST.GODZ",
+                                               "CEST.NTG",
+                                               "CEST.L",
+                                               "CEST.VIT",
+                                               "CEST.UNK",
+                                               "MONO.GYRO",
+                                               "MONO.DACT",
+                                               "MONO.LG",
+                                               "TREM.RNDA",
+                                               "TREM.UNK"),
+                            "Adult", "Larval"))
+    # removing the species I'm not using
+Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
+                                                      "COPE.GRAB",
+                                                      "CYST.EMPTY",
+                                                      "CYST.NEH",
+                                                      "CYST.NP",
+                                                      "WORM.A")))
+```
 
 
+### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. 
+- acanths
+- monogenes
+- myxozoans 
+Make sure you rename the new dataframe as something different from what you named it in the previous one (so that we can keep both versions to reference back to)
+```{r only a/l both in host}
+
+```
+
+### Add back a column for Fulton's Condition Factor. 
+```{r FCF into new dataframe}
+
+```
+
+
+### Pivot and sum all the adult and larval stages as Chelsea described.
+- you might need to play around with this section a bit
+```{r add sums of parasites for each stage}
+df <- df %>%
+  group_by(fish_ID, psite_group, life_stage) %>%
+  sum(???)
+```
 
 
 
