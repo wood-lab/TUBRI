@@ -29,6 +29,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 * To answer this question, we would need to go through the data and identify what parasites are in their adult stage versus their larval stage. This would involve a bit of research into what the different (larval or adult) stages are present for each of the ones we have found. You would then be also able to look at the literature to see where that parasite would live within the fish at that stage in its life cycle, and then we could make commentaries about how different stages/types of parasites could be associated with changes to body condition. For example, if we had a ton of adult cestodes in the intestine and found that fish to have a very bad condition score, we could talk about how adult cestodes require more nutrients based on their big size, etc. 
 
 ## Methods
+We removed "one-off" species as defined by appearing less than five times across all species datasets and if the parasite also exists in its own group (e.g., We found four acanthacephalean species across four fish species, so acanths were removed because less than five were found and they exist in a seperate group from other parasites. e.g., TREM.META was kept because even though it only appeared once in the H. nuchalis dataset, it will be lumped in with the other trematode metacercaria data points.)
 
 #### Rules for discriminating between adult and larval: 
 * For any parasite we have identified to a specific taxonomic level (family, genus, etc.), we will look at that life cycle in the literature and ID what stage we have. 
@@ -56,6 +57,7 @@ install.packages("ggeffects")
 install.packages("rmarkdown")
 install.packages("caret")
 install.packages("tibble")
+install.packages("DHARMa")
 ```
 
 #### Load packages
@@ -570,15 +572,57 @@ plot(FCF_ath_al_anova)
 # Full dataset analyses
 
 #### Import dataset 
-- make sure you name all these new datasets and frames sometheing different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
+- make sure you name all these new datasets and frames something different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
 ```{r full dataset import, echo=TRUE}
-
+full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv") %>% 
+  janitor::clean_names()
 ```
 
-### Split everything into adult or larval based on the designations from initial analyses. Remove all non-concern cases of parasites (leech, nematomorph)
+### Split everything into adult or larval based on the designations from initial analyses. Remove all non-concern cases of parasites (leech, nematomorph, copepod)
 ```{r adult vs larval splits}
-
-```
+full.data.stages <- full.data %>%
+  mutate(life_stage = ifelse(psite_spp_x %in% c("meta_hs",
+                      "meta_unk", 
+                      "myx_go",
+                      "myx_geom",
+                      "myxo_bc",
+                      "myx_thel",
+                      "myxo_sbad",
+                      "myxo_unk",
+                      "myxo_up",
+                      "trem_met",
+                      "trem_sss",
+                      "trem_buc",
+                      "trem_metaf",
+                      "trem_metags",
+                      "trem_ms",
+                      "trem_nea", # P. vigilax ends
+                      "nem_cyst",
+                      "trem_meta_gg",
+                      "trem_meta_unk",
+                      "trem_lg",
+                      "nem_cyst",
+                      "myx_tail",
+                      "myx_geom", # I. punctatus ends
+                      "nem_cyst",
+                      "trem_larv",
+                      "trem_meta",
+                      "myx_sp", 
+                      "myx_round",
+                      "trem_cyst", # N. atherinoides ends
+                      "nem_daft",
+                      "trem_cm",
+                      "trem_meta_het",
+                      "trem_meta_sp",
+                      "trem_bc",
+                      "trem_meta_go",
+                      "trem_meta_es",
+                      "meta_unk",
+                      "trem_meta",
+                      "trem_meta_unk"), # H. nuchalis ends
+                            "Larval", "Adult")) %>% 
+  janitor::clean_names()
+    ```
 
 - this is your code from before --> you could use this as a template for doing these analyses again with the new dataset
 - use the distinctions we mapped out in the analyses above for what is adult or larval, since I think we have made some changes since this last one 
@@ -659,7 +703,14 @@ Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
 - myxozoans 
 Make sure you rename the new dataframe as something different from what you named it in the previous one (so that we can keep both versions to reference back to)
 ```{r only a/l both in host}
-
+# fix this
+Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
+                                                      "COPE.GRAB",
+                                                      "CYST.EMPTY",
+                                                      "CYST.NEH",
+                                                      "CYST.NP",
+                                                      "WORM.A"))) %>% 
+  janitor::clean_names()
 ```
 
 ### Add back a column for Fulton's Condition Factor. 
@@ -676,5 +727,36 @@ df <- df %>%
   sum(???)
 ```
 
+H. nuchalis parasite species to include w/ life stage:
+A CEST.BB
+A NEM.BUD
+L NEM.DAFT
+A NEM.UNK
+L TREM.CM
+A TREM.ASS
+A TREM.NS
+L TREM.META.HET
+L TREM.META.SP
+L TREM.BC
+L TREM.META.GO
+A TREM.DIPLO
+L TREM.META.ES
+A TREM.UNK
+A CEST.UNK
+L META.UNK
+L TREM.META
+L TREM.META.UNK
 
 
+Species to remove:
+MYX.AK
+MYX.FI
+MYX.OT
+MYX.TIN
+MYX.GL
+MYX.EYE
+MYX.GC
+MONO.DACT
+MONO.GDAC
+ACAN.AD - one-off (occurs 4 times in all species)
+COPE.POOD - one-off (occurs 3 times in all species)
