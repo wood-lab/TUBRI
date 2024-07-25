@@ -760,3 +760,38 @@ MONO.DACT
 MONO.GDAC
 ACAN.AD - one-off (occurs 4 times in all species)
 COPE.POOD - one-off (occurs 3 times in all species)
+
+
+
+```{r dont forget to have fun!}
+# Define data for the face, eyes, and mouth
+face <- data.frame(x = 0, y = 0, r = 10)
+left_eye <- data.frame(x = -3, y = 3, r = 1.5)
+right_eye <- data.frame(x = 3, y = 3, r = 1.5)
+
+# Define data for the mouth
+mouth <- data.frame(
+  x = c(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5),
+  y = c(0, -1, -2, -2.5, -3, -3, -3, -2.5, -2, -1, 0)
+)
+
+# Create the plot
+ggplot() +
+  # Add face
+  geom_point(data = face, aes(x = x, y = y), size = 100, shape = 21, fill = "yellow", color = "black") +
+  # Add left eye
+  geom_point(data = left_eye, aes(x = x, y = y), size = 20, shape = 21, fill = "white", color = "black") +
+  geom_point(data = left_eye, aes(x = x, y = y), size = 10, shape = 21, fill = "black", color = "black") +
+  # Add right eye
+  geom_point(data = right_eye, aes(x = x, y = y), size = 20, shape = 21, fill = "white", color = "black") +
+  geom_point(data = right_eye, aes(x = x, y = y), size = 10, shape = 21, fill = "black", color = "black") +
+  # Add mouth
+  geom_line(data = mouth, aes(x = x, y = y), size = 2, color = "black") +
+  # Set aspect ratio to 1:1 for correct proportions
+  coord_fixed() +
+  # Remove axes and background for a cleaner look
+  theme_void() +
+  theme(panel.background = element_rect(fill = "skyblue", color = "skyblue"))
+
+```
+
