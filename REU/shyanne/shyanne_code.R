@@ -47,9 +47,9 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 
 
-### PRELIMINARY ANALYSIS - CHELSEA, 22 JULY 2024
+### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.19.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv", header = T, sep = ",")
 colnames(full_data)[20]<-"scaled_TL_mm"
 
 View(full_data)
@@ -71,7 +71,7 @@ summary(model_1)
 
 library(stargazer)
 model_1_output<-stargazer::stargazer(model_1, type = "text")
-write.table(model_1_output,"REU/shyanne/model_1_output_2024.07.15")
+write.table(model_1_output,"REU/shyanne/model_1_output_2024.07.26")
 
 # Check VIFs to make sure that there is no collinearity
 library(car)
@@ -107,9 +107,20 @@ color_plot
 # Now create a model where you are looking at Parasite_taxonomic_group (Nematoda, Trematoda, etc)
 # Note that this model will take a WHILE to run. It took about 37 minutes on my computer.
 
+# To do this, we need to trim out a lot of things from the dataset, like leeches, nematomorphs, and myxos.
+
+stuff <- full_data %>%
+  group_by(Parasite_taxonomic_group) %>%
+  summarize(count = n())
+
+trimmed_data <- full_data %>%
+  filter(Parasite_taxonomic_group=="Acanthocephala" | Parasite_taxonomic_group=="Cestoda" |
+           Parasite_taxonomic_group=="Copepoda" | Parasite_taxonomic_group=="Monogenea" |
+           Parasite_taxonomic_group=="Nematoda" | Parasite_taxonomic_group=="Trematoda")
+
 library(lme4)
 model_2<-glmer.nb(psite_count~CI*Parasite_taxonomic_group+(1|Fish_sp.x/psite_spp.x)+
-                    offset(log(scaled_TL_mm)),data=full_data,family="nbinom")
+                    offset(log(scaled_TL_mm)),data=trimmed_data,family="nbinom")
 
 
 # At some point, you should probably control for season
@@ -126,7 +137,7 @@ vif(model_2)
 # for the model to run and converge
 
 model_2_output<-stargazer::stargazer(model_2, type = "text")
-write.table(model_2_output,"REU/shyanne/model_2_output_2024.07.15")
+write.table(model_2_output,"REU/shyanne/model_2_output_2024.07.26")
 
 read.table("REU/shyanne/model_2_output_2024.07.15")
 
