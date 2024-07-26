@@ -581,46 +581,46 @@ full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_
 ### Split everything into adult or larval based on the designations from initial analyses. Remove all non-concern cases of parasites (leech, nematomorph, copepod)
 ```{r adult vs larval splits}
 full.data.stages <- full.data %>%
-  mutate(life_stage = ifelse(psite_spp_x %in% c("meta_hs",
-                      "meta_unk", 
-                      "myx_go",
-                      "myx_geom",
-                      "myxo_bc",
-                      "myx_thel",
-                      "myxo_sbad",
-                      "myxo_unk",
-                      "myxo_up",
-                      "trem_met",
-                      "trem_sss",
-                      "trem_buc",
-                      "trem_metaf",
-                      "trem_metags",
-                      "trem_ms",
-                      "trem_nea", # P. vigilax ends
-                      "nem_cyst",
-                      "trem_meta_gg",
-                      "trem_meta_unk",
-                      "trem_lg",
-                      "nem_cyst",
-                      "myx_tail",
-                      "myx_geom", # I. punctatus ends
-                      "nem_cyst",
-                      "trem_larv",
-                      "trem_meta",
-                      "myx_sp", 
-                      "myx_round",
-                      "trem_cyst", # N. atherinoides ends
-                      "nem_daft",
-                      "trem_cm",
-                      "trem_meta_het",
-                      "trem_meta_sp",
-                      "trem_bc",
-                      "trem_meta_go",
-                      "trem_meta_es",
-                      "meta_unk",
-                      "trem_meta",
-                      "trem_meta_unk"), # H. nuchalis ends
-                            "Larval", "Adult")) %>% 
+  mutate(life_stage = ifelse(psite_spp_x %in% c("META.HS",
+                      "META.UNK", 
+                      "MYX.GO",
+                      "MYX.GEOM",
+                      "MYXO.BC",
+                      "MYX.THEL",
+                      "MYXO.SBAD",
+                      "MYXO.UNK",
+                      "MYXO.UP",
+                      "TREM.MET",
+                      "TREM.SSS",
+                      "TREM.BUC",
+                      "TREM.METAF",
+                      "TREM.METAGS",
+                      "TREM.MS",
+                      "TREM.NEA", # P. vigilax ends
+                      "NEM.CYST",
+                      "TREM.META.GG",
+                      "TREM.META.UNK",
+                      "TREM.LG",
+                      "NEM.CYST",
+                      "MYX.TAIL",
+                      "MYX.GEOM", # I. punctatus ends
+                      "NEM.CYST",
+                      "TREM.LARV",
+                      "TREM.META",
+                      "MYX.SP", 
+                      "MYX.ROUND",
+                      "TREM.CYST", # N. atherinoides ends
+                      "NEM.DAFT",
+                      "TREM.CM",
+                      "TREM.META.HET",
+                      "TREM.META.SP",
+                      "TREM.BC",
+                      "TREM.META.GO",
+                      "TREM.META.ES",
+                      "META.UNK",
+                      "TREM.META",
+                      "TREM.META.UNK"), # H. nuchalis ends
+                            "Larval", "Adult")) %>%
   janitor::clean_names()
     ```
 
@@ -703,19 +703,20 @@ Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
 - myxozoans 
 Make sure you rename the new dataframe as something different from what you named it in the previous one (so that we can keep both versions to reference back to)
 ```{r only a/l both in host}
-# fix this
-Pvig.life.stage <- subset(Pvig.life.stage, !(psite_spp %in% c("COPE.CL",
-                                                      "COPE.GRAB",
-                                                      "CYST.EMPTY",
-                                                      "CYST.NEH",
-                                                      "CYST.NP",
-                                                      "WORM.A"))) %>% 
+full.data.revised <- full.data.stages %>%
+                              filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
   janitor::clean_names()
+
+# did not change psite_spp_y because it deletes some of the data when the y column equals NA: filter(!str_detect(psite_spp_y, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>% 
+# appears to be fine without it - checked using any() and checked the lengths of both columns
 ```
 
 ### Add back a column for Fulton's Condition Factor. 
 ```{r FCF into new dataframe}
-
+full.data.revised <- full.data.revised %>%
+  mutate(FCF = ((full.data.revised$weight_mg/((full.data.revised$standard_length_mm)^3)))*(100)) %>%
+  janitor::clean_names() %>%
+  filter(sex != "MA" & sex != "")
 ```
 
 
