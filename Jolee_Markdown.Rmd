@@ -659,7 +659,7 @@ full.data <- full.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
 ```
 
-### Split everything into adult or larval based on the designations from initial analyses. Remove all non-concern cases of parasites (leech, nematomorph, copepod)
+### Split everything into adult or larval based on the designations from initial analyses and create a column for identifying parasite taxonomic group
 ```{r adult vs larval splits, echo=FALSE}
 full.data.stages <- full.data %>%
   mutate(life_stage = ifelse(psite_spp_x %in% c("META.HS",
@@ -701,7 +701,8 @@ full.data.stages <- full.data %>%
                       "META.UNK",
                       "TREM.META",
                       "TREM.META.UNK"), # H. nuchalis ends
-                            "Larval", "Adult")) %>%
+                            "Larval", "Adult"),
+    psite_taxon = sub("\\..*", "", psite_spp_x)) %>%
   janitor::clean_names()
 ```
 
@@ -726,10 +727,9 @@ full.data.revised <- full.data.revised %>%
   janitor::clean_names()
 ```
 
-### Pivot and sum all the adult and larval stages as Chelsea described.
-- you might need to play around with this section a bit
-```{r add sums of parasites for each stage}
-#df <- df %>%
- # group_by(fish_ID, psite_group, life_stage) %>%
-  #sum(???)
+### Test the model for question 3
+
+```{r model for q3}
+summary(q3m <- lm(fcf ~ psite_count * psite_taxon + psite_count, data = full.data.revised))
+plot(q3m)
 ```
