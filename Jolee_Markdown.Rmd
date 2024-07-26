@@ -83,6 +83,14 @@ I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_human
   mutate(day_collected = as.integer(day_collected))
 N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_human_readable.csv") %>% 
   janitor::clean_names()
+H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable.csv") %>%
+  janitor::clean_names()
+```
+
+#### Mutate character variable to numeric for Hnuc
+```{r convert to numeric}
+H.nuchalis.data <- H.nuchalis.data %>%
+  mutate(weight_mg = as.numeric(weight_mg))
 ```
 
 ## Giving adult and larval IDs so we can look at life stage compared to parasite burden
@@ -207,6 +215,48 @@ Nath.life.stage <- N.atherinoides.data %>%
                       "nem_unkn",
                       "trem_gb",
                       "trem_l"))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>%
+  janitor::clean_names()
+```
+
+### _Hybognathus nuchalis_ - add columns to identify species as an adult or larval stage and new column for total parasite count
+```{r h. nuch a/l stage}
+Hnuc.life.stage <- H.nuchalis.data %>%
+  mutate(larval = rowSums(select(., 
+                      "nem_daft",
+                      "trem_cm",
+                      "trem_meta_het",
+                      "trem_meta_sp",
+                      "trem_bc",
+                      "trem_meta_go",
+                      "trem_meta_es",
+                      "meta_unk",
+                      "trem_meta",
+                      "trem_meta_unk",
+                      "myx_ak",
+                      "myx_fi",
+                      "myx_tin",
+                      "myx_gl",
+                      "myx_ot",
+                      "myx_eye",
+                      "myx_gc"))) %>%#
+  mutate(adult = rowSums(select(.,
+                      "cest_bb",
+                      "nem_bud",
+                      "nem_unk",
+                      "trem_ass",
+                      "trem_ns",
+                      "trem_diplo",
+                      "trem_unk",
+                      "cest_unk",
+                      "mono_dact",
+                      "mono_gdac",
+                      "acan_ad",
+                      "cope_pood"))) %>%
   mutate(adult = as.integer(adult)) %>% 
   mutate(larval = as.integer(larval)) %>%
   mutate(psite_count = rowSums(select(.,
@@ -344,8 +394,49 @@ Nath.life.stage <- N.atherinoides.data %>%
   mutate(larval = as.integer(larval)) %>%
   mutate(psite_count = rowSums(select(.,
                                       "adult", 
-                                      "larval")))  %>% 
+                                      "larval"))) %>% 
   select(-matches("^(myx_|mono_|cope_)")) %>%
+  janitor::clean_names()
+
+####
+Hnuc.life.stage <- H.nuchalis.data %>%
+  mutate(larval = rowSums(select(., 
+                      "nem_daft",
+                      "trem_cm",
+                      "trem_meta_het",
+                      "trem_meta_sp",
+                      "trem_bc",
+                      "trem_meta_go",
+                      "trem_meta_es",
+                      "meta_unk",
+                      "trem_meta",
+                      "trem_meta_unk",
+                      "myx_ak",
+                      "myx_fi",
+                      "myx_tin",
+                      "myx_gl",
+                      "myx_ot",
+                      "myx_eye",
+                      "myx_gc"))) %>%#
+  mutate(adult = rowSums(select(.,
+                      "cest_bb",
+                      "nem_bud",
+                      "nem_unk",
+                      "trem_ass",
+                      "trem_ns",
+                      "trem_diplo",
+                      "trem_unk",
+                      "cest_unk",
+                      "mono_dact",
+                      "mono_gdac",
+                      "acan_ad",
+                      "cope_pood"))) %>%
+  mutate(adult = as.integer(adult)) %>% 
+  mutate(larval = as.integer(larval)) %>%
+  mutate(psite_count = rowSums(select(.,
+                                      "adult", 
+                                      "larval"))) %>% 
+  select(-matches("^(myx_|mono_|cope_|acan_)")) %>%
   janitor::clean_names()
 ```
 
@@ -366,21 +457,29 @@ Ipun.life.stage <- Ipun.life.stage %>%
   janitor::clean_names() %>%
   filter(sex != "MA" & sex != "")
 
+Hnuc.life.stage <- Hnuc.life.stage %>%
+  mutate(body.index.nuc = ((Hnuc.life.stage$weight_mg/((Hnuc.life.stage$standard_length_mm)^3)))*(100)) %>%
+  janitor::clean_names() %>%
+  filter(sex != "MA" & sex != "")
+
 ```
 
 #### Combine datasets and scale data. Add condition factor back into the dataframes. 
 ```{r}
-na_ip_pv_combined <- bind_rows(Nath.life.stage, Pvig.life.stage, Ipun.life.stage, .id = "dataset")
-na_ip_pv_pp <- preProcess(na_ip_pv_combined, method = c("center", "scale"))
-na_ip_pv_scaled <- predict(na_ip_pv_pp, na_ip_pv_combined)
-notath_scaled <- na_ip_pv_scaled %>% filter(dataset == "1") %>%
+na_ip_pv_hn_combined <- bind_rows(Nath.life.stage, Pvig.life.stage, Ipun.life.stage, Hnuc.life.stage, .id = "dataset")
+na_ip_pv_hn_pp <- preProcess(na_ip_pv_hn_combined, method = c("center", "scale"))
+na_ip_pv_hn_scaled <- predict(na_ip_pv_hn_pp, na_ip_pv_hn_combined)
+notath_scaled <- na_ip_pv_hn_scaled %>% filter(dataset == "1") %>%
   mutate(body.index.notath = ((Nath.life.stage$weight_mg/((Nath.life.stage$standard_length_mm)^3)))*(100)) %>%
   janitor::clean_names()
-pimvig_scaled <- na_ip_pv_scaled %>% filter(dataset == "2") %>%
+pimvig_scaled <- na_ip_pv_hn_scaled %>% filter(dataset == "2") %>%
   mutate(body.index.pimvig = ((Pvig.life.stage$weight_mg/((Pvig.life.stage$standard_length_mm)^3)))*(100)) %>%
   janitor::clean_names()
-ictpun_scaled <- na_ip_pv_scaled %>% filter(dataset == "3") %>%
+ictpun_scaled <- na_ip_pv_hn_scaled %>% filter(dataset == "3") %>%
   mutate(body.index.ictpun = ((Ipun.life.stage$weight_mg/((Ipun.life.stage$standard_length_mm)^3)))*(100)) %>%
+  janitor::clean_names()
+hybnuc_scaled <- na_ip_pv_hn_scaled %>% filter(dataset == "4") %>%
+  mutate(body.index.hybnuc = ((Hnuc.life.stage$weight_mg/((Hnuc.life.stage$standard_length_mm)^3)))*(100)) %>%
   janitor::clean_names()
 ```
 
@@ -400,14 +499,18 @@ PV.psc.fcf <- ggplot(Pvig.life.stage,
        aes(x = psite_count, y = body_index_vig, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
   ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
 
-ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C"))
+HN.psc.fcf <- ggplot(Hnuc.life.stage, 
+       aes(x = psite_count, y = body_index_nuc, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
+  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
+
+ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, HN.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D"))
 # more variability than the others
 
 ```
 
 ### Plot life stage data using original dataframe (with above-mentioned exclusions)
 ```{r life stage plots, echo=TRUE}
-# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+# plot condition factor for life stage (aka "stage-specific parasite stuff")
 NA.bc.a <- ggplot(Nath.life.stage,
        aes(x = adult, y = body_index_ath, color = sex)) + xlab("Adult")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
@@ -416,7 +519,7 @@ NA.bc.l <- ggplot(Nath.life.stage,
        aes(x = larval, y = body_index_ath, color = sex)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+# plot condition factor for life stage (aka "stage-specific parasite stuff")
 IP.bc.a <- ggplot(Ipun.life.stage,
        aes(x = adult, y = body_index_pun, color = sex)) + xlab("Adult")  + geom_point() + 
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
@@ -425,7 +528,7 @@ IP.bc.l <- ggplot(Ipun.life.stage,
        aes(x = larval, y = body_index_pun, color = sex)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+# plot condition factor for life stage (aka "stage-specific parasite stuff")
 PV.bc.a <- ggplot(Pvig.life.stage, 
        aes(x = adult, y = body_index_vig, color = sex)) + xlab("Adult")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
@@ -434,7 +537,16 @@ PV.bc.l <- ggplot(Pvig.life.stage,
        aes(x = larval, y = body_index_vig, color = sex)) + xlab("Larval")  + geom_point() +
   ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
 
-ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D", "E", "F"))
+# plot condition factor vs binary code for life stage (aka "stage-specific parasite stuff")
+HN.bc.a <- ggplot(Hnuc.life.stage, 
+       aes(x = adult, y = body_index_nuc, color = sex)) + xlab("Adult")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
+
+HN.bc.l <- ggplot(Hnuc.life.stage,
+       aes(x = larval, y = body_index_nuc, color = sex)) + xlab("Larval")  + geom_point() +
+  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
+
+ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D", "E", "F", "G", "H"))
 # more variability than the others
 
 ## double check sex, weights
@@ -765,7 +877,6 @@ COPE.POOD - one-off (occurs 3 times in all species)
 
 
 ```{r dont forget to have fun!}
-
 face <- data.frame(x = 0, y = 0, r = 10)
 left_eye <- data.frame(x = -3, y = 3, r = 1.5)
 right_eye <- data.frame(x = 3, y = 3, r = 1.5)
