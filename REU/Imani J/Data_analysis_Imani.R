@@ -129,7 +129,7 @@ glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|C
 
 summary(glmmonoip1)
 
-#Evaluate residuals
+#Evaluate diagnostics
 library(DHARMa)
 library(MASS)
 
