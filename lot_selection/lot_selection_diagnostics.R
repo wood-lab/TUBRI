@@ -318,10 +318,8 @@ plot(jitter(per_vig_with_metadata$Latitude.y,30)~jitter(per_vig_with_metadata$Ye
 # Desired level of replication
 
 per_vig_desired<-read.csv(file="lot_selection/desired_replication/per_vig_goal.csv")
-per_vig_desired<-per_vig_desired[,-1]
-colnames(per_vig_desired)[3]<-"n_lots_desired"
+colnames(per_vig_desired)[2]<-"n_lots_desired"
 per_vig_desired$individual_fish_desired<-per_vig_desired$n_lots_desired*2
-per_vig_desired$combo<-paste(per_vig_desired$CI,per_vig_desired$decade,sep="_")
 sum(per_vig_desired$individual_fish_desired)
 
 
