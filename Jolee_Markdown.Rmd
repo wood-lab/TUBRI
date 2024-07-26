@@ -703,7 +703,7 @@ full.data.stages <- full.data %>%
                       "TREM.META.UNK"), # H. nuchalis ends
                             "Larval", "Adult")) %>%
   janitor::clean_names()
-    ```
+```
 
 ### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. 
 - acanths
