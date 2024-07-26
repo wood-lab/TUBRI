@@ -93,7 +93,7 @@ H.nuchalis.data <- H.nuchalis.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
 ```
 
-#### Giving adult and larval IDs so we can look at life stage compared to total parasite burden (for answering question 1)
+### Giving adult and larval IDs so we can look at life stage compared to total parasite burden (for answering question 1)
 - add columns to identify species as an adult or larval stage and new column for total parasite count
 ```{r p.vig a/l stage}
 Pvig.life.stage.total <- P.vigilax.data %>%
@@ -258,7 +258,7 @@ Hnuc.life.stage.total <- H.nuchalis.data %>%
   janitor::clean_names()
 ```
 
-#### Modify datasets to refect only parasites that are able to occur in larval and adult stages in the host. 
+### Modify datasets to refect only parasites that are able to occur in larval and adult stages in the host. 
 - we are doing this because in order to have a truly comparable dataset of parasites and their association with host body condition, we need to analyze parasites in a uniform way that does not skew the data one direction or another. For example, if you look at trematode parasites, both metacercaria and adult trematodes can live within a fish host. Now, compare that to monogenes who only occur as adults in the fish host. Because their larval stage will not occur in these fish hosts, by including them in our analyses we will be skewing the adult subset of parasites high. The monogenes have no larval counterpart in the fish, so they will always push the adult count higher. By removing monogenes from our analyses, we will have an even ground to compare larval and adult parasites. Therefore, parasites to __NOT__ include in our analyses are: 
 - monogenes
 - copepods
@@ -473,7 +473,7 @@ Hnuc.life.stage.pared <- Hnuc.life.stage.pared %>%
 
 ```
 
-#### Combine datasets and scale data. Add condition factor back into the dataframes. 
+### Combine datasets and scale data. Add condition factor back into the dataframes. 
 ```{r scaling datasets to each other, echo=FALSE}
 ### for answering question 1
 
@@ -512,7 +512,7 @@ hybnuc_scaled.pared <- na_ip_pv_hn_scaled.pared %>% filter(dataset == "4") %>%
   janitor::clean_names()
 ```
 
-#### Plot FCF vs. total parasite burden (question 1)
+### Plot FCF vs. total parasite burden (question 1)
 ```{r exploratory plots, echo=FALSE, eval=FALSE}
 
 # plot condition factor vs parasite burden in total - may be interesting
@@ -613,7 +613,7 @@ $$
 K_i\sim\ parasite\ stage\ * parasite\ group\ + parasite\ count
 $$
 
-### Run linear model to test above questions
+#### Run linear model to test above questions
 ```{r model}
 
 # Question 1 (lm)
@@ -644,7 +644,7 @@ plot(FCF_nuc_al_lm)
 
 ```
 
-# Full dataset analyses
+## Full dataset analyses
 
 #### Import dataset 
 - make sure you name all these new datasets and frames something different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
