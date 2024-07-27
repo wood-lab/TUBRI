@@ -733,6 +733,90 @@ full.data.revised <- full.data.revised %>%
 ```{r model for q3}
 summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 plot(q3m)
-summary(q3m2 <- glm(fcf ~ life_stage * psite_taxon + psite_count, family = poisson, data = full.data.revised))
         
 ```
+Steps to Improve the Model
+Check for Multicollinearity:
+-Multicollinearity can cause instability in the coefficient estimates. You can use the Variance Inflation Factor (VIF) to check for this.
+Transform Variables:
+-Transforming the dependent variable (fcf) or the independent variables might help in stabilizing variance and making the model fit better.
+Remove or Address Outliers:
+-Identify and address outliers that might be affecting the model fit.
+Interaction Terms:
+-Simplify or reconsider interaction terms if they are not significant or cause issues.
+Robust Regression:
+-Use robust regression techniques to handle outliers better.
+
+```{r}
+
+#Step 1: Check for Multicollinearity
+# Load necessary package
+if (!require(car)) install.packages("car")
+library(car)
+
+# Check for aliased coefficients
+alias(lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
+
+# Load necessary package
+install.packages("glmnet")
+library(glmnet)
+
+# Prepare data for ridge regression
+x <- model.matrix(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised)[, -1]
+y <- full.data.revised$fcf
+
+# Fit ridge regression model
+ridge_model <- cv.glmnet(x, y, alpha = 0)
+summary(ridge_model)
+
+
+# Calculate VIF
+vif(lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised, type="predictor"))
+#A VIF value greater than 5-10 indicates high multicollinearity.
+
+#Step 2: Transform Variables
+#Consider a log transformation of fcf if it is highly skewed:
+# Transform the dependent variable
+full.data.revised$log_fcf <- log(full.data.revised$fcf + 1) # Adding 1 to avoid log(0)
+
+# Fit the model again
+q3m2_ancova_log <- lm(log_fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
+summary(q3m2_ancova_log)
+#Step 3: Identify and Address Outliers
+# Cook's distance to identify influential points
+cooksd <- cooks.distance(q3m2_ancova)
+plot(cooksd, type = "h", main = "Cook's Distance", ylab = "Cook's distance")
+abline(h = 4/(nrow(full.data.revised)-length(coef(q3m2_ancova))), col = "red")
+
+# Remove influential points
+influential_points <- which(cooksd > (4/(nrow(full.data.revised) - length(coef(q3m2_ancova)))))
+full.data.cleaned <- full.data.revised[-influential_points, ]
+
+# Fit the model again without influential points
+q3m2_ancova_cleaned <- lm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.cleaned)
+summary(q3m2_ancova_cleaned)
+#Step 4: Simplify Interaction Terms
+#If an interaction term is not significant or causing issues, consider removing it:
+# Fit a simplified model without the problematic interaction term
+q3m2_ancova_simple <- lm(fcf ~ psite_count + life_stage + psite_taxon, data = full.data.revised)
+summary(q3m2_ancova_simple)
+#Step 5: Robust Regression
+# Load necessary package
+if (!require(MASS)) install.packages("MASS")
+library(MASS)
+
+# Fit a robust regression model
+q3m2_robust <- rlm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
+summary(q3m2_robust)
+
+
+```
+Explanation
+Multicollinearity: By calculating VIF, you can identify if any predictors are highly correlated and address them by removing or combining variables.
+Transformation: Transforming fcf can help in stabilizing variance and normalizing the distribution.
+Outliers: Identifying and removing influential points can improve the model's fit.
+Simplifying Interaction Terms: If the interaction terms are not significant or causing issues, removing them can simplify the model and improve interpretability.
+Robust Regression: Using robust regression can provide more reliable estimates in the presence of outliers.
+
+
+
