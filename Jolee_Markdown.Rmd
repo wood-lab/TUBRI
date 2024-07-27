@@ -610,7 +610,7 @@ K_i\sim\ life\ stage\ + parasite\ count
 $$
 #### Model formula for Question 3 
 $$
-K_i\sim\ parasite\ stage\ * parasite\ group\ + parasite\ count
+K_i\sim\ life\ stage\ * taxon\ + parasite\ count
 $$
 
 #### Run linear model to test above questions
@@ -702,7 +702,8 @@ full.data.stages <- full.data %>%
                       "TREM.META",
                       "TREM.META.UNK"), # H. nuchalis ends
                             "Larval", "Adult"),
-    psite_taxon = sub("\\..*", "", psite_spp_x)) %>%
+    psite_taxon = ifelse(sub("\\..*", "", psite_spp_x) == "META", "TREM", sub("\\..*", "", psite_spp_x))
+  ) %>%
   janitor::clean_names()
 ```
 
@@ -730,6 +731,8 @@ full.data.revised <- full.data.revised %>%
 ### Test the model for question 3
 
 ```{r model for q3}
-summary(q3m <- lm(fcf ~ psite_count * psite_taxon + psite_count, data = full.data.revised))
+summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 plot(q3m)
+summary(q3m2 <- glm(fcf ~ life_stage * psite_taxon + psite_count, family = poisson, data = full.data.revised))
+        
 ```
