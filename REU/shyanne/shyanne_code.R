@@ -151,14 +151,21 @@ color_predict_2<-ggeffect(model_2,c("Parasite_taxonomic_group","CI"))
 
 # Set up a nice color palette first.
 library(viridis)
-pal<-viridis(n=9)
+plasma_pal <- c("red", viridis::plasma(n = 6))
+pal<-viridis(n=6)
 
-color_plot_2<-ggplot(color_predict_2,aes(group,predicted),group=Parasite_taxonomic_group,
-                   color=Parasite_taxonomic_group)+
+pal.bands(coolwarm)
+
+par(op)
+color_predict_2$group
+
+color_plot_2<-ggplot(color_predict_2,aes(c(0.85,0.9,0.95,1,1.05,1.1,1.85,1.9,1.95,2,2.05,2.1),predicted),
+                     group=Parasite_taxonomic_group,color=Parasite_taxonomic_group)+
   geom_point(aes(group=x,color=x),size=4,pch=19)+
-  #geom_errorbar(data=color_predict_2,mapping=aes(x="CI",ymin=conf.low,ymax=conf.high),width=0.03)+
-  geom_line(aes(group=x,color=x,linetype=x))+
-  scale_color_manual(name = c("parasite taxonomic group"),values=pal)+
+  geom_errorbar(data=color_predict_2,mapping=aes(x=c(0.85,0.9,0.95,1,1.05,1.1,1.85,1.9,1.95,2,2.05,2.1),
+                                                 ymin=conf.low,ymax=conf.high,group=x,color=x),width=0.03)+
+  geom_line(aes(group=x,color=x))+
+  scale_color_manual(name = c("parasite taxonomic group"),values=plasma_pal)+
   xlab("treatment")+
   ylab("predicted parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
@@ -168,7 +175,70 @@ color_plot_2<-ggplot(color_predict_2,aes(group,predicted),group=Parasite_taxonom
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=(levels(color_predict_2$group)))+
-  theme(legend.position="left",legend.title = element_text(size = 18),
+  theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=14))
 color_plot_2
+
+
+
+# How about making a dedicated analysis and plot for myxos?
+
+myxo_data <- full_data %>%
+  filter(Parasite_taxonomic_group=="Myxozoa")
+
+# For some myxos, we counted cysts, while others were presence (1) / absence (0). We need to turn the whole
+# myxo dataset into presence/absence, and the loop below does that.
+
+myxo_data$presence<-vector("character",length(myxo_data$fish_psite_combo))
+
+for(i in 1:length(myxo_data$fish_psite_combo)) {
+  
+  if(is.na(myxo_data$psite_count[i])){
+    myxo_data$presence[i] <- NA
+  } else {
+    
+    if(myxo_data$psite_count[i]>0){
+      myxo_data$presence[i] <- 1
+      
+    } else {
+      
+      if(myxo_data$psite_count[i]==0){
+        myxo_data$presence[i] <- 0
+      }
+    }
+  }
+}
+myxo_data$presence
+myxo_data$presence<-as.numeric(myxo_data$presence)
+
+model_myxo<-glmer(presence~CI+(1|Fish_sp.x/psite_spp.x)+
+                    offset(log(scaled_TL_mm)),data=myxo_data,family="binomial")
+summary(model_myxo)
+
+
+# Now let's plot it
+
+library(ggeffects)
+myxo_predict<-ggemmeans(model_myxo,"CI")
+
+myxo_predict$x
+myxo_predict$predicted
+
+myxo_plot<-ggplot(myxo_predict,aes(x,predicted))+
+  geom_errorbar(data=myxo_predict,mapping=aes(x=x,y=predicted,ymin=conf.low,ymax=conf.high),width=0.03)+
+  geom_line(aes(group=group,linetype=group))+
+  geom_point(size=6,pch=21,fill=c("cadetblue","burlywood4"))+
+  xlab("treatment")+
+  ylab("predicted likelihood of parasite presence\n per myxozoan taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  scale_linetype_discrete(name = c("life history"),labels=c("direct","complex"))+
+  theme(legend.position="none")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color=c("cadetblue","burlywood4")),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(levels(myxo_predict$x)),labels=c("control","impact"))
+  
+myxo_plot
 
