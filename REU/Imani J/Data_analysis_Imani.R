@@ -129,7 +129,7 @@ glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|C
 
 summary(glmmonoip1)
 
-#Evaluate residuals
+#Evaluate diagnostics
 library(DHARMa)
 library(MASS)
 
@@ -321,7 +321,7 @@ ggsave(file="REU/Imani J/Model plots/PIMVIG_Gyrodactylus_modelplot.pdf", width=1
 
 
 
-# Analaysis for Notropis atherinoides----
+### Analaysis for Notropis atherinoides----
 
 # geom point adds points to graph.
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
@@ -406,5 +406,85 @@ library (ggplot2)
   
   ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
   ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
+  
+  
+
+### Analaysis for Hybognathus nuchalis----
+  
+  # geom point adds points to graph.
+  #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
+  #y=label for y axis. color= represents the legend or key of labels.
+  
+  library(readr)
+  
+  HYBNUC <- read_csv("data/processed/Hybognathus_nuchalis_processed_machine_readable.csv")
+  HYBNUC_MONOS <- subset(HYBNUC, psite_spp == "MONO.DACT")
+  
+  library (ggplot2)
+  
+  apatheme= theme_bw(base_size = 11,base_family = "sans")+
+    theme(panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          panel.border=element_blank(),
+          axis.line=element_line())
+  
+  ggplot(HYBNUC_MONOS, aes(x= YearCollected,
+                           y=psite_count,
+                           ,color=CI,
+                           group=CI))+
+    geom_point()+ 
+    labs(title = "Counts of monogenean species in Hybognathus nuchalis", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
+           "Pollution impact:")+apatheme+geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
+    facet_wrap(~ psite_spp)
+  
+  
+  # Models
+  
+  library(stats)
+  library(lme4)
+  library(DHARMa)
+  library(glmmTMB)
+  
+  HYBNUC_MONOS$CI <- as.factor(HYBNUC_MONOS$CI)
+  
+  #Is linear, no quadratic term. Good diagnostics
+  glm_hybnucmono1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = HYBNUC_MONOS)
+
+  #Is linear, no quadratic term. Bad diagnostics
+    glm_hybnucmono2 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = HYBNUC_MONOS)
+  
+  summary(glm_hybnucmono1)
+  
+  #Evaluate residuals
+  library(DHARMa)
+  library(MASS)
+  
+  par(mfrow = c(2, 2))
+  s=simulateResiduals(fittedModel=glm_hybnucmono1,n=250)
+  s$scaledResiduals
+  plot(s)
+  
+  ## final plot with predictions and CI
+  library(ggeffects)
+  plot_model(glm_hybnucmono1)
+  
+  mydf <- ggpredict(glm_hybnucmono1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+  
+  apatheme=theme_bw()+
+    theme(panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          panel.border=element_blank(),
+          axis.line=element_line(),
+          text=element_text(family='Times'))
+  
+  
+  plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+    labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
+    apatheme
+  
+  
+  ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+  ggsave(file="REU/Imani J/Model plots/NOTATH_DACTYLOGYRUS_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
+  
   
   

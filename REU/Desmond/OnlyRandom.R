@@ -4,6 +4,8 @@
 
 
 setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
+library(lme4)
+library(ggeffects)
 #################################################################SIZE DATA FROM DISSECTED FISHES
 #############################ictalurus
 #loading in dada
@@ -81,13 +83,37 @@ SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
  SL_time
 
-#plotting only ictalurus 
-ict_only <- ggplot(subset(desmond_data, Species %in% "Ictalurus_punctatus"), aes(Year,SL))+
+###########################ictalurus
+#subset
+ict_desmond <- subset(desmond_data, Species == "Ictalurus_punctatus")
+ict_desmond$weight_to_sl <- ict_desmond$Weight/ict_desmond$SL
+View(ict_desmond)
+#model
+ict_model <- lmer(SL~Year + (1|Cat_Num), data= ict_desmond)
+ict_sum <- summary(ict_model)
+plot(ict_model)
+#predicting line
+mydf <- ggpredict(ict_model, c("Year [n=100]"))
+#plotting
+plot(mydf, show_data = TRUE, dot_alpha = 1)+
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL)+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+
+#plot
+ict_only <- ggplot(ict_desmond, aes(Year,SL))+
   geom_point(size=4)+
   xlab("Year collected")+
   ylab("Standard Length in mm")+
-  geom_smooth(method = "lm", formula = y ~ x)+
+  geom_line(aes(y = predicted), linewidth = 1)+
   theme_minimal()+
+ # annotate("text", x = -Inf, y = Inf, 
+           #label = paste("p-value:", format.pval(p_value), "\n",
+                       #  "R-squared:", round(r_squared, 2), "\n",
+                       #  "Slope:", round(coef(ict_sum)[2], 3)),
+          # hjust = -0.5, vjust = 1.5, 
+          # size = 4, 
+          # color = "black", 
+          # fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 ict_only
 
@@ -129,7 +155,7 @@ View(hybog_desmond)
 
 #########plots
 #ictalurus
-ict_w2SL_only <- ggplot(ict_desmond, aes(Year,weight_to_sl))+
+ict_w_2SL_only <- ggplot(ict_desmond, aes(Year,weight_to_sl))+
   geom_point(size=4)+
   xlab("Year collected")+
   ylab("Weight/Length Ratio")+
