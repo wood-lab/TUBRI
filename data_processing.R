@@ -1088,6 +1088,153 @@ write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_proc
 
 
 
+### PERVIG: Percina vigil----
+
+
+# You can also do it the old-fashioned way
+
+per_vig_today<-read.csv("data/raw/Percina_vigil_Datasheet - Sheet1_2024.07.29.csv")
+length(per_vig_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+per_vig_today_with_metadata<-merge(per_vig_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(per_vig_today_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(per_vig_today_with_metadata$Latitude.y,30)~jitter(per_vig_today_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+str(per_vig_today_with_metadata)
+per_vig_headers<-ls(per_vig_today_with_metadata)
+per_vig_headers<-as.factor(per_vig_headers)
+
+
+# Add parasites across organs and double what needs to be doubled.
+
+ACANTH.BB<-per_vig_today_with_metadata$ACANTH.BB.FLUSH+per_vig_today_with_metadata$ACANTH.BB.INTESTINE    
+ACANTH.CYA<-per_vig_today_with_metadata$ACANTH.CYA.CONNECTIVETISSUE+
+  per_vig_today_with_metadata$ACANTH.CYA.FLUSH+per_vig_today_with_metadata$acanth.cya.intestine            
+ACANTH.THIN<-per_vig_today_with_metadata$ACANTH.THIN.CONNECTIVE           
+CEST.BOT<-per_vig_today_with_metadata$CEST.BOT.INTESTINE+per_vig_today_with_metadata$CEST.BOT.Stomach                
+# not known whether this is a parasite: CYST.LOBE.ConnectiveTissue       
+# not known whether this is a parasite: CYST.LOBE.FLUSH                 
+# not known whether this is a parasite: CYST.LOBE.INTESTINE              
+# not known whether this is a parasite: CYST.LOBE.Liver                  
+# this is cancer, not a parasite: CYST.PRO.AnalFin                 
+# this is cancer, not a parasite: CYST.PRO.CaudalFin               
+# this is cancer, not a parasite: CYST.PRO.DorsalFin              
+# this is cancer, not a parasite: CYST.PRO.PectoralFin             
+# this is cancer, not a parasite: CYST.PRO.PelvicFin               
+# not known whether this is a parasite: CYST.UNK.CONNECTIVETISSUES       
+# not known whether this is a parasite: CYST.UNK.EYE                     
+# not known whether this is a parasite: CYST.UNK.GILL                   
+# not known whether this is a parasite: CYST.UNKN.INTESTINE              
+MONO.GYRO<-(2*per_vig_today_with_metadata$MONO.GYRO.Gill)                  
+NEM.HEATH<-per_vig_today_with_metadata$NEM.HEATH.INTESTINE              
+NEM.LARV<-per_vig_today_with_metadata$NEM.LARV.CONNECTIVETISSUE+(2*per_vig_today_with_metadata$nem.larv.eye)+
+  per_vig_today_with_metadata$NEM.LARV.Flush+per_vig_today_with_metadata$NEM.LARV.INTESTINE+
+  per_vig_today_with_metadata$NEM.LARV.Liver                   
+NEM.SQUIG<-per_vig_today_with_metadata$NEM.SQUIG.INTESTINE              
+NEM.UNK<-per_vig_today_with_metadata$nem.unk.connectivetissue+per_vig_today_with_metadata$NEM.UNK.INTESTINE                
+TREM.CHONK<-per_vig_today_with_metadata$TREM.CHONK.BODYCAV              
+TREM.CL<-per_vig_today_with_metadata$TREM.CL.CONNECTIVETISSUES        
+TREM.ENDOUS<-per_vig_today_with_metadata$TREM.ENDOUS.CONNECTIVE+per_vig_today_with_metadata$TREM.ENDOUS.LIVER                
+TREM.ISPOT<-(2*per_vig_today_with_metadata$TREM.ISPOT.GILL)                  
+
+per_vig_today_with_metadata$TREM.PHLb.UrinaryBladder 
+
+# We agreed that TREM.PHLB would be 0 even where urinary bladder wasn't specifically checked, since these trems
+# are big and difficult to miss. Write a loop to fix.
+
+per_vig_today_with_metadata$TREM.PHLB<-vector("numeric",length(per_vig_today_with_metadata$CatalogNumber))
+
+for(i in 1:length(per_vig_today_with_metadata$CatalogNumber)) {
+  
+  if(is.na(per_vig_today_with_metadata$TREM.PHLb.UrinaryBladder[i])){
+    per_vig_today_with_metadata$TREM.PHLB[i] <- 0
+    
+  } else {
+    
+    if(per_vig_today_with_metadata$TREM.PHLb.UrinaryBladder[i] > 0){
+      per_vig_today_with_metadata$TREM.PHLB[i] <- per_vig_today_with_metadata$TREM.PHLb.UrinaryBladder[i]
+      
+      } else {
+          
+        per_vig_today_with_metadata$TREM.PHLB[i] <- 0
+      }
+  }
+}
+
+per_vig_today_with_metadata$TREM.PHLB<-as.numeric(per_vig_today_with_metadata$TREM.PHLB) 
+
+per_vig_today_with_metadata$TREM.PHLB[is.na(per_vig_today_with_metadata$TREM.PHLB)]<-0
+TREM.PHLB<-per_vig_today_with_metadata$TREM.PHLB
+
+TREM.SK<-per_vig_today_with_metadata$TREM.SK.BodyCavity+(2*per_vig_today_with_metadata$TREM.SK.Eye)+
+  (2*per_vig_today_with_metadata$TREM.Sk.SKIN)                    
+
+
+
+# Now put it all together
+
+per_vig_processed_data<-cbind.data.frame(per_vig_today_with_metadata$CatalogNumber,per_vig_today_with_metadata$YearCollected.x,
+                                         per_vig_today_with_metadata$MonthCollected.x,per_vig_today_with_metadata$DayCollected.x,
+                                         per_vig_today_with_metadata$IndividualFishID,per_vig_today_with_metadata$Dissector,
+                                         per_vig_today_with_metadata$DissectionDate,per_vig_today_with_metadata$Sex,
+                                         per_vig_today_with_metadata$TotalLength_mm,per_vig_today_with_metadata$StandardLength_mm,
+                                         per_vig_today_with_metadata$weight_mg,per_vig_today_with_metadata$CI,
+                                         per_vig_today_with_metadata$combo,
+                                         per_vig_today_with_metadata$Latitude.y,
+                                         per_vig_today_with_metadata$Longitude.y,
+                                         ACANTH.BB,ACANTH.CYA,ACANTH.THIN,CEST.BOT,MONO.GYRO,NEM.HEATH,
+                                         NEM.LARV,NEM.SQUIG,NEM.UNK,TREM.CHONK,TREM.CL,TREM.ENDOUS,
+                                         TREM.ISPOT,TREM.PHLB,TREM.SK)
+
+# Name the columns
+
+colnames(per_vig_processed_data)[1]<-"CatalogNumber"
+colnames(per_vig_processed_data)[2]<-"YearCollected"
+colnames(per_vig_processed_data)[3]<-"MonthCollected"
+colnames(per_vig_processed_data)[4]<-"DayCollected"
+colnames(per_vig_processed_data)[5]<-"IndividualFishID"
+colnames(per_vig_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(per_vig_processed_data)[7]<-"DissectionDate"
+colnames(per_vig_processed_data)[8]<-"Sex"
+colnames(per_vig_processed_data)[9]<-"TotalLength_mm"
+colnames(per_vig_processed_data)[10]<-"StandardLength_mm"
+colnames(per_vig_processed_data)[11]<-"Weight_mg"
+colnames(per_vig_processed_data)[12]<-"CI"
+colnames(per_vig_processed_data)[13]<-"combo"
+colnames(per_vig_processed_data)[14]<-"Latitude"
+colnames(per_vig_processed_data)[15]<-"Longitude"
+
+View(per_vig_processed_data)
+
+
+# Make the dataset analyzable
+library(reshape2)
+per_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
+                                                                "MonthCollected", "DayCollected", 
+                                                                "IndividualFishID", "Dissector_and_Examiner",
+                                                                "DissectionDate", "Sex", 
+                                                                "TotalLength_mm", "StandardLength_mm",
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
+
+colnames(per_vig_processed_data_longer)[16]<-"psite_spp"
+colnames(per_vig_processed_data_longer)[17]<-"psite_count"
+
+
+# Export both sheets
+
+write.csv(per_vig_processed_data_longer, file="data/processed/Percina_vigil_processed_machine_readable.csv")
+write.csv(per_vig_processed_data, file="data/processed/Percina_vigil_processed_human_readable.csv")
+
+
+
+
 ### Put all the sheets together----
 
 # Start by scaling fish body size within fish species
@@ -1096,6 +1243,7 @@ pim_vig_processed_data_longer$scaled_TL<-scale(pim_vig_processed_data_longer$Tot
 ict_pun_processed_data_longer$scaled_TL<-scale(ict_pun_processed_data_longer$TotalLength_mm)
 not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$TotalLength_mm)
 hyb_nuc_processed_data_longer$scaled_TL<-scale(hyb_nuc_processed_data_longer$TotalLength_mm)
+per_vig_processed_data_longer$scaled_TL<-scale(per_vig_processed_data_longer$TotalLength_mm)
 
 
 # Then make sure that there is a column for the fish species
@@ -1104,9 +1252,11 @@ pim_vig_processed_data_longer$Fish_sp<-c(rep("Pimephales vigilax",length(pim_vig
 ict_pun_processed_data_longer$Fish_sp<-c(rep("Ictalurus punctatus",length(ict_pun_processed_data_longer$CatalogNumber)))
 not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_ath_processed_data_longer$CatalogNumber)))
 hyb_nuc_processed_data_longer$Fish_sp<-c(rep("Hybognathus nuchalis",length(hyb_nuc_processed_data_longer$CatalogNumber)))
+per_vig_processed_data_longer$Fish_sp<-c(rep("Percina vigil",length(per_vig_processed_data_longer$CatalogNumber)))
 
 full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_data_longer,
-                                          not_ath_processed_data_longer,hyb_nuc_processed_data_longer)
+                                          not_ath_processed_data_longer,hyb_nuc_processed_data_longer,
+                               per_vig_processed_data_longer)
 
 full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
 
@@ -1124,5 +1274,5 @@ colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.29.csv")
 
