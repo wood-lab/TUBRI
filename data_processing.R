@@ -1260,7 +1260,7 @@ full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_d
 
 full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
 
-life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.07.14.csv",header=T,sep=",")
+life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.07.29.csv",header=T,sep=",")
 life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psite_spp,sep="_")
 
 
@@ -1269,10 +1269,43 @@ full_dataset_with_LH<-merge(full_dataset, life_histories, by.x = "fish_psite_com
 View(full_dataset_with_LH)
 
 colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
+full_dataset_with_LH$YearCollected<-as.numeric(full_dataset_with_LH$YearCollected)
 
+
+# Write a loop to create a before/after column
+
+full_dataset_with_LH$before_after<-vector("character",length(full_dataset_with_LH$fish_psite_combo))
+
+for(i in 1:length(full_dataset_with_LH$fish_psite_combo)) {
+  
+    if(full_dataset_with_LH$YearCollected[i] > 1972){
+      full_dataset_with_LH$before_after[i] <- "after"
+      
+    } else {
+      
+      if(full_dataset_with_LH$YearCollected[i] < 1973){
+        full_dataset_with_LH$before_after[i] <- "before"
+        
+      } else {
+                    
+        full_dataset_with_LH$before_after[i] <- "NA"
+      }
+    }
+}
+                 
+full_dataset_with_LH$before_after     
+              
 
 
 # Export the sheet
 
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.29.csv")
+
+
+# Playing around with the big analysis
+
+model_draft<-glmer.nb(psite_count~CI*before_after+(1|psite_spp.x),data=full_dataset_with_LH,family="nbinom")
+summary(model_draft)
+
+offset(log(scaled_TL_mm))
 
