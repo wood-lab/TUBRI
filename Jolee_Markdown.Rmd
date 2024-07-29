@@ -58,6 +58,7 @@ install.packages("rmarkdown")
 install.packages("caret")
 install.packages("tibble")
 install.packages("DHARMa")
+install.packages("lme4")
 ```
 
 #### Load packages
@@ -72,6 +73,7 @@ library(dbplyr)
 library(lubridate)
 library(ggplot2)
 library(glmmTMB)
+library(broom)
 library(DHARMa)
 ```
 
@@ -85,11 +87,15 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
   janitor::clean_names()
 H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable.csv") %>%
   janitor::clean_names()
+P.vigil.data <- read_csv("data/processed/Percina_vigil_processed_human_readable.csv") %>% 
+  janitor::clean_names()
 ```
 
-#### Mutate character variable to numeric for Hnuc
+#### Mutate character variable to numeric for Hnuc and Pvigil
 ```{r convert to numeric}
 H.nuchalis.data <- H.nuchalis.data %>%
+  mutate(weight_mg = as.numeric(weight_mg))
+P.vigil.data <- P.vigil.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
 ```
 
@@ -731,8 +737,49 @@ full.data.revised <- full.data.revised %>%
 ### Test the model for question 3
 
 ```{r model for q3}
-summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
+library(lme4)
+
+full.data.revised$psite_taxon <- as.factor(full.data.revised$psite_taxon)
+full.data.revised$life_stage <- as.factor(full.data.revised$life_stage)
+
+
+summary(q3m <- lm(fcf ~ life_stage*psite_taxon-1, data = full.data.revised))
 plot(q3m)
 ```
+
+#### Remove outliers from the final model and rerun
+```{r}
+# Remove rows with missing values in the relevant columns
+full.data.revised_cleaned <- full.data.revised %>%
+  filter(!is.na(fcf) & !is.na(life_stage) & !is.na(psite_taxon) & !is.na(psite_count))
+
+# Fit the model
+q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_cleaned)
+
+# Augment the cleaned data with model diagnostics
+full.data.revised_augmented <- augment(q3m, data = full.data.revised_cleaned)
+
+# Visualize standardized residuals
+ggplot(full.data.revised_augmented, aes(x = .fitted, y = .std.resid)) +
+  geom_point() +
+  geom_hline(yintercept = c(-3, 3), color = "red", linetype = "dashed") +
+  theme_minimal() +
+  ggtitle("Standardized Residuals")
+
+# Filter out outliers with standardized residuals > |3|
+full.data.revised_no_outliers <- full.data.revised_augmented %>%
+  filter(abs(.std.resid) <= 3)
+
+# Re-run the model without outliers
+summary(clean_model <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_no_outliers))
+
+# Visualize the clean data
+ggplot(full.data.revised_no_outliers, aes(x = .fitted, y = fcf)) +
+  geom_point()
+
+
+```
+
+
 
 
