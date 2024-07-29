@@ -5,6 +5,7 @@
 
 setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
 library(lme4)
+library(lmerTest)
 library(ggeffects)
 #################################################################SIZE DATA FROM DISSECTED FISHES
 #############################ictalurus
@@ -21,11 +22,23 @@ ictpuntrim <- ictpunraw[-c(13, 17, 35, 39, 44, 46, 56, 57, 65, 67, 69, 70, 74, 7
 View(ictpuntrim)
 
 #plot only randomly selected fishes
-plot(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected)
+ggplot(data=ictpuntrim, aes(YearCollected, StandardLength_mm))+
+  geom_point(size=2)+
+  geom_smooth(method=lm, color="blue")+
+  xlab("Year collected")+
+  ylab("Standard Length in mm")+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.637", "\n",
+                         "slope: 0.067"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 
-#create model and add regression line
+#simple linear model summary
 summary(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
-abline(lm(ictpuntrim$StandardLength_mm~ictpuntrim$YearCollected))
 
 ################################notropis
 #loading in data
@@ -41,11 +54,23 @@ notroptrim <- notropraw[-c(35, 36, 37, 54, 75, 81, 82, 83, 84, 85, 86, 87, 88, 9
 View(notroptrim)
 
 #plot only randomly selected fishes
-plot(notroptrim$StandardLength_mm~notroptrim$YearCollected)
+ggplot(data=notroptrim, aes(YearCollected, StandardLength_mm))+
+  geom_point(size=2)+
+  geom_smooth(method=lm, color="red")+
+  xlab("Year collected")+
+  ylab("Standard Length in mm")+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.001", "\n",
+                         "slope: -0.274"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 
-#create model and add regression line
+#model summary
 summary(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected)) 
-abline(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
 
 #############################hybog
 #loading in data
@@ -53,11 +78,23 @@ hybograw <-Hybognathus_nuchalis_Datasheet_2024_07_25
 View(hybograw)
 
 #plotting ALL
-plot(hybograw$StandardLength_mm~hybograw$YearCollected)
+ggplot(data=hybograw, aes(YearCollected, StandardLength_mm), color="#006008")+
+  geom_point(size=2)+
+  geom_smooth(method=lm, color="#006008")+
+  xlab("Year collected")+
+  ylab("Standard Length in mm")+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.012", "\n",
+                         "slope: -0.172"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 
 #create model and add regression line
 summary(lm(hybograw$StandardLength_mm~hybograw$YearCollected)) 
-abline(lm(hybograw$StandardLength_mm~hybograw$YearCollected))
 #nearly every fish was selected for size; even still there is a significant size decrease
 
 
@@ -71,12 +108,13 @@ gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this c
 
 #main research question: how did body length change over time?
 library(ggplot2)
-
 View(desmond_data)
-#plotting both species together
+
+
+###############################all species
 SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
-  scale_color_manual(values=c("#FCD12A", "#0571b0","#ca0020"))+
-  geom_point(size=4)+
+  scale_color_manual(values=c("#008000", "blue","red"))+
+  geom_point(size=2)+
   xlab("Year collected")+
   ylab("Standard Length in mm")+
   theme_minimal()+
@@ -86,74 +124,89 @@ SL_time<-ggplot(desmond_data,aes(Year,SL, color=Species))+
 ###########################ictalurus
 #subset
 ict_desmond <- subset(desmond_data, Species == "Ictalurus_punctatus")
-ict_desmond$weight_to_sl <- ict_desmond$Weight/ict_desmond$SL
 View(ict_desmond)
 #model
-ict_model <- lmer(SL~Year + (1|Cat_Num), data= ict_desmond)
+ict_model <- lmerTest::lmer(SL~Year + (1|Cat_Num), data= ict_desmond)
 ict_sum <- summary(ict_model)
 plot(ict_model)
 #predicting line
-mydf <- ggpredict(ict_model, c("Year [n=100]"))
+ict_pred <- ggpredict(ict_model, c("Year [n=100]"))
 #plotting
-plot(mydf, show_data = TRUE, dot_alpha = 1)+
+plot(ict_pred, show_data = TRUE, dot_alpha = 1, color = "blue")+ 
   labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.855", "\n",
+             "slope: 0.098"),
+            hjust = -0.5, vjust = 1.5, 
+            size = 4, 
+            color = "black", 
+            fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 
+#############################notropis
+#subset
+notrop_desmond <- subset(desmond_data, Species == "Notropis_atherinoides")
+#model
+notrop_model <- lmerTest::lmer(SL~Year + (1|Cat_Num), data= notrop_desmond)
+summary(notrop_model)
+plot(notrop_model)
+#predicting line
+notrop_pred <- ggpredict(notrop_model, c("Year [n=100]"))
 #plot
-ict_only <- ggplot(ict_desmond, aes(Year,SL))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Standard Length in mm")+
-  geom_line(aes(y = predicted), linewidth = 1)+
-  theme_minimal()+
- # annotate("text", x = -Inf, y = Inf, 
-           #label = paste("p-value:", format.pval(p_value), "\n",
-                       #  "R-squared:", round(r_squared, 2), "\n",
-                       #  "Slope:", round(coef(ict_sum)[2], 3)),
-          # hjust = -0.5, vjust = 1.5, 
-          # size = 4, 
-          # color = "black", 
-          # fontface = "italic") +
+plot(notrop_pred, show_data = TRUE, dot_alpha = 1, color = "red")+ 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.009", "\n",
+                         "slope: -0.513"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-ict_only
 
-#plotting only notropis
-notrop_only <- ggplot(subset(desmond_data, Species %in% "Notropis_atherinoides"), aes(Year,SL))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Standard Length in mm")+
-  geom_smooth(method = "lm", formula = y ~ x)+
-  theme_minimal()+
+##############################hybog
+#subset
+hybog_desmond <- subset(desmond_data, Species == "Hybognathus_nuchalis")
+View(hybog_desmond)
+#model
+hybog_model <- lmerTest::lmer(SL~Year + (1|Cat_Num), data= hybog_desmond)
+summary(hybog_model)
+plot(hybog_model)
+#predicting line
+hybog_pred <- ggpredict(hybog_model, c("Year [n=100]"))
+#plot
+plot(hybog_pred, show_data = TRUE, dot_alpha = 1, color = "#008000")+ 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.0004", "\n",
+                         "slope: -0.724"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-notrop_only
 
-#plotting only hybog
-hybog_only <- ggplot(subset(desmond_data, Species %in% "Hybognathus_nuchalis"), aes(Year,SL))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Standard Length in mm")+
-  geom_smooth(method = "lm", formula = y ~ x)+
-  theme_minimal()+
-  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-hybog_only
+
+
+
+
+
 
 
 ##################################################WHAT ABOUT WEIGHT:LENGTH RATIO?
-##########subset data
+# this data won't be used for august's poster session, but by plotting the graphs you can see we show a pretty intense decrease in weight to body length ratio! this means that not only are fish getting shorter, they're getting thinner for their size. this suggests that the issue may not be exclusively age class shifting/suttkus fishing out the sampling sites, but something else
+###################subset data
 #ictalurus
-ict_desmond <- subset(desmond_data, Species == "Ictalurus_punctatus")
 ict_desmond$weight_to_sl <- ict_desmond$Weight/ict_desmond$SL
 View(ict_desmond)
 #notropis
-notrop_desmond <- subset(desmond_data, Species == "Notropis_atherinoides")
 notrop_desmond$weight_to_sl <- notrop_desmond$Weight/notrop_desmond$SL
 View(notrop_desmond)
 #hybog
-hybog_desmond <- subset(desmond_data, Species == "Hybognathus_nuchalis")
 hybog_desmond$weight_to_sl <- hybog_desmond$Weight/hybog_desmond$SL
 View(hybog_desmond)
 
-#########plots
+###################plots
 #ictalurus
 ict_w_2SL_only <- ggplot(ict_desmond, aes(Year,weight_to_sl))+
   geom_point(size=4)+
@@ -183,17 +236,3 @@ hybog_w2SL_only <- ggplot(hybog_desmond, aes(Year,weight_to_sl))+
   theme_minimal()+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 hybog_w2SL_only
-
-##################################################MODELS FOR RESELECTED FISHES
-#ictalurus
-ict_model <- lm(SL~Year, data= ict_desmond)
-summary(ict_model)
-#the model summary shows that there is not a very good fit of this model to the data (low R-sq value), and that there is no significant slope (pvalue, or Pr>t, is much greater than 0.05). 
-
-#notropis
-notrop_model <- lm(SL~Year, data= notrop_desmond)
-summary(notrop_model)
-
-#hybog
-hybog_model <- lm(SL~Year, data= hybog_desmond)
-summary(hybog_model)
