@@ -767,5 +767,14 @@ library(sjPlot)
 
 plot_model(q3m)
 
+
+#Evaluate diagnostics
+library(DHARMa)
+library(MASS)
+
+s=simulateResiduals(fittedModel=q3m,n=250)
+s$scaledResiduals
+plot(s)
+
 ```
 
