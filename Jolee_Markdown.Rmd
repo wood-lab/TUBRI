@@ -57,6 +57,7 @@ install.packages("ggeffects")
 install.packages("rmarkdown")
 install.packages("caret")
 install.packages("tibble")
+install.packages("lmerTest")
 install.packages("DHARMa")
 install.packages("lme4")
 ```
@@ -65,9 +66,12 @@ install.packages("lme4")
 ```{r load packages, echo=TRUE}
 library(ggeffects)
 library(tidyverse)
+library(lmerTest)
 library(ggpubr)
+library(stringr)
 library(caret)
 library(tibble)
+library(car)
 library(readr)
 library(dbplyr)
 library(lubridate)
@@ -616,7 +620,7 @@ K_i\sim\ life\ stage\ + parasite\ count
 $$
 #### Model formula for Question 3 
 $$
-K_i\sim\ life\ stage\ * taxon\ + parasite\ count
+K_i\sim\ life\ stage\ * taxon\ + parasite\ count\ + (1|fish)\ + (1|catelog) 
 $$
 
 #### Run linear model to test above questions
@@ -663,123 +667,105 @@ full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_
 ```{r mutate variable, echo=FALSE}
 full.data <- full.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
+full.data <- full.data %>%
+  mutate(psite_count = as.numeric(psite_count))
+
 ```
 
-### Split everything into adult or larval based on the designations from initial analyses and create a column for identifying parasite taxonomic group
-```{r adult vs larval splits, echo=FALSE}
-full.data.stages <- full.data %>%
-  mutate(life_stage = ifelse(psite_spp_x %in% c("META.HS",
-                      "META.UNK", 
-                      "MYX.GO",
-                      "MYX.GEOM",
-                      "MYXO.BC",
-                      "MYX.THEL",
-                      "MYXO.SBAD",
-                      "MYXO.UNK",
-                      "MYXO.UP",
-                      "TREM.MET",
-                      "TREM.SSS",
-                      "TREM.BUC",
-                      "TREM.METAF",
-                      "TREM.METAGS",
-                      "TREM.MS",
-                      "TREM.NEA", # P. vigilax ends
-                      "NEM.CYST",
-                      "TREM.META.GG",
-                      "TREM.META.UNK",
-                      "TREM.LG",
-                      "NEM.CYST",
-                      "MYX.TAIL",
-                      "MYX.GEOM", # I. punctatus ends
-                      "NEM.CYST",
-                      "TREM.LARV",
-                      "TREM.META",
-                      "MYX.SP", 
-                      "MYX.ROUND",
-                      "TREM.CYST", # N. atherinoides ends
-                      "NEM.DAFT",
-                      "TREM.CM",
-                      "TREM.META.HET",
-                      "TREM.META.SP",
-                      "TREM.BC",
-                      "TREM.META.GO",
-                      "TREM.META.ES",
-                      "META.UNK",
-                      "TREM.META",
-                      "TREM.META.UNK"), # H. nuchalis ends
-                            "Larval", "Adult"),
-    psite_taxon = ifelse(sub("\\..*", "", psite_spp_x) == "META", "TREM", sub("\\..*", "", psite_spp_x))
-  ) %>%
-  janitor::clean_names()
-```
-
-### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. 
+### Split everything into adult or larval based on the designations from initial analyses and create a column for identifying parasite taxonomic group. 
 - acanths
 - monogenes
 - myxozoans 
 Make sure you rename the new dataframe as something different from what you named it in the previous one (so that we can keep both versions to reference back to)
-```{r only a/l both in host, echo=FALSE}
-full.data.revised <- full.data.stages %>%
-                              filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
+- need to readd acanths if we are using the percina data (acanth.cya)
+### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. Add back a column for Fulton's Condition Factor.
+```{r add stages to total, echo=FALSE}
+
+full.data.stages <- full.data %>%
+  mutate(
+    life_stage = case_when(
+      psite_count == 0 ~ "AAuninfected", 
+      psite_spp_x %in% c("ACANTH.BIGB", "ACANTH.BKR", "NEM.CONA", "NEM.CAP",
+                         "NEM.DICH", "NEM.LARV", "NEM.TRBK", "NEM.UNK",
+                         "CEST.GODZ", "CEST.COMP", "CEST.NTG", "COPE.CL",
+                         "COPE.GRAB", "CEST.PEA", "CEST.L", "CEST.VIT",
+                         "CEST.UNK", "MONO.GYRO", "MONO.DACT", "MONO.LG",
+                         "TREM.RNDA", "TREM.UNK", "ACAN.OSTR", "CEST.COMP",
+                         "CEST.MEG", "LEECH.KUT", "NEM.NMTS", "MONO.IP",
+                         "MONO.UNK", "NEM.PHAR", "NEM.PTY", "NEM.SP",
+                         "NEM.TAF", "NEM.UNK", "NMORPH", "TREM.2",
+                         "TREM.ALLO", "TREM.BLE", "TREM.CREP", "TREM.F",
+                         "TREM.LIP", "TREM.MEGICT", "TREM.SMILE", "TREM.UNK",
+                         "CEST.COMP", "CEST.HYD", "CEST.LVS", "CEST.TRI",
+                         "COPE.A", "MONO.ALL", "MONO.UNK", "NEM.BRAN",
+                         "NEM.CAP", "NEM.SPKY", "NEM.TFS", "NEM.TWAS",
+                         "NEM.UNKN", "TREM.GB", "TREM.L", "CEST.BB",
+                         "NEM.BUD", "NEM.UNK", "TREM.ASS", "TREM.NS",
+                         "TREM.DIPLO", "TREM.UNK", "CEST.UNK", "MONO.DACT",
+                         "MONO.GDAC", "ACAN.AD", "COPE.POOD") ~ "adult",
+      
+      psite_spp_x %in% c("META.HS", "META.UNK", "MYX.GO", "MYX.GEOM",
+                         "MYXO.BC", "MYX.THEL", "MYXO.SBAD", "MYXO.UNK",
+                         "MYXO.UP", "TREM.MET", "TREM.SSS", "TREM.BUC",
+                         "TREM.METAF", "TREM.METAGS", "TREM.MS", "TREM.NEA",
+                         "NEM.CYST", "TREM.META.GG", "TREM.META.UNK", "TREM.LG",
+                         "MYX.TAIL", "MYX.GEOM", "NEM.CYST", "NEM.DAFT",
+                         "TREM.CM", "TREM.META.HET", "TREM.META.SP", "TREM.BC",
+                         "TREM.META.GO", "TREM.META.ES", "MYX.AK", "MYX.FI",
+                         "MYX.TIN", "MYX.GL", "MYX.OT", "MYX.EYE",
+                         "MYX.GC", "NEM.CYST", "TREM.LARV", "TREM.META",
+                         "MYX.SP", "MYX.ROUND", "TREM.CYST") ~ "larval",
+      
+      is.na(psite_spp_x) ~ "0"
+    ),
+    
+    psite_taxon = case_when(
+      psite_count == 0 ~ "AAuninfected",  
+      startsWith(psite_spp_x, "CEST") ~ "cest",
+      startsWith(psite_spp_x, "TREM") ~ "trem",
+      startsWith(psite_spp_x, "META") ~ "meta",
+      startsWith(psite_spp_x, "NEM") ~ "nem",
+      TRUE ~ "other"
+    )
+  ) %>%
+  filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
   janitor::clean_names()
 
-# did not change psite_spp_y because it deletes some of the data when the y column equals NA: filter(!str_detect(psite_spp_y, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>% 
-# appears to be fine without it - checked using any() and checked the lengths of both columns
+
+### FCF added back
+full.data.stages <- full.data.stages %>%
+  mutate(FCF = ((full.data.stages$weight_mg/((full.data.stages$standard_length_mm)^3)))*(100)) %>% 
+  janitor::clean_names()
+
+### fix variable type
+full.data.stages <- full.data.stages %>%
+  mutate(life_stage = as.factor(life_stage))
+full.data.stages <- full.data.stages %>%
+  mutate(psite_taxon = as.factor(psite_taxon))
+
 ```
 
-### Add back a column for Fulton's Condition Factor. 
-```{r FCF into new dataframe, echo=FALSE}
-full.data.revised <- full.data.revised %>%
-  mutate(FCF = ((full.data.revised$weight_mg/((full.data.revised$standard_length_mm)^3)))*(100)) %>%
-  janitor::clean_names()
-```
+### Plot relationships for total data models
+
 
 ### Test the model for question 3
 
 ```{r model for q3}
-library(lme4)
+summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
 
-full.data.revised$psite_taxon <- as.factor(full.data.revised$psite_taxon)
-full.data.revised$life_stage <- as.factor(full.data.revised$life_stage)
+summary(q3m <- lmer(fcf ~ relevel(life_stage, ref = "uninfected") + relevel(life_stage, ref = "uninfected"):relevel(psite_taxon, ref = "uninfected")+ (1|catalog_number), data = full.data.stages))
 
 
-summary(q3m <- lm(fcf ~ life_stage*psite_taxon-1, data = full.data.revised))
 plot(q3m)
-```
+# check colinearity using vif function --> less than 10 means model is ok concerning colinearity
+vif(q3m)
 
-#### Remove outliers from the final model and rerun
-```{r}
-# Remove rows with missing values in the relevant columns
-full.data.revised_cleaned <- full.data.revised %>%
-  filter(!is.na(fcf) & !is.na(life_stage) & !is.na(psite_taxon) & !is.na(psite_count))
+drop1(q3m,test="F")
 
-# Fit the model
-q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_cleaned)
+install.packages("sjPlot")
+library(sjPlot)
 
-# Augment the cleaned data with model diagnostics
-full.data.revised_augmented <- augment(q3m, data = full.data.revised_cleaned)
-
-# Visualize standardized residuals
-ggplot(full.data.revised_augmented, aes(x = .fitted, y = .std.resid)) +
-  geom_point() +
-  geom_hline(yintercept = c(-3, 3), color = "red", linetype = "dashed") +
-  theme_minimal() +
-  ggtitle("Standardized Residuals")
-
-# Filter out outliers with standardized residuals > |3|
-full.data.revised_no_outliers <- full.data.revised_augmented %>%
-  filter(abs(.std.resid) <= 3)
-
-# Re-run the model without outliers
-summary(clean_model <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_no_outliers))
-
-# Visualize the clean data
-ggplot(full.data.revised_no_outliers, aes(x = .fitted, y = fcf)) +
-  geom_point()
-
+plot_model(q3m)
 
 ```
-
-
-
 
