@@ -684,7 +684,7 @@ Make sure you rename the new dataframe as something different from what you name
 full.data.stages <- full.data %>%
   mutate(
     life_stage = case_when(
-      psite_count == 0 ~ "AAuninfected", 
+      psite_count == 0 ~ "uninfected", 
       psite_spp_x %in% c("ACANTH.BIGB", "ACANTH.BKR", "NEM.CONA", "NEM.CAP",
                          "NEM.DICH", "NEM.LARV", "NEM.TRBK", "NEM.UNK",
                          "CEST.GODZ", "CEST.COMP", "CEST.NTG", "COPE.CL",
@@ -720,15 +720,16 @@ full.data.stages <- full.data %>%
     ),
     
     psite_taxon = case_when(
-      psite_count == 0 ~ "AAuninfected",  
+      psite_count == 0 ~ "uninfected",  
       startsWith(psite_spp_x, "CEST") ~ "cest",
       startsWith(psite_spp_x, "TREM") ~ "trem",
-      startsWith(psite_spp_x, "META") ~ "meta",
+      startsWith(psite_spp_x, "META") ~ "trem",
       startsWith(psite_spp_x, "NEM") ~ "nem",
       TRUE ~ "other"
     )
   ) %>%
   filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
+  replace_na(list(life_stage = "uninfected"))  %>%
   janitor::clean_names()
 
 
@@ -753,19 +754,25 @@ full.data.stages <- full.data.stages %>%
 ```{r model for q3}
 summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
 
-summary(q3m <- lmer(fcf ~ relevel(life_stage, ref = "uninfected") + relevel(life_stage, ref = "uninfected"):relevel(psite_taxon, ref = "uninfected")+ (1|catalog_number), data = full.data.stages))
-
-
-plot(q3m)
 # check colinearity using vif function --> less than 10 means model is ok concerning colinearity
 vif(q3m)
 
-drop1(q3m,test="F")
+crosstab_table <- crosstab %>%
+  pivot_wider(names_from = psite_count, values_from = n, values_fill = list(n = 0))
+view(crosstab_table)
 
-install.packages("sjPlot")
-library(sjPlot)
+# Print the table
+print(kable(crosstab_table, format = "markdown"))
 
-plot_model(q3m)
+crosstab <- full.data.stages %>%
+  count(life_stage, psite_taxon, psite_count)
+
+ggplot(crosstab, aes(x = life_stage, y = psite_taxon, fill = n)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(x = "Variable 1", y = "Variable 2", fill = "Count") +
+  facet_wrap(~ psite_count) +
+  theme_minimal()
 
 
 #Evaluate diagnostics
