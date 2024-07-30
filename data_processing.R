@@ -854,9 +854,7 @@ MYX.GC<-(2*hyb_nuc_today_with_metadata$myx.gc.gill)
 MYX.GL<-(2*hyb_nuc_today_with_metadata$MYX.GL.gill)                     
 MYX.OT<-(2*hyb_nuc_today_with_metadata$myx.ot.gill)+(2*hyb_nuc_today_with_metadata$MYX.OT.Skin)                      
 MYX.TIN<-(2*hyb_nuc_today_with_metadata$MYX.TIN.GILL)                     
-
-# free-living?
-NEM.BUD<-(2*hyb_nuc_today_with_metadata$NEM.BUD.GILL)+(hyb_nuc_today_with_metadata$NEM.BUD.INTESTINE)                
+# free-living, not a parasite: NEM.BUD<-(2*hyb_nuc_today_with_metadata$NEM.BUD.GILL)+(hyb_nuc_today_with_metadata$NEM.BUD.INTESTINE)                
 NEM.DAFT<-hyb_nuc_today_with_metadata$NEM.DAFT.CONNECTIVETISSUE       
 NEM.UNK<-hyb_nuc_today_with_metadata$NEM.UNK.INTESTINE                
 TREM.ASS<-hyb_nuc_today_with_metadata$TREM.ASS.ConnectiveTissue+hyb_nuc_today_with_metadata$TREM.ASS.Flush+
@@ -941,7 +939,7 @@ hyb_nuc_processed_data<-cbind.data.frame(hyb_nuc_today_with_metadata$CatalogNumb
                                          hyb_nuc_today_with_metadata$Latitude,
                                          hyb_nuc_today_with_metadata$Longitude,
                                          ACAN.AD,CEST.BB,CEST.UNK,COPE.POOD,META.UNK,MONO.DACT,MONO.GDAC,
-                                         MYX.AK,MYX.EYE,MYX.FI,MYX.GC,MYX.GL,MYX.OT,MYX.TIN,NEM.BUD,NEM.DAFT,
+                                         MYX.AK,MYX.EYE,MYX.FI,MYX.GC,MYX.GL,MYX.OT,MYX.TIN,NEM.DAFT,
                                          NEM.UNK,TREM.ASS,TREM.BC,TREM.CM,TREM.DIPLO,TREM.META,TREM.META.ES,
                                          TREM.META.GO,TREM.META.HET,TREM.META.SP,TREM.META.UNK,TREM.NS,TREM.UNK)
 
@@ -1066,7 +1064,6 @@ stuff<-hyb_nuc_processed_data %>%
   filter(is.na(CI))
 
 
-
 # Make the dataset analyzable
 
 hyb_nuc_processed_data_longer<-melt(hyb_nuc_processed_data,id=c("CatalogNumber", "YearCollected", 
@@ -1082,8 +1079,8 @@ colnames(hyb_nuc_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(hyb_nuc_processed_data_longer, file="data/processed/Hybognathus_nuchalis_processed_machine_readable.csv")
-write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_processed_human_readable.csv")
+write.csv(hyb_nuc_processed_data_longer, file="data/processed/Hybognathus_nuchalis_processed_machine_readable_UPDATED_2024.07.30.csv")
+write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.07.30.csv")
 
 
 
@@ -1299,7 +1296,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.29.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.30.csv")
 
 
 # Playing around with the big analysis
