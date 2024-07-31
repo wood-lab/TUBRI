@@ -49,7 +49,7 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.30.csv", header = T, sep = ",")
 colnames(full_data)[20]<-"scaled_TL_mm"
 
 View(full_data)
