@@ -588,54 +588,31 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l
 ## should we exclude these outliers
 
 # Jolee's plot - messing around
-# check that code runs with new dataset
-ggplot(full.data.stages,
+ggplot(full.data.revised,
        aes(x = life_stage,
            y = fcf,
            colour = sex)) +
   geom_boxplot()
 
 ```
-
-### Plot to answer question 3
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
 # Jolee's plots - messing around
-
-# scatter plot
-# code works with fake data, check with new full.data.stages dataset
-ggplot(full.data.stages %>%
-         filter(psite_taxon != "NEM"),  # it should be NEM right?
-       aes(x = psite_count,
-           y = fcf,
-           colour = life_stage,
-           shape = psite_taxon)) +
-  geom_point() +
-  labs(x = "Parasite Count",
-       y = expression(paste("FCF (", mg/mm^3, ")")),
-       colour = "Life Stages",
-       shape = "Parasite Taxon") +
-  scale_shape_manual(values = c(16, 17)) +
-  #scale_color_manual(values = c("Adult" = "blue", "Juvenile" = "red"))
-  theme_classic()
-
-
-# boxplot - wrong and probably won't use (colour code is incorrect)
 ggplot(full.data.revised %>%
          filter(psite_taxon != "CEST"),
        aes(x = life_stage,
            y = fcf,
            colour = psite_taxon,
-           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
   geom_boxplot() +
   xlab("Life Stage") +
   ylab("FCF") +
   labs(colour = "Parasite Taxon") +
   theme_bw()
 
-
 ```
+
 
 
 ## Models
@@ -723,7 +700,6 @@ Make sure you rename the new dataframe as something different from what you name
 - need to readd acanths if we are using the percina data (acanth.cya)
 ### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. Add back a column for Fulton's Condition Factor.
 ```{r add stages to total, echo=FALSE}
-
 full.data.stages <- full.data %>%
   mutate(
     life_stage = case_when(
@@ -763,7 +739,7 @@ full.data.stages <- full.data %>%
     ),
     
     psite_taxon = case_when(
-      psite_count == 0 ~ "AAuninfected",  
+      psite_count == 0 ~ "uninfected",  
       startsWith(psite_spp_x, "CEST") ~ "cest",
       startsWith(psite_spp_x, "TREM") ~ "trem",
       startsWith(psite_spp_x, "META") ~ "trem",
@@ -791,12 +767,11 @@ full.data.stages <- full.data.stages %>%
 
 ### Plot relationships for total data models
 
-
 ### Test the model for question 3
 
 ```{r model for q3}
 #<<<<<<< HEAD
-summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised)) # code no longer works b/c "revised"
+summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 plot(q3m)
         
 ```
@@ -813,7 +788,6 @@ Robust Regression:
 -Use robust regression techniques to handle outliers better.
 
 ```{r}
-
 #Step 1: Check for Multicollinearity
 # Load necessary package
 if (!require(car)) install.packages("car")
@@ -873,9 +847,19 @@ library(MASS)
 # Fit a robust regression model
 q3m2_robust <- rlm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
 summary(q3m2_robust)
-#=======
 
-#### I think this is the model that we should go with, which is finally maybe fully working? check with DAki's model diagnostics stuff
+
+#Evaluate diagnostics
+library(DHARMa)
+library(MASS)
+>>>>>>> 352050d06b050ab220e21975f7b890bb959fd427
+#=======
+```
+
+
+```{r final model}
+#### I think this is the model that we should go with, which is finally maybe fully working? check with DAki's model diagnostics stuff 
+#### there are no larval cestodes in this analysis ####
 summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
 
 # check colinearity using vif function --> less than 10 means model is ok concerning colinearity
@@ -889,10 +873,6 @@ crosstab_table <- crosstab %>%
   pivot_wider(names_from = psite_count, values_from = n, values_fill = list(n = 0))
 view(crosstab_table)
 
-#Evaluate diagnostics
-library(DHARMa)
-library(MASS)
->>>>>>> 352050d06b050ab220e21975f7b890bb959fd427
 
 s=simulateResiduals(fittedModel=q3m,n=250)
 s$scaledResiduals
