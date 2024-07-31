@@ -57,23 +57,25 @@ install.packages("ggeffects")
 install.packages("rmarkdown")
 install.packages("caret")
 install.packages("tibble")
+install.packages("lmerTest")
 install.packages("DHARMa")
-install.packages("lme4")
 ```
 
 #### Load packages
 ```{r load packages, echo=TRUE}
 library(ggeffects)
 library(tidyverse)
+library(lmerTest)
 library(ggpubr)
+library(stringr)
 library(caret)
 library(tibble)
+library(car)
 library(readr)
 library(dbplyr)
 library(lubridate)
 library(ggplot2)
 library(glmmTMB)
-library(broom)
 library(DHARMa)
 ```
 
@@ -87,15 +89,11 @@ N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_
   janitor::clean_names()
 H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable.csv") %>%
   janitor::clean_names()
-P.vigil.data <- read_csv("data/processed/Percina_vigil_processed_human_readable.csv") %>% 
-  janitor::clean_names()
 ```
 
-#### Mutate character variable to numeric for Hnuc and Pvigil
+#### Mutate character variable to numeric for Hnuc
 ```{r convert to numeric}
 H.nuchalis.data <- H.nuchalis.data %>%
-  mutate(weight_mg = as.numeric(weight_mg))
-P.vigil.data <- P.vigil.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
 ```
 
@@ -531,7 +529,7 @@ NA.psc.fcf <- ggplot(Nath.life.stage.total,
   ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
 
 PV.psc.fcf <- ggplot(Pvig.life.stage.total, 
-       aes(x = psite_count, y = body_index_vig, colour = sex)) + geom_point() + xlab("Parasite Count")  + 
+       aes(x = psite_count, y = body_index_vig, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
   ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
 
 HN.psc.fcf <- ggplot(Hnuc.life.stage.total, 
@@ -540,6 +538,8 @@ HN.psc.fcf <- ggplot(Hnuc.life.stage.total,
 
 ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, HN.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D"))
 # more variability than the others
+
+# Jolee's graph - messing around
 
 ```
 
@@ -587,6 +587,30 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l
 ## double check sex, weights
 ## should we exclude these outliers
 
+# Jolee's plot - messing around
+ggplot(full.data.revised,
+       aes(x = life_stage,
+           y = fcf,
+           colour = sex)) +
+  geom_boxplot()
+
+```
+```{r, plots for Question 3}
+# FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
+
+# Jolee's plots - messing around
+ggplot(full.data.revised %>%
+         filter(psite_taxon != "CEST"),
+       aes(x = life_stage,
+           y = fcf,
+           colour = psite_taxon,
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
+  geom_boxplot() +
+  xlab("Life Stage") +
+  ylab("FCF") +
+  labs(colour = "Parasite Taxon") +
+  theme_bw()
+
 ```
 
 
@@ -616,12 +640,12 @@ K_i\sim\ life\ stage\ + parasite\ count
 $$
 #### Model formula for Question 3 
 $$
-K_i\sim\ life\ stage\ * taxon\ + parasite\ count
+K_i\sim\ life\ stage\ * taxon\ + parasite\ count\ + (1|fish)\ + (1|catelog) 
 $$
 
 #### Run linear model to test above questions
 ```{r model}
-## we can also run these using the total dataset and then make fish species another random effect
+
 # Question 1 (lm)
 summary(FCF_ath_lm <- lm(body_index_ath ~ psite_count, data = Nath.life.stage.total))
 plot(FCF_ath_lm)
@@ -663,123 +687,212 @@ full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_
 ```{r mutate variable, echo=FALSE}
 full.data <- full.data %>%
   mutate(weight_mg = as.numeric(weight_mg))
+full.data <- full.data %>%
+  mutate(psite_count = as.numeric(psite_count))
+
 ```
 
-### Split everything into adult or larval based on the designations from initial analyses and create a column for identifying parasite taxonomic group
-```{r adult vs larval splits, echo=FALSE}
-full.data.stages <- full.data %>%
-  mutate(life_stage = ifelse(psite_spp_x %in% c("META.HS",
-                      "META.UNK", 
-                      "MYX.GO",
-                      "MYX.GEOM",
-                      "MYXO.BC",
-                      "MYX.THEL",
-                      "MYXO.SBAD",
-                      "MYXO.UNK",
-                      "MYXO.UP",
-                      "TREM.MET",
-                      "TREM.SSS",
-                      "TREM.BUC",
-                      "TREM.METAF",
-                      "TREM.METAGS",
-                      "TREM.MS",
-                      "TREM.NEA", # P. vigilax ends
-                      "NEM.CYST",
-                      "TREM.META.GG",
-                      "TREM.META.UNK",
-                      "TREM.LG",
-                      "NEM.CYST",
-                      "MYX.TAIL",
-                      "MYX.GEOM", # I. punctatus ends
-                      "NEM.CYST",
-                      "TREM.LARV",
-                      "TREM.META",
-                      "MYX.SP", 
-                      "MYX.ROUND",
-                      "TREM.CYST", # N. atherinoides ends
-                      "NEM.DAFT",
-                      "TREM.CM",
-                      "TREM.META.HET",
-                      "TREM.META.SP",
-                      "TREM.BC",
-                      "TREM.META.GO",
-                      "TREM.META.ES",
-                      "META.UNK",
-                      "TREM.META",
-                      "TREM.META.UNK"), # H. nuchalis ends
-                            "Larval", "Adult"),
-    psite_taxon = ifelse(sub("\\..*", "", psite_spp_x) == "META", "TREM", sub("\\..*", "", psite_spp_x))
-  ) %>%
-  janitor::clean_names()
-```
-
-### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. 
+### Split everything into adult or larval based on the designations from initial analyses and create a column for identifying parasite taxonomic group. 
 - acanths
 - monogenes
 - myxozoans 
 Make sure you rename the new dataframe as something different from what you named it in the previous one (so that we can keep both versions to reference back to)
-```{r only a/l both in host, echo=FALSE}
-full.data.revised <- full.data.stages %>%
-                              filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
+- need to readd acanths if we are using the percina data (acanth.cya)
+### Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host. Add back a column for Fulton's Condition Factor.
+```{r add stages to total, echo=FALSE}
+
+full.data.stages <- full.data %>%
+  mutate(
+    life_stage = case_when(
+      psite_count == 0 ~ "uninfected", 
+      psite_spp_x %in% c("ACANTH.BIGB", "ACANTH.BKR", "NEM.CONA", "NEM.CAP",
+                         "NEM.DICH", "NEM.LARV", "NEM.TRBK", "NEM.UNK",
+                         "CEST.GODZ", "CEST.COMP", "CEST.NTG", "COPE.CL",
+                         "COPE.GRAB", "CEST.PEA", "CEST.L", "CEST.VIT",
+                         "CEST.UNK", "MONO.GYRO", "MONO.DACT", "MONO.LG",
+                         "TREM.RNDA", "TREM.UNK", "ACAN.OSTR", "CEST.COMP",
+                         "CEST.MEG", "LEECH.KUT", "NEM.NMTS", "MONO.IP",
+                         "MONO.UNK", "NEM.PHAR", "NEM.PTY", "NEM.SP",
+                         "NEM.TAF", "NEM.UNK", "NMORPH", "TREM.2",
+                         "TREM.ALLO", "TREM.BLE", "TREM.CREP", "TREM.F",
+                         "TREM.LIP", "TREM.MEGICT", "TREM.SMILE", "TREM.UNK",
+                         "CEST.COMP", "CEST.HYD", "CEST.LVS", "CEST.TRI",
+                         "COPE.A", "MONO.ALL", "MONO.UNK", "NEM.BRAN",
+                         "NEM.CAP", "NEM.SPKY", "NEM.TFS", "NEM.TWAS",
+                         "NEM.UNKN", "TREM.GB", "TREM.L", "CEST.BB",
+                         "NEM.BUD", "NEM.UNK", "TREM.ASS", "TREM.NS",
+                         "TREM.DIPLO", "TREM.UNK", "CEST.UNK", "MONO.DACT",
+                         "MONO.GDAC", "ACAN.AD", "COPE.POOD") ~ "adult",
+      
+      psite_spp_x %in% c("META.HS", "META.UNK", "MYX.GO", "MYX.GEOM",
+                         "MYXO.BC", "MYX.THEL", "MYXO.SBAD", "MYXO.UNK",
+                         "MYXO.UP", "TREM.MET", "TREM.SSS", "TREM.BUC",
+                         "TREM.METAF", "TREM.METAGS", "TREM.MS", "TREM.NEA",
+                         "NEM.CYST", "TREM.META.GG", "TREM.META.UNK", "TREM.LG",
+                         "MYX.TAIL", "MYX.GEOM", "NEM.CYST", "NEM.DAFT",
+                         "TREM.CM", "TREM.META.HET", "TREM.META.SP", "TREM.BC",
+                         "TREM.META.GO", "TREM.META.ES", "MYX.AK", "MYX.FI",
+                         "MYX.TIN", "MYX.GL", "MYX.OT", "MYX.EYE",
+                         "MYX.GC", "NEM.CYST", "TREM.LARV", "TREM.META",
+                         "MYX.SP", "MYX.ROUND", "TREM.CYST") ~ "larval",
+      
+      is.na(psite_spp_x) ~ "0"
+    ),
+    
+    psite_taxon = case_when(
+      psite_count == 0 ~ "uninfected",  
+      startsWith(psite_spp_x, "CEST") ~ "cest",
+      startsWith(psite_spp_x, "TREM") ~ "trem",
+      startsWith(psite_spp_x, "META") ~ "trem",
+      startsWith(psite_spp_x, "NEM") ~ "nem",
+      TRUE ~ "other"
+    )
+  ) %>%
+  filter(!str_detect(psite_spp_x, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>%
+  replace_na(list(life_stage = "uninfected"))  %>%
   janitor::clean_names()
 
-# did not change psite_spp_y because it deletes some of the data when the y column equals NA: filter(!str_detect(psite_spp_y, "^(ACAN|MONO|COPE|LEECH|NMORPH|MYX)")) %>% 
-# appears to be fine without it - checked using any() and checked the lengths of both columns
+
+### FCF added back
+full.data.stages <- full.data.stages %>%
+  mutate(FCF = ((full.data.stages$weight_mg/((full.data.stages$standard_length_mm)^3)))*(100)) %>% 
+  janitor::clean_names()
+
+### fix variable type
+full.data.stages <- full.data.stages %>%
+  mutate(life_stage = as.factor(life_stage))
+full.data.stages <- full.data.stages %>%
+  mutate(psite_taxon = as.factor(psite_taxon))
+
 ```
 
-### Add back a column for Fulton's Condition Factor. 
-```{r FCF into new dataframe, echo=FALSE}
-full.data.revised <- full.data.revised %>%
-  mutate(FCF = ((full.data.revised$weight_mg/((full.data.revised$standard_length_mm)^3)))*(100)) %>%
-  janitor::clean_names()
-```
+### Plot relationships for total data models
+
 
 ### Test the model for question 3
 
 ```{r model for q3}
-library(lme4)
-
-full.data.revised$psite_taxon <- as.factor(full.data.revised$psite_taxon)
-full.data.revised$life_stage <- as.factor(full.data.revised$life_stage)
-
-
-summary(q3m <- lm(fcf ~ life_stage*psite_taxon-1, data = full.data.revised))
+<<<<<<< HEAD
+summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 plot(q3m)
+        
 ```
+Steps to Improve the Model
+Check for Multicollinearity:
+-Multicollinearity can cause instability in the coefficient estimates. You can use the Variance Inflation Factor (VIF) to check for this.
+Transform Variables:
+-Transforming the dependent variable (fcf) or the independent variables might help in stabilizing variance and making the model fit better.
+Remove or Address Outliers:
+-Identify and address outliers that might be affecting the model fit.
+Interaction Terms:
+-Simplify or reconsider interaction terms if they are not significant or cause issues.
+Robust Regression:
+-Use robust regression techniques to handle outliers better.
 
-#### Remove outliers from the final model and rerun
 ```{r}
-# Remove rows with missing values in the relevant columns
-full.data.revised_cleaned <- full.data.revised %>%
-  filter(!is.na(fcf) & !is.na(life_stage) & !is.na(psite_taxon) & !is.na(psite_count))
 
-# Fit the model
-q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_cleaned)
+#Step 1: Check for Multicollinearity
+# Load necessary package
+if (!require(car)) install.packages("car")
+library(car)
 
-# Augment the cleaned data with model diagnostics
-full.data.revised_augmented <- augment(q3m, data = full.data.revised_cleaned)
+# Check for aliased coefficients
+alias(lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 
-# Visualize standardized residuals
-ggplot(full.data.revised_augmented, aes(x = .fitted, y = .std.resid)) +
-  geom_point() +
-  geom_hline(yintercept = c(-3, 3), color = "red", linetype = "dashed") +
-  theme_minimal() +
-  ggtitle("Standardized Residuals")
+# Load necessary package
+install.packages("glmnet")
+library(glmnet)
 
-# Filter out outliers with standardized residuals > |3|
-full.data.revised_no_outliers <- full.data.revised_augmented %>%
-  filter(abs(.std.resid) <= 3)
+# Prepare data for ridge regression
+x <- model.matrix(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised)[, -1]
+y <- full.data.revised$fcf
 
-# Re-run the model without outliers
-summary(clean_model <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised_no_outliers))
+# Fit ridge regression model
+ridge_model <- cv.glmnet(x, y, alpha = 0)
+summary(ridge_model)
 
-# Visualize the clean data
-ggplot(full.data.revised_no_outliers, aes(x = .fitted, y = fcf)) +
-  geom_point()
 
+# Calculate VIF
+vif(lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised, type="predictor"))
+#A VIF value greater than 5-10 indicates high multicollinearity.
+
+#Step 2: Transform Variables
+#Consider a log transformation of fcf if it is highly skewed:
+# Transform the dependent variable
+full.data.revised$log_fcf <- log(full.data.revised$fcf + 1) # Adding 1 to avoid log(0)
+
+# Fit the model again
+q3m2_ancova_log <- lm(log_fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
+summary(q3m2_ancova_log)
+#Step 3: Identify and Address Outliers
+# Cook's distance to identify influential points
+cooksd <- cooks.distance(q3m2_ancova)
+plot(cooksd, type = "h", main = "Cook's Distance", ylab = "Cook's distance")
+abline(h = 4/(nrow(full.data.revised)-length(coef(q3m2_ancova))), col = "red")
+
+# Remove influential points
+influential_points <- which(cooksd > (4/(nrow(full.data.revised) - length(coef(q3m2_ancova)))))
+full.data.cleaned <- full.data.revised[-influential_points, ]
+
+# Fit the model again without influential points
+q3m2_ancova_cleaned <- lm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.cleaned)
+summary(q3m2_ancova_cleaned)
+#Step 4: Simplify Interaction Terms
+#If an interaction term is not significant or causing issues, consider removing it:
+# Fit a simplified model without the problematic interaction term
+q3m2_ancova_simple <- lm(fcf ~ psite_count + life_stage + psite_taxon, data = full.data.revised)
+summary(q3m2_ancova_simple)
+#Step 5: Robust Regression
+# Load necessary package
+if (!require(MASS)) install.packages("MASS")
+library(MASS)
+
+# Fit a robust regression model
+q3m2_robust <- rlm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
+summary(q3m2_robust)
+=======
+summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
+
+# check colinearity using vif function --> less than 10 means model is ok concerning colinearity
+vif(q3m)
+
+crosstab_table <- crosstab %>%
+  pivot_wider(names_from = psite_count, values_from = n, values_fill = list(n = 0))
+view(crosstab_table)
+
+# Print the table
+print(kable(crosstab_table, format = "markdown"))
+
+crosstab <- full.data.stages %>%
+  count(life_stage, psite_taxon, psite_count)
+
+ggplot(crosstab, aes(x = life_stage, y = psite_taxon, fill = n)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(x = "Variable 1", y = "Variable 2", fill = "Count") +
+  facet_wrap(~ psite_count) +
+  theme_minimal()
+
+
+#Evaluate diagnostics
+library(DHARMa)
+library(MASS)
+>>>>>>> 352050d06b050ab220e21975f7b890bb959fd427
+
+s=simulateResiduals(fittedModel=q3m,n=250)
+s$scaledResiduals
+plot(s)
 
 ```
+<<<<<<< HEAD
+Explanation
+Multicollinearity: By calculating VIF, you can identify if any predictors are highly correlated and address them by removing or combining variables.
+Transformation: Transforming fcf can help in stabilizing variance and normalizing the distribution.
+Outliers: Identifying and removing influential points can improve the model's fit.
+Simplifying Interaction Terms: If the interaction terms are not significant or causing issues, removing them can simplify the model and improve interpretability.
+Robust Regression: Using robust regression can provide more reliable estimates in the presence of outliers.
 
 
-
+=======
+>>>>>>> 352050d06b050ab220e21975f7b890bb959fd427
 
