@@ -740,7 +740,7 @@ full.data.stages <- full.data %>%
     ),
     
     psite_taxon = case_when(
-      psite_count == 0 ~ "uninfected",  
+      psite_count == 0 ~ "AAuninfected",  
       startsWith(psite_spp_x, "CEST") ~ "cest",
       startsWith(psite_spp_x, "TREM") ~ "trem",
       startsWith(psite_spp_x, "META") ~ "trem",
@@ -865,19 +865,6 @@ crosstab <- full.data.stages %>%
 crosstab_table <- crosstab %>%
   pivot_wider(names_from = psite_count, values_from = n, values_fill = list(n = 0))
 view(crosstab_table)
-
-# Print the table
-print(kable(crosstab_table, format = "markdown"))
-
-
-
-ggplot(crosstab, aes(x = life_stage, y = psite_taxon, fill = n)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(x = "Variable 1", y = "Variable 2", fill = "Count") +
-  facet_wrap(~ psite_count) +
-  theme_minimal()
-
 
 #Evaluate diagnostics
 library(DHARMa)
