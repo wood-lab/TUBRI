@@ -539,7 +539,14 @@ HN.psc.fcf <- ggplot(Hnuc.life.stage.total,
 ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, HN.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D"))
 # more variability than the others
 
-# Jolee's graph - messing around
+# Jolee: graphing -
+ggplot(full.data.stages,
+       aes(x = psite_count,
+           y = fcf)) +
+  geom_point() +
+  xlab("Parasite Count") +
+  ylab(expression(paste("FCF (", mg/mm^3, ")"))) +
+  theme_classic()
 
 ```
 
@@ -587,24 +594,95 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l
 ## double check sex, weights
 ## should we exclude these outliers
 
-# Jolee's plot - messing around
-ggplot(full.data.revised,
+
+# Jolee: plot - include sex? if so, need to match f and F and F, m and M, and take out whatever the blank one is (red)
+ggplot(full.data.stages %>%
+         filter(sex != "MA") %>%
+         filter(sex != "NA") %>%
+         filter(sex != "na") %>%
+         filter(sex != "Na"),
        aes(x = life_stage,
            y = fcf,
            colour = sex)) +
-  geom_boxplot()
+  geom_boxplot() +
+  theme_classic()
+
 
 ```
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
-# Jolee's plots - messing around
-ggplot(full.data.revised %>%
-         filter(psite_taxon != "CEST"),
+# Jolee: graphing -
+
+# scatterplot w/ both adult and larval (hard to see adult)
+ggplot(full.data.stages %>%
+         filter(psite_taxon != "nem") %>%
+         filter(psite_taxon != "uninfected") %>%
+         filter(life_stage != "uninfected"),
+       aes(x = psite_count,
+           y = fcf,
+           colour = life_stage,
+           shape = psite_taxon)) +
+  geom_point(size = 3) +
+  labs(x = "Parasite Count",
+       y = expression(paste("FCF (", mg/mm^3, ")")),
+       colour = "Life Stages",
+       shape = "Parasite Taxon") +
+    scale_shape_manual(values = c(16, 17)) +
+  theme_classic()
+
+
+# scatterplot just adult - colour is not constant (change to make trem the same colour in both plots)
+Q3.adult <- ggplot(full.data.stages %>%
+        filter(psite_taxon != "nem") %>%
+         filter(psite_taxon != "uninfected") %>%
+         filter(life_stage != "larval") %>%
+         filter(life_stage != "uninfected"),
+       aes(x = psite_count,
+           y = fcf,
+           colour = psite_taxon,
+           shape = life_stage)) +
+  geom_point(size = 2) +
+  labs(x = "Parasite Count",
+       y = expression(paste("FCF (", mg/mm^3, ")")),
+       colour = "Parasite Taxon",
+       shape = "Life Stage") +
+    scale_shape_manual(values = c(16)) +
+  theme_classic()
+
+# scatterplot just larval - colour is not constant (change to make trem the same colour in both plots)
+Q3.larval <- ggplot(full.data.stages %>%
+         filter(psite_taxon != "nem") %>%
+         filter(psite_taxon != "uninfected") %>%
+         filter(life_stage != "adult") %>%
+         filter(life_stage != "uninfected"),
+       aes(x = psite_count,
+           y = fcf,
+           colour = psite_taxon,
+           shape = life_stage)) +
+  geom_point(size = 2) +
+  labs(x = "Parasite Count",
+       y = expression(paste("FCF (", mg/mm^3, ")")),
+       colour = "Parasite Taxon",
+       shape = "Life Stage") +
+    scale_shape_manual(values = c(17)) +
+  theme_classic()
+
+# combining both plots into one
+ggarrange(Q3.adult, Q3.larval, common.legend = TRUE, legend = "right", labels = c("A", "B")) 
+# missing larval legend
+
+
+
+# boxplot - not using, missing parasite count (that part of code is wrong)
+ggplot(full.data.stages %>%
+         filter(psite_taxon != "uninfected") %>%
+         filter(psite_taxon != "nem") %>%
+         filter(life_stage != "uninfected"),
        aes(x = life_stage,
            y = fcf,
            colour = psite_taxon,
-           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # add psite_count 
   geom_boxplot() +
   xlab("Life Stage") +
   ylab("FCF") +
