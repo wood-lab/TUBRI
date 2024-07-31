@@ -4,6 +4,8 @@
 
 
 setwd("C:/Users/Test 1/OneDrive/Documents/WOODLAB/TUBRI")
+library(googlesheets4)
+library(ggplot2)
 library(lme4)
 library(lmerTest)
 library(ggeffects)
@@ -102,12 +104,10 @@ summary(lm(hybograw$StandardLength_mm~hybograw$YearCollected))
 #######################################################SIZE DATA FROM FULLY RESELECTED FISHES
 
 install.packages("googlesheets4")
-library(googlesheets4)
 desmond_data <- read_sheet("https://docs.google.com/spreadsheets/d/1Ix7ZkoTA7AZDOnA3Rqmxt8cB9hPGSwEiwbmCek9uUOQ/edit?gid=0#gid=0") #paste the URL of the google sheet, then follow the prompts
 gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this code can only read the spreadsheet! follow prompts and ALLOW tidyverse to see your spreadsheets
 
 #main research question: how did body length change over time?
-library(ggplot2)
 View(desmond_data)
 
 
