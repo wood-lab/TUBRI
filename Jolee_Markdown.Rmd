@@ -858,7 +858,8 @@ library(MASS)
 
 
 ```{r final model}
-#### I think this is the model that we should go with, which is finally maybe fully working? check with DAki's model diagnostics stuff
+#### I think this is the model that we should go with, which is finally maybe fully working? check with DAki's model diagnostics stuff 
+#### there are no larval cestodes in this analysis ####
 summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
 
 # check colinearity using vif function --> less than 10 means model is ok concerning colinearity
