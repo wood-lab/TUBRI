@@ -588,31 +588,54 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l
 ## should we exclude these outliers
 
 # Jolee's plot - messing around
-ggplot(full.data.revised,
+# check that code runs with new dataset
+ggplot(full.data.stages,
        aes(x = life_stage,
            y = fcf,
            colour = sex)) +
   geom_boxplot()
 
 ```
+
+### Plot to answer question 3
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
 # Jolee's plots - messing around
+
+# scatter plot
+# code works with fake data, check with new full.data.stages dataset
+ggplot(full.data.stages %>%
+         filter(psite_taxon != "NEM"),  # it should be NEM right?
+       aes(x = psite_count,
+           y = fcf,
+           colour = life_stage,
+           shape = psite_taxon)) +
+  geom_point() +
+  labs(x = "Parasite Count",
+       y = expression(paste("FCF (", mg/mm^3, ")")),
+       colour = "Life Stages",
+       shape = "Parasite Taxon") +
+  scale_shape_manual(values = c(16, 17)) +
+  #scale_color_manual(values = c("Adult" = "blue", "Juvenile" = "red"))
+  theme_classic()
+
+
+# boxplot - wrong and probably won't use (colour code is incorrect)
 ggplot(full.data.revised %>%
          filter(psite_taxon != "CEST"),
        aes(x = life_stage,
            y = fcf,
            colour = psite_taxon,
-           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count
   geom_boxplot() +
   xlab("Life Stage") +
   ylab("FCF") +
   labs(colour = "Parasite Taxon") +
   theme_bw()
 
-```
 
+```
 
 
 ## Models
@@ -773,7 +796,7 @@ full.data.stages <- full.data.stages %>%
 
 ```{r model for q3}
 #<<<<<<< HEAD
-summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
+summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised)) # code no longer works b/c "revised"
 plot(q3m)
         
 ```
