@@ -56,6 +56,7 @@ install.packages("janitor")
 install.packages("ggeffects")
 install.packages("rmarkdown")
 install.packages("caret")
+install.packages("emmeans")
 install.packages("tibble")
 install.packages("lmerTest")
 install.packages("DHARMa")
@@ -66,6 +67,7 @@ install.packages("DHARMa")
 library(ggeffects)
 library(tidyverse)
 library(lmerTest)
+library(emmeans)
 library(ggpubr)
 library(stringr)
 library(caret)
@@ -394,14 +396,7 @@ HN.psc.fcf <- ggplot(Hnuc.life.stage.total,
 ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, HN.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D"))
 # more variability than the others
 
-# Jolee: graphing -
-ggplot(full.data.stages,
-       aes(x = psite_count,
-           y = fcf)) +
-  geom_point() +
-  xlab("Parasite Count") +
-  ylab(expression(paste("FCF (", mg/mm^3, ")"))) +
-  theme_classic()
+# Jolee's graph - messing around
 
 ```
 
@@ -449,95 +444,24 @@ ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l
 ## double check sex, weights
 ## should we exclude these outliers
 
-
-# Jolee: plot - include sex? if so, need to match f and F and F, m and M, and take out whatever the blank one is (red)
-ggplot(full.data.stages %>%
-         filter(sex != "MA") %>%
-         filter(sex != "NA") %>%
-         filter(sex != "na") %>%
-         filter(sex != "Na"),
+# Jolee's plot - messing around
+ggplot(full.data.revised,
        aes(x = life_stage,
            y = fcf,
            colour = sex)) +
-  geom_boxplot() +
-  theme_classic()
-
+  geom_boxplot()
 
 ```
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
-# Jolee: graphing -
-
-# scatterplot w/ both adult and larval (hard to see adult)
-ggplot(full.data.stages %>%
-         filter(psite_taxon != "nem") %>%
-         filter(psite_taxon != "uninfected") %>%
-         filter(life_stage != "uninfected"),
-       aes(x = psite_count,
-           y = fcf,
-           colour = life_stage,
-           shape = psite_taxon)) +
-  geom_point(size = 3) +
-  labs(x = "Parasite Count",
-       y = expression(paste("FCF (", mg/mm^3, ")")),
-       colour = "Life Stages",
-       shape = "Parasite Taxon") +
-    scale_shape_manual(values = c(16, 17)) +
-  theme_classic()
-
-
-# scatterplot just adult - colour is not constant (change to make trem the same colour in both plots)
-Q3.adult <- ggplot(full.data.stages %>%
-        filter(psite_taxon != "nem") %>%
-         filter(psite_taxon != "uninfected") %>%
-         filter(life_stage != "larval") %>%
-         filter(life_stage != "uninfected"),
-       aes(x = psite_count,
-           y = fcf,
-           colour = psite_taxon,
-           shape = life_stage)) +
-  geom_point(size = 2) +
-  labs(x = "Parasite Count",
-       y = expression(paste("FCF (", mg/mm^3, ")")),
-       colour = "Parasite Taxon",
-       shape = "Life Stage") +
-    scale_shape_manual(values = c(16)) +
-  theme_classic()
-
-# scatterplot just larval - colour is not constant (change to make trem the same colour in both plots)
-Q3.larval <- ggplot(full.data.stages %>%
-         filter(psite_taxon != "nem") %>%
-         filter(psite_taxon != "uninfected") %>%
-         filter(life_stage != "adult") %>%
-         filter(life_stage != "uninfected"),
-       aes(x = psite_count,
-           y = fcf,
-           colour = psite_taxon,
-           shape = life_stage)) +
-  geom_point(size = 2) +
-  labs(x = "Parasite Count",
-       y = expression(paste("FCF (", mg/mm^3, ")")),
-       colour = "Parasite Taxon",
-       shape = "Life Stage") +
-    scale_shape_manual(values = c(17)) +
-  theme_classic()
-
-# combining both plots into one
-ggarrange(Q3.adult, Q3.larval, common.legend = TRUE, legend = "right", labels = c("A", "B")) 
-# missing larval legend
-
-
-
-# boxplot - not using, missing parasite count (that part of code is wrong)
-ggplot(full.data.stages %>%
-         filter(psite_taxon != "uninfected") %>%
-         filter(psite_taxon != "nem") %>%
-         filter(life_stage != "uninfected"),
+# Jolee's plots - messing around
+ggplot(full.data.revised %>%
+         filter(psite_taxon != "CEST"),
        aes(x = life_stage,
            y = fcf,
            colour = psite_taxon,
-           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # add psite_count 
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
   geom_boxplot() +
   xlab("Life Stage") +
   ylab("FCF") +
@@ -592,19 +516,6 @@ plot(FCF_ath_lm)
 summary(FCF_nuc_lm <- lm(body_index_nuc ~ psite_count, data = Hnuc.life.stage.total))
 plot(FCF_nuc_lm)
 
-# Question 2 (lm)
-summary(FCF_ath_al_lm <- lm(body_index_ath ~ larval + psite_count, data = Nath.life.stage.pared))
-plot(FCF_ath_al_lm)
-
-summary(FCF_ath_al_lm <- lm(body_index_pun ~ larval + psite_count, data = Ipun.life.stage.pared))
-plot(FCF_ath_al_lm)
-
-summary(FCF_ath_al_lm <- lm(body_index_vig ~ larval + psite_count, data = Pvig.life.stage.pared))
-plot(FCF_ath_al_lm)
-
-summary(FCF_nuc_al_lm <- lm(body_index_nuc ~ larval + psite_count, data = Hnuc.life.stage.pared))
-plot(FCF_nuc_al_lm)
-
 ```
 
 ## Full dataset analyses
@@ -619,7 +530,8 @@ full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_
 #### Mutate to change character to numeric for weight_mg
 ```{r mutate variable, echo=FALSE}
 full.data <- full.data %>%
-  mutate(weight_mg = as.numeric(weight_mg))
+  mutate(weight_mg = as.numeric(weight_mg))%>%
+  weight_mg/1000
 full.data <- full.data %>%
   mutate(psite_count = as.numeric(psite_count))
 
@@ -689,19 +601,34 @@ full.data.stages <- full.data %>%
   replace_na(list(life_stage = "uninfected")) %>%
   janitor::clean_names()
 
-
-
 ### FCF added back
 full.data.stages <- full.data.stages %>%
-  mutate(FCF = ((full.data.stages$weight_mg/((full.data.stages$standard_length_mm)^3)))*(100)) %>% 
+  mutate(FCF = ((((full.data.stages$weight_mg)/1000)/((full.data.stages$standard_length_mm)^3)))*(100)) %>% 
   janitor::clean_names()  # this makes a second row of fcf_2, but i am keeping this in here because I can't tell exactly where the first fcf column is coming from using this above code
 
 ### fix variable type
 full.data.stages <- full.data.stages %>%
   mutate(life_stage = as.factor(life_stage))
 full.data.stages <- full.data.stages %>%
+  mutate(life_stage = relevel(life_stage,ref='uninfected'))
+full.data.stages <- full.data.stages %>%
   mutate(psite_taxon = as.factor(psite_taxon))
 
+```
+
+### Test the model for Question 2
+### change data to include the total adults and larvae we found
+```{r}
+# Question 2 (lm) 
+summary(q2m <- lmer(fcf ~ relevel(life_stage, ref = "uninfected") + psite_count + (1|fish_sp_x), data = full.data.stages))
+
+# check colinearity using vif function --> GVIF^(1/(2*Df)) less than 10 means model is ok concerning colinearity (under 5 is acceptable generally)
+vif(q2m)
+
+# check how the model fits
+s2=simulateResiduals(fittedModel=q2m,n=250)
+s2$scaledResiduals
+plot(s2)
 ```
 
 ### Test the model for question 3
@@ -715,15 +642,40 @@ crosstab_table <- crosstab %>%
 view(crosstab_table)
 
 # run the model
-summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|catalog_number), data = full.data.stages))
+summary(q3m <- lmer(fcf ~ life_stage + psite_count + (1|fish_sp_x)+ (1|catalog_number), data = full.data.stages))
 
 # check colinearity using vif function --> GVIF^(1/(2*Df)) less than 10 means model is ok concerning colinearity (under 5 is acceptable generally)
 vif(q3m)
 
 # check how the model fits
-s=simulateResiduals(fittedModel=q3m,n=250)
-s$scaledResiduals
-plot(s)
+s3=simulateResiduals(fittedModel=q3m,n=250)
+s3$scaledResiduals
+plot(s3)
+
+
+## final plot with predictions and CI
+library(ggeffects)
+library(MASS)
+plot_model(q3m)
+
+mydf <- ggpredict(q3m, c("life_stage"), jitter=TRUE) 
+
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+  labs(x = 'Life stage', y = 'K',title=NULL)+
+  apatheme
+
+dev.off()
+
+
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Dactylogyrus_modelplot.png", width=150, height=90, dpi=1000, units = "mm")
+ggsave(file="REU/Imani J/Model plots/PIMVIG_Dactylogyrus_modelplot.pdf", width=150, height=90, dpi=1000, units = "mm")
+
 
 ```
 
