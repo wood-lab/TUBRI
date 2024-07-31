@@ -595,37 +595,16 @@ ggplot(full.data.revised,
   geom_boxplot()
 
 ```
-
-### Plot with FCF, life stage, taxon (T & C), and parasite count to answer question 3)
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
 # Jolee's plots - messing around
-
-# scatter plot with all four factors
-ggplot(full.data.revised %>%
-         filter(psite_taxon != "CEST"), # or is it NEM that we're taking out?
-       aes(x = psite_count,
-           y = fcf,
-           colour = life_stage,
-           shape = psite_taxon)) +
-  geom_point() +
- labs(x = "Parasite Count",
-       y = expression(paste("FCF (", mg/mm^3, ")")),
-       colour = "Life Stages",
-       shape = "Parasite Taxon") +
-  scale_shape_manual(values = c(16, 17)) +
-  #scale_color_manual(values = c("Adult" = "blue", "Juvenile" = "red")) +
-  theme_bw()
-
-
-# maybe boxplot without adding parasite count - not correct code
 ggplot(full.data.revised %>%
          filter(psite_taxon != "CEST"),
        aes(x = life_stage,
            y = fcf,
            colour = psite_taxon,
-           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix add psite_count
+           scale_colour_gradient(psite_count, low = "blue", high = "red", name = "Parasite Count"))) + # fix to add in psite_count possibly
   geom_boxplot() +
   xlab("Life Stage") +
   ylab("FCF") +
@@ -793,7 +772,7 @@ full.data.stages <- full.data.stages %>%
 ### Test the model for question 3
 
 ```{r model for q3}
-<<<<<<< HEAD
+#<<<<<<< HEAD
 summary(q3m <- lm(fcf ~ life_stage * psite_taxon + psite_count, data = full.data.revised))
 plot(q3m)
         
@@ -871,12 +850,18 @@ library(MASS)
 # Fit a robust regression model
 q3m2_robust <- rlm(fcf ~ psite_count + life_stage * psite_taxon, data = full.data.revised)
 summary(q3m2_robust)
-=======
+#=======
+
+#### I think this is the model that we should go with, which is finally maybe fully working? check with DAki's model diagnostics stuff
 summary(q3m <- lmer(fcf ~ life_stage + psite_taxon + psite_count + (1|fish_sp_x) + (1|catalog_number), data = full.data.stages))
 
 # check colinearity using vif function --> less than 10 means model is ok concerning colinearity
 vif(q3m)
 
+# check how the different variables are interacting with each other 
+
+crosstab <- full.data.stages %>%
+  count(life_stage, psite_taxon, psite_count)
 crosstab_table <- crosstab %>%
   pivot_wider(names_from = psite_count, values_from = n, values_fill = list(n = 0))
 view(crosstab_table)
@@ -884,8 +869,7 @@ view(crosstab_table)
 # Print the table
 print(kable(crosstab_table, format = "markdown"))
 
-crosstab <- full.data.stages %>%
-  count(life_stage, psite_taxon, psite_count)
+
 
 ggplot(crosstab, aes(x = life_stage, y = psite_taxon, fill = n)) +
   geom_tile() +
