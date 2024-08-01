@@ -314,18 +314,6 @@ H.nuchalis.data.fcf <- H.nuchalis.data %>%
   janitor::clean_names()
 ```
 
-```{r}
-# Combine the datasets
-combined_data <- bind_rows(
-  P.vigilax.data.fcf %>% mutate(species = "P.vigilax"),
-  I.punctatus.data.fcf %>% mutate(species = "I.punctatus"),
-  N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides"),
-  H.nuchalis.data.fcf %>% mutate(species = "H.nuchalis")
-)
-```
-
-
-
 #### Model formula for Question 1 
 $$
 K_i\sim parasite\ count
@@ -334,10 +322,10 @@ $$
 - run models
 ```{r q1m}
 # run models 
-summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count, data = P.vigilax.data.fcf))
-summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count, data = I.punctatus.data.fcf))
-summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count, data = N.atherinoides.data.fcf))
-summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count, data = H.nuchalis.data.fcf))
+summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) #.
+summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punctatus.data.fcf))
+summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf))
+summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
 ```
 
 - see how the models are fitting
@@ -348,19 +336,31 @@ plot(fcf_notath_lm)
 plot(fcf_hybnuc_lm)
 ```
 
+
 #### Plots 
+
+```{r}
+# Combine the datasets
+combined_data <- bind_rows(
+  P.vigilax.data.fcf %>% mutate(species = "P.vigilax"),
+  I.punctatus.data.fcf %>% mutate(species = "I.punctatus"),
+  N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides"),
+  H.nuchalis.data.fcf %>% mutate(species = "H.nuchalis")
+)
+```
+
 ```{r q1 plots}
 # plot condition factor vs parasite burden in total - may be interesting
 # Gather the data into long format
 combined_data_long <- combined_data %>%
   gather(key = "body_index_type", value = "body_index_value", body_index_ictpun, body_index_notath, body_index_pimvig, body_index_hybnuc)
 
-ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = species)) + 
+ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = ci)) + 
   geom_point() + 
   xlab("Parasite Count") + 
   ylab("Body Index") + 
   theme_bw() + 
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") + facet_wrap(~species)
 
 ```
 
@@ -386,6 +386,8 @@ full.data <- full.data %>%
 ```
 
 ### Categorize parasites as either adult or larval. All found parasites are included in these analyses (should we exclude the ones that can only occur as adult and/or larval in the host?) Add back a column for Fulton's Condition Factor. 
+
+## still contains percina -- need to remove percina
 ```{r add stages to total, echo=FALSE}
 full.data.stages <- full.data %>%
   mutate(
@@ -468,7 +470,7 @@ s2$scaledResiduals
 plot(s2)
 
 ## final plot with predictions and CI
-mydf <- ggpredict(q2m, c("life_stage"), jitter=TRUE) 
+mydf <- ggpredict(q2m, c("ci", "life_stage"), jitter=TRUE) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -477,8 +479,8 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         axis.line=element_line())
 
 plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256")) +
-  labs(x = 'Life stage', y = 'K'title=NULL)+
-  apatheme 
+  labs(x = 'Life stage', y = 'K', title=NULL) +
+  apatheme
 
 ```
 ### Plot question 2
