@@ -49,29 +49,52 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.30.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv", header = T, sep = ",")
+
 colnames(full_data)[20]<-"scaled_TL_mm"
 
 View(full_data)
 
+
 # First create a model where you are looking at Life_History (direct versus complex)
 # Note that this model may take a few minutes to run.
 
-library(lme4)
+trimmed_data <- full_data %>%
+  filter(Life_History=="Direct" | Life_History=="Complex")
+
+
+# Remember that you need to remove myxos from this analysis, because they are quantified differently than the
+# other parasites (i.e., by number of cysts or presence/absence, not by number of individuals).
+
+trimmed_data <- trimmed_data %>%
+  filter(Parasite_taxonomic_group!="Myxozoa")
+
+
+# The model won't run with all the data, and I narrowed the culprit down to Hybognathus nuchalis - it doesn't have 
+# enough directly transmitted parasites to make a fair comparison between direct versus complex!  So we will have to 
+# drop it from this particular analysis.
+
+trimmed_data <- trimmed_data %>%
+  filter(Fish_sp.x!="Hybognathus nuchalis")
+
 model_1<-glmer.nb(psite_count~CI*Life_History+(1|Fish_sp.x/psite_spp.x)+
-                                offset(log(scaled_TL_mm)),data=full_data,family="nbinom")
+                    offset(log(scaled_TL_mm)),data=trimmed_data,family="nbinom")
+
+summary(model_1)
+
+levels(as.factor(trimmed_data$Fish_sp.x))
+
 
 # At some point, you should probably control for season
 # (1|MonthCollected)
 
-summary(model_1)
 
 # Let's save the model output down somewhere so that we can grab it again when we need it without having to wait
 # for the model to run and converge
 
 library(stargazer)
 model_1_output<-stargazer::stargazer(model_1, type = "text")
-write.table(model_1_output,"REU/shyanne/model_1_output_2024.07.26")
+write.table(model_1_output,"REU/shyanne/model_1_output_2024.08.01")
 
 # Check VIFs to make sure that there is no collinearity
 library(car)
@@ -109,14 +132,9 @@ color_plot
 
 # To do this, we need to trim out a lot of things from the dataset, like leeches, nematomorphs, and myxos.
 
-stuff <- full_data %>%
+stuff <- trimmed_data %>%
   group_by(Parasite_taxonomic_group) %>%
   summarize(count = n())
-
-trimmed_data <- full_data %>%
-  filter(Parasite_taxonomic_group=="Acanthocephala" | Parasite_taxonomic_group=="Cestoda" |
-           Parasite_taxonomic_group=="Copepoda" | Parasite_taxonomic_group=="Monogenea" |
-           Parasite_taxonomic_group=="Nematoda" | Parasite_taxonomic_group=="Trematoda")
 
 library(lme4)
 model_2<-glmer.nb(psite_count~CI*Parasite_taxonomic_group+(1|Fish_sp.x/psite_spp.x)+
@@ -137,9 +155,8 @@ vif(model_2)
 # for the model to run and converge
 
 model_2_output<-stargazer::stargazer(model_2, type = "text")
-write.table(model_2_output,"REU/shyanne/model_2_output_2024.07.26")
+write.table(model_2_output,"REU/shyanne/model_2_output_2024.08.01")
 
-read.table("REU/shyanne/model_2_output_2024.07.15")
 
 # Now let's plot it
 
@@ -176,12 +193,12 @@ color_plot_2<-ggplot(color_predict_2,aes(c(0.85,0.9,0.95,1,1.05,1.1,1.85,1.9,1.9
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=(levels(color_predict_2$group)))+
   theme(legend.position="top",legend.title = element_text(size = 18),
-        legend.text = element_text(size=14))
+        legend.text = element_text(size=12))
 color_plot_2
 
 
 
-# How about making a dedicated analysis and plot for myxos?
+# Now make a dedicated analysis and plot for Myxozoa
 
 myxo_data <- full_data %>%
   filter(Parasite_taxonomic_group=="Myxozoa")

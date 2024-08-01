@@ -87,7 +87,7 @@ for(i in 1:length(lots_MS_lower$InstitutionCode)) {
     lots_MS_lower$CI[i] <- NA
   } else {
     
-    if(lots_MS_lower$Latitude[i] > 30.76){
+    if(lots_MS_lower$Latitude[i] > 30.76558198250576){
       lots_MS_lower$CI[i] <- "control"
       
     } else {
@@ -655,6 +655,8 @@ car_vel_matrix<-car_vel_selected %>%
 write.csv(car_vel_selected, file="lot_selection/final_lots/CAR_VEL_final_lots_2024.02.07.csv")
 
 plot(jitter(car_vel_selected$Latitude,5)~car_vel_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+write.csv(car_vel_matrix,file="lot_selection/desired_replication/car_vel_goal.csv")
 
 
 ### PIMVIG

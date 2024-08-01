@@ -50,11 +50,20 @@ $$
 # TROUBLESHOOTING
 ```{r}
 unique_fish_fcf <- full.data.stages %>%
-  select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, fcf) %>%
+  select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, weight_mg, fcf) %>%
   distinct()
 
 view(unique_fish_fcf)
 
+ggplot(full.data.stages, 
+       aes(x = standard_length_mm, y = weight_g)) + geom_point() + geom_smooth(method = lm) + facet_wrap(~fish_sp_x) + geom_jitter()
+        
+fdsr <- full.data.stages %>%
+  mutate(ratio = (weight_mg/standard_length_mm))
+
+ggplot(fdsr, 
+       aes(x = fish_sp_x, y = ratio)) + geom_boxplot() + geom_smooth(method = lm)
+plot(fdsr$ratio)
 ```
 
 
@@ -95,22 +104,22 @@ library(DHARMa)
 
 #### Load datasets 
 ```{r CW datasets, echo=FALSE}
-P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv") %>% janitor::clean_names() %>%
+P.vigilax.data <- read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.01.csv") %>% janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
 
-I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.19.csv")  %>%
+I.punctatus.data <- read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv")  %>%
   janitor::clean_names() %>%
   mutate(day_collected = as.integer(day_collected)) %>%
   mutate(weight_mg = as.numeric(weight_mg))%>% 
   mutate(weight_g = (weight_mg/1000))
 
-N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_human_readable.csv") %>% 
+N.atherinoides.data <- read.csv("data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv") %>% 
   janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
 
-H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable.csv") %>%
+H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv") %>%
   janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
@@ -266,7 +275,6 @@ H.nuchalis.data <- H.nuchalis.data %>%
                       "myx_gc"))) %>%#
   mutate(adult = rowSums(select(.,
                       "cest_bb",
-                      "nem_bud",
                       "nem_unk",
                       "trem_ass",
                       "trem_ns",
@@ -306,6 +314,35 @@ H.nuchalis.data.fcf <- H.nuchalis.data %>%
   janitor::clean_names()
 ```
 
+#### Model formula for Question 1 
+$$
+K_i\sim parasite\ count\ + ci
+$$
+#### Test model for question 1
+- run models
+```{r q1m}
+# run models 
+summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.05
+summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punctatus.data.fcf))
+summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf))
+summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
+```
+
+- see how the models are fitting
+```{r q1m plots, echo=FALSE, eval=FALSE}
+# sig plot from above for pimvig
+s1=simulateResiduals(fittedModel=fcf_pimvig_lm,n=250)
+s1$scaledResiduals
+plot(s1)
+
+plot(fcf_ictpun_lm)
+plot(fcf_notath_lm)
+plot(fcf_hybnuc_lm)
+```
+
+
+#### Plots 
+
 ```{r}
 # Combine the datasets
 combined_data <- bind_rows(
@@ -316,43 +353,18 @@ combined_data <- bind_rows(
 )
 ```
 
-
-
-#### Model formula for Question 1 
-$$
-K_i\sim parasite\ count
-$$
-#### Test model for question 1
-- run models
-```{r q1m}
-# run models 
-summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count, data = P.vigilax.data.fcf))
-summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count, data = I.punctatus.data.fcf))
-summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count, data = N.atherinoides.data.fcf))
-summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count, data = H.nuchalis.data.fcf))
-```
-
-- see how the models are fitting
-```{r q1m plots, echo=FALSE, eval=FALSE}
-plot(fcf_pimvig_lm)
-plot(fcf_ictpun_lm)
-plot(fcf_notath_lm)
-plot(fcf_hybnuc_lm)
-```
-
-#### Plots 
 ```{r q1 plots}
 # plot condition factor vs parasite burden in total - may be interesting
 # Gather the data into long format
 combined_data_long <- combined_data %>%
   gather(key = "body_index_type", value = "body_index_value", body_index_ictpun, body_index_notath, body_index_pimvig, body_index_hybnuc)
 
-ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = species)) + 
+ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = ci)) + 
   geom_point() + 
   xlab("Parasite Count") + 
   ylab("Body Index") + 
   theme_bw() + 
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") + facet_wrap(~species)
 
 ```
 
@@ -368,7 +380,7 @@ ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = sp
 #### Import dataset 
 - make sure you name all these new datasets and frames something different from what you named them above (that way we can still run all the analyses in total without losing any of the previous ones)
 ```{r full dataset import, echo=FALSE}
-full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv") %>% 
+full.data <- read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv") %>% 
   janitor::clean_names()
 
 full.data <- full.data %>%
@@ -378,6 +390,8 @@ full.data <- full.data %>%
 ```
 
 ### Categorize parasites as either adult or larval. All found parasites are included in these analyses (should we exclude the ones that can only occur as adult and/or larval in the host?) Add back a column for Fulton's Condition Factor. 
+
+## still contains percina -- need to remove percina
 ```{r add stages to total, echo=FALSE}
 full.data.stages <- full.data %>%
   mutate(
@@ -400,8 +414,8 @@ full.data.stages <- full.data %>%
                          "CEST.HYD", "CEST.TRI",
                          "COPE.A", "MONO.ALL", "MONO.UNK", "NEM.BRAN",
                          "NEM.CAP", "NEM.SPKY", "NEM.TFS", "NEM.TWAS",
-                         "NEM.UNKN", "TREM.GB", "TREM.L", "CEST.BB",
-                         "NEM.BUD", "NEM.UNK", "TREM.ASS", "TREM.NS",
+                         "NEM.UNKN", "TREM.GB", "TREM.L", "CEST.BB", 
+                         "NEM.UNK", "TREM.ASS", "TREM.NS",
                          "TREM.DIPLO", "TREM.UNK", "CEST.UNK", "MONO.DACT",
                          "MONO.GDAC", "ACAN.AD", "COPE.POOD") ~ "adult",
       
@@ -438,6 +452,11 @@ full.data.stages <- full.data.stages %>%
 
 ```
 
+#### Model formula for Question 2 
+$$
+K_i\sim life\ stage + parasite\ count\ + ci\ + (1|fish\ species)\ + (1|catalog\ number)
+$$
+
 ### Test the model for Question 2
 
 ```{r final model}
@@ -449,7 +468,7 @@ crosstab_table <- crosstab %>%
 view(crosstab_table)
 
 # run the model
-summary(q2m <- lmer(fcf ~ life_stage + psite_count + (1|fish_sp_x)+ (1|catalog_number), data = full.data.stages))
+summary(q2m <- lmer(fcf ~ life_stage + psite_count + ci + (1|fish_sp_x)+ (1|catalog_number), data = full.data.stages))
 
 # check colinearity using vif function --> GVIF^(1/(2*Df)) less than 10 means model is ok concerning colinearity (under 5 is acceptable generally)
 vif(q2m)
@@ -460,7 +479,7 @@ s2$scaledResiduals
 plot(s2)
 
 ## final plot with predictions and CI
-mydf <- ggpredict(q2m, c("life_stage"), jitter=TRUE) 
+mydf <- ggpredict(q2m, c("ci", "life_stage"))
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -468,9 +487,9 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         panel.border=element_blank(),
         axis.line=element_line())
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256")) +
-  labs(x = 'Life stage', y = 'K',title=NULL)+
-  apatheme 
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256","blue")) + jitter("predicted", factor = 0.001, amount = NULL) +
+  labs(x = 'Life stage', y = 'K', title=NULL) +
+  apatheme
 
 ```
 ### Plot question 2
