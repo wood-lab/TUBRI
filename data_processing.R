@@ -269,6 +269,18 @@ pim_vig_processed_data$Weight_mg[pim_vig_processed_data$IndividualFishID=="18713
 stuff<-pim_vig_processed_data %>%
   filter(IndividualFishID=="187137_01")
 
+# Some weird lats and longs for CatalogNumber 157327
+
+stuff<-pim_vig_processed_data %>%
+  filter(CatalogNumber=="157327")
+
+# I checked on iDigBio and the lats and longs are correct (although rounded).
+# This fish is way too far south for us to include. Drop it from the dataset.
+
+pim_vig_processed_data <- pim_vig_processed_data %>%
+  filter(CatalogNumber=="157327")
+
+
 
 # Make the dataset analyzable
 
