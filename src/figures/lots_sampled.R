@@ -61,7 +61,6 @@ map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% g
 map
 
 # create legend
-survey_sites_legend<-read.csv("TUBRI/AL/survey_sites_legend.csv")
 bounds<-c(left=-87.6, bottom=31.5, right=-87.35, top=32.05)
 legend<-get_stamenmap(bounds, zoom=11, maptype = "terrain-background") %>% ggmap()+
   geom_point(data = survey_sites_legend, aes(x=Longitude,y=Latitude,fill=CI),shape=21)+

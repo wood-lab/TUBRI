@@ -278,7 +278,7 @@ stuff<-pim_vig_processed_data %>%
 # This fish is way too far south for us to include. Drop it from the dataset.
 
 pim_vig_processed_data <- pim_vig_processed_data %>%
-  filter(CatalogNumber=="157327")
+  filter(CatalogNumber!="157327")
 
 
 
