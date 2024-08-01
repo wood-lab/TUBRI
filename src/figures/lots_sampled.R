@@ -87,6 +87,40 @@ wes_palette("Zissou1")
 pal<-wes_palette(name = "Zissou1", 5, type = "continuous")
 
 
+# PIMVIG plot
+
+PIMVIG_data <- fish_sampled %>%
+  filter(Fish_sp.x=="Pimephales vigilax")
+
+PIMVIG_plot<-ggplot(data=PIMVIG_data,aes(x=YearCollected,y=CI))+
+  scale_y_discrete(limits=rev,labels=c("I","C"))+
+  annotate(geom = "rect", xmin = -Inf, xmax = 1972.5, ymin = -Inf, ymax = Inf,
+           fill = "grey", colour = NA, alpha = 0.5)+
+  #annotate(geom = "rect", xmin = 1966.75, xmax = 1969.25, ymin = -Inf, ymax = Inf,
+           fill = "darkgrey", colour = NA, alpha = 0.75)+
+  #annotate(geom = "rect", xmin = 1975.75, xmax = 1977.25, ymin = -Inf, ymax = Inf,
+           fill = "darkgrey", colour = NA, alpha = 0.75)+
+  #annotate(geom = "rect", xmin = 1980.75, xmax = 1981.25, ymin = -Inf, ymax = Inf,
+           fill = "darkgrey", colour = NA, alpha = 0.75)+
+  #annotate(geom = "rect", xmin = 1984.75, xmax = 1986.25, ymin = -Inf, ymax = Inf,
+           fill = "darkgrey", colour = NA, alpha = 0.75)+
+  #annotate(geom = "rect", xmin = 1999.75, xmax = 2001.25, ymin = -Inf, ymax = Inf,
+           fill = "darkgrey", colour = NA, alpha = 0.75)+
+  geom_point(data=fish_sampled,aes(x=YearCollected,fill=Fish_sp.x),
+             position=position_jitter(width=0.15),shape=21,size=3)+
+  scale_fill_manual(values=pal[1],name='')+
+  xlab("")+
+  ylab("")+
+  geom_vline(xintercept=1972.5,linetype="dashed")+
+  #Katrina: geom_vline(xintercept=2005,linetype="dotted")+
+  xlim(1962,2006)+
+  theme_bw()+
+  theme(legend.position = "none")+
+  guides(fill = guide_legend(override.aes = list(size=7)))+
+  theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=18))
+fish_plot
+
 fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
   scale_y_discrete(limits=rev,labels=c("I","C"))+
   annotate(geom = "rect", xmin = -Inf, xmax = 1972.5, ymin = -Inf, ymax = Inf,
