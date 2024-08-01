@@ -29,15 +29,23 @@ library(pdftools)
 
 # Load data about TUBRI lots
 
-lots<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv", header = T, sep = ",")
+psite_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv", header = T, sep = ",")
 str(lots)
 
-# MS lower map
-survey_sites_MS_lower<-read.csv("TUBRI/MS/survey_sites_MS_lower.csv")
+
+# First you need to reduce the dataset to make each fish a row
+
+fish_sampled <- psite_data %>%
+  group_by(Fish_sp.x,IndividualFishID,CI,Latitude,Longitude,YearCollected) %>%
+  summarize(count = n())
+
+
+# Make the map
+
 bounds<-c(left=-89.855, bottom=30.69, right=-89.81, top=30.81)
-map_MS_lower<-get_stamenmap(bounds, zoom=12, maptype = "terrain-background") %>% ggmap()+
+map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% ggmap()+
   geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
-  geom_point(data = survey_sites_MS_lower, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
+  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
   scale_fill_manual(values=c("white","#bdbdbd"))+
   xlab("")+
   ylab("")+
@@ -50,7 +58,7 @@ map_MS_lower<-get_stamenmap(bounds, zoom=12, maptype = "terrain-background") %>%
 #geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
 #annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
 #annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
-map_MS_lower
+map
 
 # create legend
 survey_sites_legend<-read.csv("TUBRI/AL/survey_sites_legend.csv")
@@ -73,51 +81,15 @@ legend<-get_stamenmap(bounds, zoom=11, maptype = "terrain-background") %>% ggmap
 legend
 
 
-#MS lower plot
-
-lots_MS_lower<-read.csv("TUBRI/MS/MS_lower_search_results.csv")
-
-
-#Filter out just the five species you want to focus on
-
-lots_MS_lower <- lots_MS_lower %>%
-  filter(ScientificName == "Pimephales vigilax" | ScientificName == "Notropis atherinoides" | ScientificName == "Gambusia affinis" 
-         | ScientificName == "Ictalurus punctatus" | ScientificName == "Lepomis macrochirus" | ScientificName == "Carpiodes velifer" 
-         | ScientificName == "Hybognathus nuchalis" | ScientificName == "Micropterus salmoides" 
-         | ScientificName == "Lepomis megalotis" | ScientificName == "Percina vigil")
-
-min(lots_MS_lower$YearCollected)
-max(lots_MS_lower$YearCollected)
-thing<-sort(lots_MS_lower$YearCollected)
-2005-1963
-
-# Create a new column to indicate whether you're dealing with control or impact
-lots_MS_lower$CI<-vector("character",length(lots_MS_lower$InstitutionCode))
-
-for(i in 1:length(lots_MS_lower$InstitutionCode)) {
-  
-  if(is.na(lots_MS_lower$Latitude[i])){
-    lots_MS_lower$CI[i] <- NA
-  } else {
-    
-    if(lots_MS_lower$Latitude[i] > 30.76){
-      lots_MS_lower$CI[i] <- "control"
-      
-    } else {
-      
-      lots_MS_lower$CI[i] <- "impact"
-      
-    }
-  }
-}
-lots_MS_lower$CI
+# Plot the fish sampled
 
 library(wesanderson)
 wes_palette("Zissou1")
-pal<-wes_palette(name = "Zissou1", 10, type = "continuous")
+pal<-wes_palette(name = "Zissou1", 5, type = "continuous")
 
-plot_MS_lower<-ggplot(data=lots_MS_lower,aes(x=YearCollected,y=CI))+
-  scale_y_discrete(limits=rev,labels=c("P","C"))+
+
+fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
+  scale_y_discrete(limits=rev,labels=c("I","C"))+
   annotate(geom = "rect", xmin = -Inf, xmax = 1972.5, ymin = -Inf, ymax = Inf,
            fill = "grey", colour = NA, alpha = 0.5)+
   annotate(geom = "rect", xmin = 1966.75, xmax = 1969.25, ymin = -Inf, ymax = Inf,
@@ -130,8 +102,9 @@ plot_MS_lower<-ggplot(data=lots_MS_lower,aes(x=YearCollected,y=CI))+
            fill = "darkgrey", colour = NA, alpha = 0.75)+
   annotate(geom = "rect", xmin = 1999.75, xmax = 2001.25, ymin = -Inf, ymax = Inf,
            fill = "darkgrey", colour = NA, alpha = 0.75)+
-  geom_point(data=lots_MS_lower,aes(x=YearCollected,fill=ScientificName),position=position_jitter(width=0.15),shape=21)+
-  scale_fill_manual(values=pal[1:10],name='')+
+  geom_point(data=fish_sampled,aes(x=YearCollected,fill=Fish_sp.x),
+             position=position_jitter(width=0.15),shape=21,size=3)+
+  scale_fill_manual(values=pal[1:5],name='')+
   xlab("")+
   ylab("")+
   geom_vline(xintercept=1972.5,linetype="dashed")+
@@ -142,19 +115,15 @@ plot_MS_lower<-ggplot(data=lots_MS_lower,aes(x=YearCollected,y=CI))+
   guides(fill = guide_legend(override.aes = list(size=7)))+
   theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
         axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=18))
-plot_MS_lower
+fish_plot
 
 
-#Reduce to two sites
+# Set the map and the plot side-by-side
 
-final_figure <- ggdraw(plot=NULL,xlim=c(0,15),ylim=c(0,5))+
-  draw_image(magick::image_read_pdf("TUBRI/TUBRI_map.pdf"),x=0.1,y=0,width=5,height=4.75)+
-  #draw_plot(legend,x=9.3,y=0,width=2,height=5)+
-  draw_plot(map_MS_lower,x=5,y=0,width=2,height=5)+
-  draw_plot(plot_MS_lower,x=7,y=0,width=3,height=5)+
-  draw_plot(map_AL,x=10,y=0,width=2,height=5)+
-  draw_plot(plot_AL,x=11.9,y=0,width=3,height=5)+
-  draw_label("(a)",x=0.25,y=4.75,size=30)+
-  draw_label("(b)",x=5,y=4.75,size=30)+
-  draw_label("(c)",x=10.4,y=4.75,size=30)
+final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,5))+
+  draw_plot(map,x=0,y=0,width=4,height=5)+
+  draw_plot(fish_plot,x=4,y=0,width=6,height=5)
+  #draw_label("(a)",x=0.25,y=4.75,size=30)+
+  #draw_label("(b)",x=5,y=4.75,size=30)+
+  #draw_label("(c)",x=10.4,y=4.75,size=30)
 final_figure

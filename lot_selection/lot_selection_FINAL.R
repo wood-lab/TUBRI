@@ -87,7 +87,7 @@ for(i in 1:length(lots_MS_lower$InstitutionCode)) {
     lots_MS_lower$CI[i] <- NA
   } else {
     
-    if(lots_MS_lower$Latitude[i] > 30.76){
+    if(lots_MS_lower$Latitude[i] > 30.76558198250576){
       lots_MS_lower$CI[i] <- "control"
       
     } else {
