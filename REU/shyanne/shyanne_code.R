@@ -49,7 +49,7 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.25.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.07.29.csv", header = T, sep = ",")
 colnames(full_data)[20]<-"scaled_TL_mm"
 
 View(full_data)
@@ -58,8 +58,16 @@ View(full_data)
 # Note that this model may take a few minutes to run.
 
 library(lme4)
+
+just_life_history<-trimmed_data <- full_data %>%
+  filter(Life_History=="Direct" | Life_History=="Complex")
 model_1<-glmer.nb(psite_count~CI*Life_History+(1|Fish_sp.x/psite_spp.x)+
-                                offset(log(scaled_TL_mm)),data=full_data,family="nbinom")
+                                offset(log(scaled_TL_mm)),data=just_life_history,family="nbinom")
+
+library(tidyverse)
+stuff <- full_data %>%
+  group_by(Life_History) %>%
+  summarize(count = n())
 
 # At some point, you should probably control for season
 # (1|MonthCollected)
