@@ -316,13 +316,13 @@ H.nuchalis.data.fcf <- H.nuchalis.data %>%
 
 #### Model formula for Question 1 
 $$
-K_i\sim parasite\ count
+K_i\sim parasite\ count\ + ci
 $$
 #### Test model for question 1
 - run models
 ```{r q1m}
 # run models 
-summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) #.
+summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.05
 summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punctatus.data.fcf))
 summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf))
 summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
@@ -330,7 +330,11 @@ summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nucha
 
 - see how the models are fitting
 ```{r q1m plots, echo=FALSE, eval=FALSE}
-plot(fcf_pimvig_lm)
+# sig plot from above for pimvig
+s1=simulateResiduals(fittedModel=fcf_pimvig_lm,n=250)
+s1$scaledResiduals
+plot(s1)
+
 plot(fcf_ictpun_lm)
 plot(fcf_notath_lm)
 plot(fcf_hybnuc_lm)
@@ -448,6 +452,11 @@ full.data.stages <- full.data.stages %>%
 
 ```
 
+#### Model formula for Question 2 
+$$
+K_i\sim life\ stage + parasite\ count\ + ci\ + (1|fish\ species)\ + (1|catalog\ number)
+$$
+
 ### Test the model for Question 2
 
 ```{r final model}
@@ -470,7 +479,7 @@ s2$scaledResiduals
 plot(s2)
 
 ## final plot with predictions and CI
-mydf <- ggpredict(q2m, c("ci", "life_stage"), jitter=TRUE) 
+mydf <- ggpredict(q2m, c("ci", "life_stage"))
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -478,7 +487,7 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         panel.border=element_blank(),
         axis.line=element_line())
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256")) +
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256","blue")) + jitter("predicted", factor = 0.001, amount = NULL) +
   labs(x = 'Life stage', y = 'K', title=NULL) +
   apatheme
 
