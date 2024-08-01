@@ -656,6 +656,8 @@ write.csv(car_vel_selected, file="lot_selection/final_lots/CAR_VEL_final_lots_20
 
 plot(jitter(car_vel_selected$Latitude,5)~car_vel_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+write.csv(car_vel_matrix,file="lot_selection/desired_replication/car_vel_goal.csv")
+
 
 ### PIMVIG
 # Katie went through all in-bounds PERVIG, CARVEL, ICTPUN, and PIMVIG and found all valid lots (i.e., present, big enough)

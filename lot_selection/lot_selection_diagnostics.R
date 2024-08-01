@@ -359,6 +359,72 @@ per_vig_dailies<-per_vig_with_metadata %>%
 View(per_vig_dailies)
 
 
+
+### CARVEL
+
+# You can also do it the old-fashioned way
+
+car_vel_today<-read.csv("data/raw/Carpiodes_velifer_Datasheet_2024.08.01.csv")
+length(car_vel_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+car_vel_with_metadata<-merge(car_vel_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(car_vel_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(car_vel_with_metadata$Latitude.y,30)~jitter(car_vel_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# Desired level of replication
+
+car_vel_desired<-read.csv(file="lot_selection/desired_replication/car_vel_goal.csv")
+car_vel_desired<-car_vel_desired[,-1]
+colnames(car_vel_desired)[2]<-"n_lots_desired"
+car_vel_desired$individual_fish_desired<-car_vel_desired$n_lots_desired*4
+sum(car_vel_desired$individual_fish_desired)
+
+
+# Actual level of replication
+
+car_vel_actual<-car_vel_with_metadata %>%
+  group_by(combo) %>%
+  summarize(actual = n())
+
+
+# Merge desired and actual
+
+car_vel_remaining<-merge(car_vel_desired, car_vel_actual, by.x = "combo", by.y = "combo", all.x = TRUE, all.y = TRUE)
+
+
+# Calculate how many you have left
+
+car_vel_remaining$to_go<-(car_vel_remaining$individual_fish_desired-ifelse(is.na(car_vel_remaining$actual),0,car_vel_remaining$actual))
+car_vel_remaining<-na.omit(car_vel_remaining)
+sum(car_vel_remaining$actual,na.rm=T)
+sum(car_vel_remaining$to_go,na.rm=T)
+
+
+# Check that body size is invariant through time
+
+summary(glm(car_vel_with_metadata$TotalLength_mm~car_vel_with_metadata$YearCollected.x))
+plot(car_vel_with_metadata$TotalLength_mm~car_vel_with_metadata$YearCollected.x)
+summary(glm(car_vel_with_metadata$TotalLength_mm~car_vel_with_metadata$Latitude.y))
+plot(car_vel_with_metadata$TotalLength_mm~car_vel_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+car_vel_dailies<-car_vel_with_metadata %>%
+  group_by(Date_datasheet_complete) %>%
+  summarize(actual = n())
+View(car_vel_dailies)
+
+
 # Calculate how many fish you need to do per day to hit your target
 
 working_days_remaining<-41
