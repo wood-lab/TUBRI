@@ -306,6 +306,16 @@ H.nuchalis.data.fcf <- H.nuchalis.data %>%
   janitor::clean_names()
 ```
 
+```{r}
+# Combine the datasets
+combined_data <- bind_rows(
+  P.vigilax.data.fcf %>% mutate(species = "P.vigilax"),
+  I.punctatus.data.fcf %>% mutate(species = "I.punctatus"),
+  N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides"),
+  H.nuchalis.data.fcf %>% mutate(species = "H.nuchalis")
+)
+```
+
 
 
 #### Model formula for Question 1 
@@ -330,29 +340,20 @@ plot(fcf_notath_lm)
 plot(fcf_hybnuc_lm)
 ```
 
-#### Plots -- need to fix the called items
+#### Plots 
 ```{r q1 plots}
 # plot condition factor vs parasite burden in total - may be interesting
-IP.psc.fcf <- ggplot(Ipun.life.stage.total, 
-       aes(x = psite_count, y = body_index_pun, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
+# Gather the data into long format
+combined_data_long <- combined_data %>%
+  gather(key = "body_index_type", value = "body_index_value", body_index_ictpun, body_index_notath, body_index_pimvig, body_index_hybnuc)
 
-NA.psc.fcf <- ggplot(Nath.life.stage.total, 
-       aes(x = psite_count, y = body_index_ath, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
+ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = species)) + 
+  geom_point() + 
+  xlab("Parasite Count") + 
+  ylab("Body Index") + 
+  theme_bw() + 
+  stat_smooth(method = "lm")
 
-PV.psc.fcf <- ggplot(Pvig.life.stage.total, 
-       aes(x = psite_count, y = body_index_vig, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
-
-HN.psc.fcf <- ggplot(Hnuc.life.stage.total, 
-       aes(x = psite_count, y = body_index_nuc, colour = ci)) + geom_point() + xlab("Parasite Count")  + 
-  ylab("FCF")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.psc.fcf, NA.psc.fcf, PV.psc.fcf, HN.psc.fcf, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D"))
-# more variability than the others
-
-# Jolee's graph - messing around
 ```
 
 ## Question 2
@@ -458,7 +459,6 @@ s2=simulateResiduals(fittedModel=q2m,n=250)
 s2$scaledResiduals
 plot(s2)
 
-
 ## final plot with predictions and CI
 mydf <- ggpredict(q2m, c("life_stage"), jitter=TRUE) 
 
@@ -468,12 +468,26 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         panel.border=element_blank(),
         axis.line=element_line())
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256")) +
   labs(x = 'Life stage', y = 'K',title=NULL)+
-  apatheme +
-  scale_y_continuous(limits = c(0, NA)) + geom_jitter()
+  apatheme 
 
 ```
+### Plot question 2
+```{r}
+ggplot(full.data.stages,
+       aes(x = life_stage, y = fcf)) + xlab("Life Stage")  + geom_boxplot() +
+  ylab("Fulton's Condition Factor")  + theme_bw()
+
+
+# Jolee's plot - messing around
+ggplot(full.data.revised,
+       aes(x = life_stage,
+           y = fcf,
+           colour = sex)) +
+  geom_boxplot()
+```
+
 
 
 ## Question 3
@@ -551,58 +565,6 @@ full.data.taxon <- full.data.taxon %>%
 ```
 
 
-### Plot life stage data using original dataframe (with above-mentioned exclusions and without) (to answer question 2)
-```{r life stage plots, echo=TRUE}
-# plot condition factor for life stage (aka "stage-specific parasite stuff")
-NA.bc.a <- ggplot(Nath.life.stage.pared,
-       aes(x = adult, y = body_index_ath, color = sex)) + xlab("Adult")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-NA.bc.l <- ggplot(Nath.life.stage.pared,
-       aes(x = larval, y = body_index_ath, color = sex)) + xlab("Larval")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-# plot condition factor for life stage (aka "stage-specific parasite stuff")
-IP.bc.a <- ggplot(Ipun.life.stage.pared,
-       aes(x = adult, y = body_index_pun, color = sex)) + xlab("Adult")  + geom_point() + 
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-IP.bc.l <- ggplot(Ipun.life.stage.pared, 
-       aes(x = larval, y = body_index_pun, color = sex)) + xlab("Larval")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-# plot condition factor for life stage (aka "stage-specific parasite stuff")
-PV.bc.a <- ggplot(Pvig.life.stage.pared, 
-       aes(x = adult, y = body_index_vig, color = sex)) + xlab("Adult")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-PV.bc.l <- ggplot(Pvig.life.stage.pared,
-       aes(x = larval, y = body_index_vig, color = sex)) + xlab("Larval")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-# plot condition factor for life stage (aka "stage-specific parasite stuff")
-HN.bc.a <- ggplot(Hnuc.life.stage.pared, 
-       aes(x = adult, y = body_index_nuc, color = sex)) + xlab("Adult")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-HN.bc.l <- ggplot(Hnuc.life.stage.pared,
-       aes(x = larval, y = body_index_nuc, color = sex)) + xlab("Larval")  + geom_point() +
-  ylab("Fulton's Condition Factor")  + theme_bw() + stat_smooth(method=lm)
-
-ggarrange(IP.bc.a, IP.bc.l, NA.bc.a, NA.bc.l, PV.bc.a, PV.bc.a, HN.bc.a, HN.bc.l, common.legend = TRUE, legend = "bottom", labels = c("A", "B", "C", "D", "E", "F", "G", "H"))
-# more variability than the others
-
-## double check sex, weights
-## should we exclude these outliers
-
-# Jolee's plot - messing around
-ggplot(full.data.revised,
-       aes(x = life_stage,
-           y = fcf,
-           colour = sex)) +
-  geom_boxplot()
-
-```
 ```{r, plots for Question 3}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
