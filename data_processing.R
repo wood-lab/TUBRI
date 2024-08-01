@@ -226,8 +226,6 @@ colnames(pim_vig_processed_data)[13]<-"combo"
 colnames(pim_vig_processed_data)[14]<-"Latitude"
 colnames(pim_vig_processed_data)[15]<-"Longitude"
 
-View(pim_vig_processed_data)
-
 
 # Looks like meta-data (CI and combo) are missing for four of the fish
 
@@ -247,6 +245,29 @@ stuff<-pim_vig_processed_data %>%
 pim_vig_processed_data$Latitude[pim_vig_processed_data$CatalogNumber=="157327"]<-30.19778
 pim_vig_processed_data$Longitude[pim_vig_processed_data$CatalogNumber=="157327"]<--89.65611
 
+# Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
+# Replace weird weights with NAs.
+
+stuff<-pim_vig_processed_data %>%
+  filter(IndividualFishID=="111516_01")
+
+pim_vig_processed_data$Weight_mg[pim_vig_processed_data$IndividualFishID=="111516_01"]<-NA
+
+stuff<-pim_vig_processed_data %>%
+  filter(IndividualFishID=="197196_03")
+
+pim_vig_processed_data$Weight_mg[pim_vig_processed_data$IndividualFishID=="197196_03"]<-NA
+
+stuff<-pim_vig_processed_data %>%
+  filter(IndividualFishID=="197196_03")
+
+stuff<-pim_vig_processed_data %>%
+  filter(IndividualFishID=="187137_01")
+
+pim_vig_processed_data$Weight_mg[pim_vig_processed_data$IndividualFishID=="187137_01"]<-NA
+
+stuff<-pim_vig_processed_data %>%
+  filter(IndividualFishID=="187137_01")
 
 
 # Make the dataset analyzable
@@ -265,9 +286,9 @@ colnames(pim_vig_processed_data_longer)[17]<-"psite_count"
 # Export both sheets
 
 write.csv(pim_vig_processed_data_longer, 
-          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
+          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.01.csv")
 write.csv(pim_vig_processed_data, 
-          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.07.10.csv")
+          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.01.csv")
 
 
 
@@ -505,8 +526,6 @@ colnames(ict_pun_processed_data)[13]<-"combo"
 colnames(ict_pun_processed_data)[14]<-"Latitude"
 colnames(ict_pun_processed_data)[15]<-"Longitude"
 
-View(ict_pun_processed_data)
-
 
 # It looks like meta-data are missing for some of the fish.
 
@@ -582,6 +601,22 @@ ict_pun_processed_data$CI[ict_pun_processed_data$CatalogNumber=="157299"]<-"cont
 stuff<-ict_pun_processed_data %>%
   filter(is.na(CI))
 
+# Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
+# Replace weird weights with NAs.
+
+stuff<-ict_pun_processed_data %>%
+  filter(IndividualFishID=="58071_01")
+
+ict_pun_processed_data$Weight_mg[ict_pun_processed_data$IndividualFishID=="58071_01"]<-NA
+
+stuff<-ict_pun_processed_data %>%
+  filter(IndividualFishID=="157316_02")
+
+ict_pun_processed_data$Weight_mg[ict_pun_processed_data$IndividualFishID=="157316_02"]<-NA
+
+stuff<-ict_pun_processed_data %>%
+  filter(IndividualFishID=="157316_02")
+
 
 # Make the dataset analyzable
 
@@ -599,9 +634,9 @@ colnames(ict_pun_processed_data_longer)[17]<-"psite_count"
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, 
-          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.19.csv")
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.01.csv")
 write.csv(ict_pun_processed_data, 
-          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.07.19.csv")
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv")
 
 
 
@@ -748,7 +783,6 @@ colnames(not_ath_processed_data)[13]<-"combo"
 colnames(not_ath_processed_data)[14]<-"Latitude"
 colnames(not_ath_processed_data)[15]<-"Longitude"
 
-View(not_ath_processed_data)
 
 #Remove #VALUE! entries from Weight_mg with "NA"
 not_ath_processed_data <- not_ath_processed_data %>%
@@ -778,6 +812,42 @@ not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,  
 ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 
+# Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
+# Replace weird weights with NAs.
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="197703_01")
+
+not_ath_processed_data$Weight_mg[not_ath_processed_data$IndividualFishID=="197703_01"]<-NA
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="197703_01")
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="197192_04")
+
+not_ath_processed_data$Weight_mg[not_ath_processed_data$IndividualFishID=="197192_04"]<-NA
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="197192_04")
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="190342_01")
+
+not_ath_processed_data$Weight_mg[not_ath_processed_data$IndividualFishID=="190342_01"]<-NA
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="190342_01")
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="186190_04")
+
+not_ath_processed_data$Weight_mg[not_ath_processed_data$IndividualFishID=="186190_04"]<-NA
+
+stuff<-not_ath_processed_data %>%
+  filter(IndividualFishID=="186190_04")
+
+
 # Make the dataset analyzable
 
 not_ath_processed_data_longer<-melt(not_ath_processed_data,id=c("CatalogNumber", "YearCollected", 
@@ -792,8 +862,8 @@ colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable.csv")
-write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable.csv")
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.01.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv")
 
 
 
@@ -961,7 +1031,7 @@ colnames(hyb_nuc_processed_data)[13]<-"combo"
 colnames(hyb_nuc_processed_data)[14]<-"Latitude"
 colnames(hyb_nuc_processed_data)[15]<-"Longitude"
 
-View(hyb_nuc_processed_data)
+
 
 #Remove #VALUE! entries from Weight_mg with "NA"
 #not_ath_processed_data <- not_ath_processed_data %>%
@@ -1079,8 +1149,8 @@ colnames(hyb_nuc_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(hyb_nuc_processed_data_longer, file="data/processed/Hybognathus_nuchalis_processed_machine_readable_UPDATED_2024.07.30.csv")
-write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.07.30.csv")
+write.csv(hyb_nuc_processed_data_longer, file="data/processed/Hybognathus_nuchalis_processed_machine_readable_UPDATED_2024.08.01.csv")
+write.csv(hyb_nuc_processed_data, file="data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv")
 
 
 
@@ -1208,11 +1278,10 @@ colnames(per_vig_processed_data)[13]<-"combo"
 colnames(per_vig_processed_data)[14]<-"Latitude"
 colnames(per_vig_processed_data)[15]<-"Longitude"
 
-View(per_vig_processed_data)
 
 
 # Make the dataset analyzable
-library(reshape2)
+
 per_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber", "YearCollected", 
                                                                 "MonthCollected", "DayCollected", 
                                                                 "IndividualFishID", "Dissector_and_Examiner",
@@ -1226,8 +1295,8 @@ colnames(per_vig_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(per_vig_processed_data_longer, file="data/processed/Percina_vigil_processed_machine_readable.csv")
-write.csv(per_vig_processed_data, file="data/processed/Percina_vigil_processed_human_readable.csv")
+write.csv(per_vig_processed_data_longer, file="data/processed/Percina_vigil_processed_machine_readable_UPDATED_2024.08.01.csv")
+write.csv(per_vig_processed_data, file="data/processed/Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv")
 
 
 
@@ -1263,7 +1332,6 @@ life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psi
 
 full_dataset_with_LH<-merge(full_dataset, life_histories, by.x = "fish_psite_combo", by.y = "fish_psite_combo", all.x = TRUE)
 
-View(full_dataset_with_LH)
 
 colnames(full_dataset_with_LH)[19]<-"scaled_TL_mm"
 full_dataset_with_LH$YearCollected<-as.numeric(full_dataset_with_LH$YearCollected)
@@ -1296,7 +1364,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.07.30.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv")
 
 
 # Playing around with the big analysis
