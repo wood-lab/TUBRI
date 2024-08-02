@@ -321,12 +321,10 @@ summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nucha
 ```{r q1m plots, echo=FALSE, eval=FALSE}
 # sig plot from above for pimvig --- this one is no longer significant somehow idk
 s1=simulateResiduals(fittedModel=fcf_pimvig_lm,n=250)
-s1$scaledResiduals
 plot(s1)
 
 #### significant result for CI notath
 s1b=simulateResiduals(fittedModel=fcf_notath_lm,n=250)
-s1b$scaledResiduals
 plot(s1b)
 
 ```
@@ -476,7 +474,6 @@ vif(q2m)
 
 # check how the model fits
 s2=simulateResiduals(fittedModel=q2m,n=250)
-s2$scaledResiduals
 plot(s2)
 
 # Generate predictions
@@ -488,13 +485,6 @@ apatheme <- theme_bw(base_size = 11, base_family = "sans") +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         axis.line = element_line())
-
-# Create the plot
-ggplot(mydf, aes(x = x, y = predicted, color = group)) + 
-  geom_point(alpha = 0.6, size = 2) +
-  labs(x = 'Life Stage', y = 'Predicted K', title = NULL) +
-  apatheme
-
 
 # Extracted values
 p_value_ciimpact <- 0.008166  # Example value; replace with actual extracted value
