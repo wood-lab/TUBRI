@@ -47,26 +47,6 @@ $$
 K_i = W/SL^3 *10^5
 $$
 
-#### TROUBLESHOOTING
-```{r}
-unique_fish_fcf <- full.data.stages %>%
-  select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, weight_mg, fcf) %>%
-  distinct()
-
-view(unique_fish_fcf)
-
-ggplot(full.data.stages, 
-       aes(x = standard_length_mm, y = weight_g)) + geom_point() + geom_smooth(method = lm) + facet_wrap(~fish_sp_x) + geom_jitter()
-        
-fdsr <- full.data.stages %>%
-  mutate(ratio = (weight_mg/standard_length_mm))
-
-ggplot(fdsr, 
-       aes(x = fish_sp_x, y = ratio)) + geom_boxplot() + geom_smooth(method = lm)
-plot(fdsr$ratio)
-```
-
-
 
 ## Code for Analyses
 
@@ -645,6 +625,25 @@ ggplot(full.data.revised %>%
 $$
 K_i\sim\ life\ stage\ * taxon\ + parasite\ count\ + (1|fish)\ + (1|catelog) 
 $$$
+
+#### TROUBLESHOOTING
+```{r, eval=FALSE, echo=FALSE}
+unique_fish_fcf <- full.data.stages %>%
+  select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, weight_mg, fcf) %>%
+  distinct()
+
+view(unique_fish_fcf)
+
+ggplot(full.data.stages, 
+       aes(x = standard_length_mm, y = weight_g)) + geom_point() + geom_smooth(method = lm) + facet_wrap(~fish_sp_x) + geom_jitter()
+        
+fdsr <- full.data.stages %>%
+  mutate(ratio = (weight_mg/standard_length_mm))
+
+ggplot(fdsr, 
+       aes(x = fish_sp_x, y = ratio)) + geom_boxplot() + geom_smooth(method = lm)
+plot(fdsr$ratio)
+```
 
 
 
