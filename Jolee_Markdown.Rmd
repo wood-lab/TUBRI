@@ -44,7 +44,7 @@ We removed "one-off" species as defined by appearing less than five times across
 | W        | weight of host fish (in grams)              |
 | SL       | standard length of fish (in millimeters)    |
 $$
-K = W/SL^3 *10^5
+K_i = W/SL^3 *10^5
 $$
 
 # TROUBLESHOOTING
@@ -89,11 +89,13 @@ library(ggeffects)
 library(tidyverse)
 library(lmerTest)
 library(emmeans)
+library(broom)
 library(ggpubr)
 library(stringr)
 library(caret)
 library(tibble)
 library(car)
+library(tidyr)
 library(readr)
 library(dbplyr)
 library(lubridate)
@@ -123,6 +125,8 @@ H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human
   janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
+
+p.vigil.data <- 
 ```
 
 ## Question 1
@@ -322,9 +326,9 @@ $$
 - run models
 ```{r q1m}
 # run models 
-summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.05
+summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.1
 summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punctatus.data.fcf))
-summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf))
+summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf)) ### @ a = 0.1
 summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
 ```
 
@@ -336,7 +340,11 @@ s1$scaledResiduals
 plot(s1)
 
 plot(fcf_ictpun_lm)
-plot(fcf_notath_lm)
+
+s1b=simulateResiduals(fittedModel=fcf_notath_lm,n=250)
+s1b$scaledResiduals
+plot(s1b)
+
 plot(fcf_hybnuc_lm)
 ```
 
@@ -347,9 +355,7 @@ plot(fcf_hybnuc_lm)
 # Combine the datasets
 combined_data <- bind_rows(
   P.vigilax.data.fcf %>% mutate(species = "P.vigilax"),
-  I.punctatus.data.fcf %>% mutate(species = "I.punctatus"),
-  N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides"),
-  H.nuchalis.data.fcf %>% mutate(species = "H.nuchalis")
+  N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides")
 )
 ```
 
@@ -357,7 +363,7 @@ combined_data <- bind_rows(
 # plot condition factor vs parasite burden in total - may be interesting
 # Gather the data into long format
 combined_data_long <- combined_data %>%
-  gather(key = "body_index_type", value = "body_index_value", body_index_ictpun, body_index_notath, body_index_pimvig, body_index_hybnuc)
+  gather(key = "body_index_type", value = "body_index_value", body_index_notath, body_index_pimvig)
 
 ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = ci)) + 
   geom_point() + 
@@ -391,7 +397,7 @@ full.data <- full.data %>%
 
 ### Categorize parasites as either adult or larval. All found parasites are included in these analyses (should we exclude the ones that can only occur as adult and/or larval in the host?) Add back a column for Fulton's Condition Factor. 
 
-## still contains percina -- need to remove percina
+## still contains percina -- need to add percina 
 ```{r add stages to total, echo=FALSE}
 full.data.stages <- full.data %>%
   mutate(
@@ -399,7 +405,8 @@ full.data.stages <- full.data %>%
   ) %>%
   mutate(
     life_stage = case_when(
-      psite_count == 0 ~ "uninfected", 
+      psite_count == 0 ~ "uninfected",
+      fish_sp_x == "Percina vigil" ~ "uninfected",
       psite_spp_x %in% c("ACANTH.BIGB", "ACANTH.BKR", "NEM.CONA", "NEM.CAP",
                          "NEM.DICH", "NEM.LARV", "NEM.TRBK", "NEM.UNK",
                          "CEST.GODZ", "CEST.NTG", "COPE.CL",
@@ -492,6 +499,7 @@ plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1
   apatheme
 
 ```
+
 ### Plot question 2
 ```{r}
 ggplot(full.data.stages,
@@ -506,7 +514,6 @@ ggplot(full.data.revised,
            colour = sex)) +
   geom_boxplot()
 ```
-
 
 
 ## Question 3
