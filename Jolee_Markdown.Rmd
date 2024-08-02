@@ -365,6 +365,28 @@ ggplot(N.atherinoides.data.fcf, aes(x = psite_count, y = body_index_notath, colo
                                                    "\nR-squared: ", format(r_squared, digits = 3)), 
            hjust = 1.1, vjust = 1.1, size = 3, color = "black")
 
+#### plotted differently 
+# Generate predictions
+mydf1 <- ggpredict(fcf_notath_lm, terms = c("ci"))
+
+# Define the theme
+apatheme <- theme_bw(base_size = 11, base_family = "sans") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line())
+
+# Extracted values
+p_value_ciimpact1 <- 0.0726  # Example value; replace with actual extracted value
+
+# Create the plot with annotations
+ggplot(mydf1, aes(x = x, y = predicted)) + 
+  geom_point(alpha = 0.6, size = 2) +
+  labs(x = 'Category', y = 'Predicted K', title = NULL) +
+  annotate("text", x = Inf, y = Inf, label = paste("p-value: ", format(p_value_ciimpact1, scientific = TRUE)),
+           hjust = 2.5, vjust = 1.5, size = 4, color = "black") +
+  apatheme
+
 ```
 
 ### Discussion
@@ -499,8 +521,8 @@ p_value_ciimpact <- 0.008166  # Example value; replace with actual extracted val
 ggplot(mydf, aes(x = x, y = predicted, color = group)) + 
   geom_point(alpha = 0.6, size = 2) +
   labs(x = 'Category', y = 'Predicted K', title = NULL) +
-  annotate("text", x = Inf, y = Inf, label = paste("p-value: ", format(p_value_ciimpact, scientific = TRUE)),
-           hjust = 2.5, vjust = 1.5, size = 4, color = "black") +
+  annotate("text", x = Inf, y = Inf, label = paste("p-value control vs. impact catergory: ", format(p_value_ciimpact, scientific = TRUE)),
+           hjust = 1.5, vjust = 1.5, size = 4, color = "black") +
   apatheme
 
 ```
@@ -597,7 +619,7 @@ full.data.taxon <- full.data.taxon %>%
   mutate(psite_taxon = as.factor(psite_taxon))
 ```
 
-
+#### Plots for Question 3
 ```{r, plots for Question 3, echo=FALSE, eval=FALSE}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
@@ -622,7 +644,7 @@ $$
 K_i\sim\ life\ stage\ * taxon\ + parasite\ count\ + (1|fish)\ + (1|catelog) 
 $$$
 
-#### TROUBLESHOOTING
+#### troubleshooting
 ```{r, eval=FALSE, echo=FALSE}
 unique_fish_fcf <- full.data.stages %>%
   select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, weight_mg, fcf) %>%
@@ -641,11 +663,6 @@ ggplot(fdsr,
 plot(fdsr$ratio)
 ```
 
-- no significant difference in fcf across time for any species 
-```{r fcf vs time plot, echo=FALSE, eval=FALSE}
-ggplot(full.data.stages, 
-       aes(x = year_collected, y = fcf)) + geom_point() + geom_smooth(method = lm) + facet_wrap(~fish_sp_x)
-```
 
 
 
