@@ -511,32 +511,26 @@ apatheme <- theme_bw(base_size = 11, base_family = "sans") +
 
 # Create the plot
 ggplot(mydf, aes(x = x, y = predicted, color = group)) + 
-  geom_jitter(width = 0.4, height = 0, alpha = 0.6) +  # Increase width of jitter for more points
-  geom_point(alpha = 0.6, size = 2) +  # Increase point size and adjust alpha for better visibility
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1, alpha = 0.5) +  # Reduce error bar width and transparency
-  scale_color_manual(values = c("#969696", "#ce1256", "blue")) +
+  geom_point(alpha = 0.6, size = 2) +
   labs(x = 'Life Stage', y = 'Predicted K', title = NULL) +
   apatheme
 
 
+# Extracted values
+p_value_ciimpact <- 0.008166  # Example value; replace with actual extracted value
 
-## final plot with predictions and CI
-mydf <- ggpredict(q2m, c("ci", "life_stage"))
-
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line())
-
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256","blue")) + jitter("predicted", factor = 0.001, amount = NULL) +
-  labs(x = 'Life stage', y = 'K', title=NULL) +
+# Create the plot with annotations
+ggplot(mydf, aes(x = x, y = predicted, color = group)) + 
+  geom_point(alpha = 0.6, size = 2) +
+  labs(x = 'Category', y = 'Predicted K', title = NULL) +
+  annotate("text", x = Inf, y = Inf, label = paste("p-value: ", format(p_value_ciimpact, scientific = TRUE)),
+           hjust = 2.5, vjust = 1.5, size = 4, color = "black") +
   apatheme
 
 ```
 
 ### Plot question 2
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 ggplot(full.data.stages,
        aes(x = life_stage, y = fcf)) + xlab("Life Stage")  + geom_boxplot() +
   ylab("Fulton's Condition Factor")  + theme_bw()
@@ -556,7 +550,7 @@ ggplot(full.data.revised,
 ## Question 3
 - Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host
 - contains option for what parasite taxon is present
-```{r}
+```{r, eval=FALSE, echo=FALSE}
 full.data.taxon <- full.data %>%
   mutate(
     psite_count = replace_na(psite_count, 0)  
@@ -628,7 +622,7 @@ full.data.taxon <- full.data.taxon %>%
 ```
 
 
-```{r, plots for Question 3}
+```{r, plots for Question 3, echo=FALSE, eval=FALSE}
 # FCF ~ life_stage * taxon + psite_count (A: T vs C, L: T vs C)
 
 # Jolee's plots - messing around
