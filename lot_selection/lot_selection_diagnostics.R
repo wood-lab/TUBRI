@@ -364,7 +364,7 @@ View(per_vig_dailies)
 
 # You can also do it the old-fashioned way
 
-car_vel_today<-read.csv("data/raw/Carpiodes_velifer_Datasheet_2024.08.01.csv")
+car_vel_today<-read.csv("data/raw/Carpiodes_velifer_Datasheet_2024.08.02.csv")
 length(car_vel_today$CatalogNumber)
 
 
