@@ -641,6 +641,15 @@ ggplot(fdsr,
 plot(fdsr$ratio)
 ```
 
+- no significant difference in fcf across time for any species 
+```{r fcf vs time plot, echo=FALSE, eval=FALSE}
+ggplot(full.data.stages, 
+       aes(x = year_collected, y = fcf)) + geom_point() + geom_smooth(method = lm) + facet_wrap(~fish_sp_x)
+```
+
+
+
+
 
 
 
