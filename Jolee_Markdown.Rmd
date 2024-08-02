@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 * Anything inside a code chunk will run as normal code, anything outside a code chunk will appear in the document as plain text. 
 
 
-## Questions we are asking: 
+# Questions we are asking: 
 1. Is increased parasitism associated with decreased body condition?
 * This is complicated because we are proposing an observational study and the causality that we are attempting to describe can go in both directions. Fish that have high parasitism could be skinner, but also skinner fish could be more susceptible to increased parasitism. We won’t be able to parse this out using our dataset, but it is still an interesting question worth answering. We just need to be careful to not make any absolute statements based on this (which is why we use the language ‘associated’ instead of ‘affected by’). 
 * There is the element of time that we can incorporate into this as well, which is to say that we could look at body condition over time and see what trends exist. If there are any non-linear trends in body condition through time (meaning it doesn’t just go down or just go up or just stay the same), we can then incorporate the variable of parasite presence/burden to see if there is any correlation between the non-linear changes in body condition and parasite counts. This would basically look like on a graph, you have a big drop in body size followed a period of time later by an increase in parasite presence in these fish, you could say something like skinnier fish are associated with an increased parasite burden, since we would see that some event caused body size to decrease and as a result there was more parasites in the fish. But again we have to be really careful to not imply causation if all we have is correlation. Chelsea said she would be surprised if we noticed this effect, but it could be worth looking at anyway. 
@@ -47,7 +47,7 @@ $$
 K_i = W/SL^3 *10^5
 $$
 
-# TROUBLESHOOTING
+#### TROUBLESHOOTING
 ```{r}
 unique_fish_fcf <- full.data.stages %>%
   select(individual_fish_id, fish_sp_x, standard_length_mm, weight_g, weight_mg, fcf) %>%
@@ -81,6 +81,8 @@ install.packages("emmeans")
 install.packages("tibble")
 install.packages("lmerTest")
 install.packages("DHARMa")
+install.packages("ggpmisc")
+install.packages("scales")
 ```
 
 #### Load packages
@@ -102,6 +104,8 @@ library(lubridate)
 library(ggplot2)
 library(glmmTMB)
 library(DHARMa)
+library(scales)
+library(ggpmisc)
 ```
 
 #### Load datasets 
@@ -125,11 +129,9 @@ H.nuchalis.data <- read_csv("data/processed/Hybognathus_nuchalis_processed_human
   janitor::clean_names() %>%
   mutate(weight_mg = as.numeric(weight_mg)) %>% 
   mutate(weight_g = (weight_mg/1000))
-
-p.vigil.data <- 
 ```
 
-## Question 1
+# Question 1
 ### Giving adult and larval IDs so we can look at life stage compared to total parasite burden (for answering question 1). Create a column in each dataset for weight in grams
 - add columns to identify species as an adult or larval stage and new column for total parasite count
 ```{r p.vig a/l stage}
@@ -365,16 +367,20 @@ combined_data <- bind_rows(
 combined_data_long <- combined_data %>%
   gather(key = "body_index_type", value = "body_index_value", body_index_notath, body_index_pimvig)
 
+
 ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = ci)) + 
-  geom_point() + 
+  geom_jitter(width = 0.2, height = 0, alpha = 0.6) + 
   xlab("Parasite Count") + 
   ylab("Body Index") + 
   theme_bw() + 
-  stat_smooth(method = "lm") + facet_wrap(~species)
+  stat_smooth(method = "lm") + 
+  facet_wrap(~species) +
+  stat_poly_eq(aes(label = paste("p-value: ", format(..p.value.., digits = 3), sep = "")), 
+               formula = y ~ x, parse = TRUE, label.x = "right", vjust = 0.5)
 
 ```
 
-## Question 2
+# Question 2
 
 ### Modify datasets to refect only parasites that are able to occur in larval and adult stages in the host. 
 - we are doing this because in order to have a truly comparable dataset of parasites and their association with host body condition, we need to analyze parasites in a uniform way that does not skew the data one direction or another. For example, if you look at trematode parasites, both metacercaria and adult trematodes can live within a fish host. Now, compare that to monogenes who only occur as adults in the fish host. Because their larval stage will not occur in these fish hosts, by including them in our analyses we will be skewing the adult subset of parasites high. The monogenes have no larval counterpart in the fish, so they will always push the adult count higher. By removing monogenes from our analyses, we will have an even ground to compare larval and adult parasites. Therefore, parasites to __NOT__ include in our analyses are: 
