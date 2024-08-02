@@ -1377,12 +1377,3 @@ full_dataset_with_LH$before_after
 # Export the sheet
 
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv")
-
-
-# Playing around with the big analysis
-
-model_draft<-glmer.nb(psite_count~CI*before_after+(1|psite_spp.x),data=full_dataset_with_LH,family="nbinom")
-summary(model_draft)
-
-offset(log(scaled_TL_mm))
-
