@@ -324,61 +324,68 @@ H.nuchalis.data.fcf <- H.nuchalis.data %>%
 $$
 K_i\sim parasite\ count\ + ci
 $$
+- impact category is anything below the pulp mill
+- control category is anything above the pulp mill
 #### Test model for question 1
 - run models
 ```{r q1m}
 # run models 
-summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.1
+summary(fcf_pimvig_lm <- lm(body_index_pimvig ~ psite_count + ci, data = P.vigilax.data.fcf)) ### @ a = 0.1 ## the value for the CI significance has somehow changed and now it is not significant? no idea why: nothing was changed in the code or the datasets
 summary(fcf_ictpun_lm <- lm(body_index_ictpun ~ psite_count + ci, data = I.punctatus.data.fcf))
 summary(fcf_notath_lm <- lm(body_index_notath ~ psite_count + ci, data = N.atherinoides.data.fcf)) ### @ a = 0.1
+## impact category is associated with an increase in fcf when accounting for total parasite count in notath
 summary(fcf_hybnuc_lm <- lm(body_index_hybnuc ~ psite_count + ci, data = H.nuchalis.data.fcf))
 ```
 
 - see how the models are fitting
 ```{r q1m plots, echo=FALSE, eval=FALSE}
-# sig plot from above for pimvig
+# sig plot from above for pimvig --- this one is no longer significant somehow idk
 s1=simulateResiduals(fittedModel=fcf_pimvig_lm,n=250)
 s1$scaledResiduals
 plot(s1)
 
-plot(fcf_ictpun_lm)
-
+#### significant result for CI notath
 s1b=simulateResiduals(fittedModel=fcf_notath_lm,n=250)
 s1b$scaledResiduals
 plot(s1b)
 
-plot(fcf_hybnuc_lm)
 ```
 
-
-#### Plots 
-
-```{r}
+```{r no longer need, eval=FALSE, echo=FALSE}
 # Combine the datasets
 combined_data <- bind_rows(
   P.vigilax.data.fcf %>% mutate(species = "P.vigilax"),
   N.atherinoides.data.fcf %>% mutate(species = "N.atherinoides")
-)
-```
-
-```{r q1 plots}
-# plot condition factor vs parasite burden in total - may be interesting
 # Gather the data into long format
 combined_data_long <- combined_data %>%
   gather(key = "body_index_type", value = "body_index_value", body_index_notath, body_index_pimvig)
+)
+```
 
+#### Plots 
 
-ggplot(combined_data_long, aes(x = psite_count, y = body_index_value, color = ci)) + 
+```{r q1 plots}
+# plot condition factor vs parasite burden in total plus CI
+# Extract p-value and R-squared
+ciimpact_p_value <- summary(fcf_notath_lm)$coefficients[3, 4]  # p-value for ciimpact
+r_squared <- summary(fcf_notath_lm)$r.squared
+
+# Create the plot with jitter and add annotations
+ggplot(N.atherinoides.data.fcf, aes(x = psite_count, y = body_index_notath, color = ci)) + 
   geom_jitter(width = 0.2, height = 0, alpha = 0.6) + 
   xlab("Parasite Count") + 
   ylab("Body Index") + 
   theme_bw() + 
-  stat_smooth(method = "lm") + 
-  facet_wrap(~species) +
-  stat_poly_eq(aes(label = paste("p-value: ", format(..p.value.., digits = 3), sep = "")), 
-               formula = y ~ x, parse = TRUE, label.x = "right", vjust = 0.5)
+  stat_smooth(method = "lm") +
+  annotate("text", x = Inf, y = Inf, label = paste("p-value: ", format(ciimpact_p_value, digits = 3), 
+                                                   "\nR-squared: ", format(r_squared, digits = 3)), 
+           hjust = 1.1, vjust = 1.1, size = 3, color = "black")
 
 ```
+
+### Discussion
+- why are fish in the impact category assocaited with a higher fcf compared to those in the control category when accounting for parasite count?
+
 
 # Question 2
 
@@ -469,6 +476,7 @@ full.data.stages <- full.data.stages %>%
 $$
 K_i\sim life\ stage + parasite\ count\ + ci\ + (1|fish\ species)\ + (1|catalog\ number)
 $$
+- random effects account for things that may be happening to influence the associations we are testing. By including the random effects, we are testing for and proving that autocorrelation (things that will produce similarities/associations in the data in the background) is not playing a role in skewing the model
 
 ### Test the model for Question 2
 
@@ -490,6 +498,27 @@ vif(q2m)
 s2=simulateResiduals(fittedModel=q2m,n=250)
 s2$scaledResiduals
 plot(s2)
+
+# Generate predictions
+mydf <- ggpredict(q2m, terms = c("ci", "life_stage"))
+
+# Define the theme
+apatheme <- theme_bw(base_size = 11, base_family = "sans") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line())
+
+# Create the plot
+ggplot(mydf, aes(x = x, y = predicted, color = group)) + 
+  geom_jitter(width = 0.4, height = 0, alpha = 0.6) +  # Increase width of jitter for more points
+  geom_point(alpha = 0.6, size = 2) +  # Increase point size and adjust alpha for better visibility
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.1, alpha = 0.5) +  # Reduce error bar width and transparency
+  scale_color_manual(values = c("#969696", "#ce1256", "blue")) +
+  labs(x = 'Life Stage', y = 'Predicted K', title = NULL) +
+  apatheme
+
+
 
 ## final plot with predictions and CI
 mydf <- ggpredict(q2m, c("ci", "life_stage"))
@@ -521,6 +550,8 @@ ggplot(full.data.revised,
   geom_boxplot()
 ```
 
+### Discussion
+- why are fish in the impact category assocaited with a higher fcf compared to those in the control category when accounting for parasite count, and life stage of parasites?
 
 ## Question 3
 - Remove from the dataframe the parasites that can only occur as either an adult or a larvae in the host
