@@ -1313,6 +1313,218 @@ write.csv(per_vig_processed_data, file="data/processed/Percina_vigil_processed_h
 
 
 
+### CARVEL: Carpiodes velifer----
+
+
+# You can also do it the old-fashioned way
+
+car_vel_today<-read.csv("data/raw/Carpiodes_velifer_Datasheet_2024.08.02.csv")
+length(car_vel_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+car_vel_today_with_metadata<-merge(car_vel_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(car_vel_today_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(car_vel_today_with_metadata$Latitude.y,30)~jitter(car_vel_today_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+str(car_vel_today_with_metadata)
+car_vel_headers<-ls(car_vel_today_with_metadata)
+car_vel_headers<-as.factor(car_vel_headers)
+
+
+# Add parasites across organs and double what needs to be doubled.
+
+CEST.ARCH<-car_vel_today_with_metadata$CEST.ARCH.INTESTINE           
+CEST.MEGAN<-car_vel_today_with_metadata$CEST.MEGAN.INTESTINE+car_vel_today_with_metadata$CEST.MEGAN.STOMACH            
+CEST.TRI<-car_vel_today_with_metadata$CEST.TRI.INTESTINE           
+CEST.UNK<-car_vel_today_with_metadata$CEST.UNK.INTESTINE           
+CEST.WS<-car_vel_today_with_metadata$CEST.WS.INTESTINE             
+CILI.FU<-(2*car_vel_today_with_metadata$CILIATE.FU.GILL)+(2*car_vel_today_with_metadata$CILLIATE.FU.PectoralFin)       
+COPE.HNY<-(2*car_vel_today_with_metadata$COPE.HNY.GILL)+(2*car_vel_today_with_metadata$COPE.HNY.SKIN)                
+# not a parasite: CYST.B.PECTORALFIN            
+# not a parasite: CYST.DE.INTESTINE             
+# not a parasite: CYST.UNK.PELVIC               
+# not a parasite: CYST.UNK.SKIN                 
+# not a parasite: CYST.UNKN.ConnectiveTissue   
+# not a parasite: CYST.UNKN.Gill                
+# not a parasite: CYST.UNKN.Intestine           
+TREM.META.UNK<-car_vel_today_with_metadata$META.UNK.CAUDALFIN+
+  car_vel_today_with_metadata$meta.unk.connectivetissues+(2*car_vel_today_with_metadata$meta.unk.eye)+
+  car_vel_today_with_metadata$META.UNK.INTESTINE   
+MONO.NID<-car_vel_today_with_metadata$MONO.NID.Flush
+MYX.BNA<-as.numeric(car_vel_today_with_metadata$myx.bna.gallbladder)          
+MYX.CM<-as.numeric(car_vel_today_with_metadata$MYX.CM.GALLBLADDER)            
+MYX.E<-(2*car_vel_today_with_metadata$MYX.E.EYE)+(2*car_vel_today_with_metadata$MYX.E.GILL)  
+
+# These two columns are for the same parasite in the same organ and were recorded separately, not duplicated.
+MYX.F<-car_vel_today_with_metadata$MYX.F.ANALFIN+car_vel_today_with_metadata$MYX.F.ANALFIN.1+
+  car_vel_today_with_metadata$MYX.F.CAUDALFIN+car_vel_today_with_metadata$MYX.F.CAUDALFIN.1+
+  car_vel_today_with_metadata$MYX.F.DorsalFin+car_vel_today_with_metadata$MYX.F.DORSALFIN+
+  (2*car_vel_today_with_metadata$MYX.F.PECTORALFIN)+(2*car_vel_today_with_metadata$MYX.F.PELVICFIN)+
+  (2*car_vel_today_with_metadata$MYX.F.PELVICFIN.1)+(2*car_vel_today_with_metadata$MYX.F.SKIN)                    
+MYX.G<-car_vel_today_with_metadata$Myx.g.Flush+(2*car_vel_today_with_metadata$MYX.G.GILL)                    
+MYX.GM<-as.numeric(car_vel_today_with_metadata$MYX.GM.Gallbladder)          
+MYX.KL<-as.numeric(car_vel_today_with_metadata$MYX.KL.Kidney)                 
+MYX.S<-(2*car_vel_today_with_metadata$MYX.S.SKIN)                    
+MYX.UNK<-as.numeric(car_vel_today_with_metadata$MYX.UNK.SWIMBLADDER)          
+# gut contents, not parasite: NEM.AM.INTESTINE              
+# gut contents, not parasite: NEM.B.INTESTINE              
+# gut contents, not parasite: NEM.B.STOMACH                 
+# gut contents, not parasite: NEM.CER.INTESTINE            
+# gut contents, not parasite: NEM.CER.Stomach   
+
+# Did we really have 55 NEM.CERL in one intestine?
+NEM.CERL<-car_vel_today_with_metadata$NEM.CERL.INTESTINE
+
+# gut contents, not parasite: NEM.CTR.INTESTINE
+
+# Not in ID guide - Daki remembers this as being loose, small nematodes - we will assume that these are free-
+# living because they were small and so many other nematodes in this fish were free-living.
+# gut contents, not parasite: NEM.LARV.STOMACH              
+
+# gut contents, not parasite: nem.ooh.intestine  
+
+# Do we consider these free-living?
+# gut contents, not parasite: NEM.UNK.Intestine             
+
+TREM.CV<-car_vel_today_with_metadata$TREM.CV.INTESTINE             
+TREM.LARV<-car_vel_today_with_metadata$TREM.LARV.AnalFin+car_vel_today_with_metadata$TREM.LARV.CaudalFin+
+  (2*car_vel_today_with_metadata$TREM.LARV.PectoralFin)+(2*car_vel_today_with_metadata$TREM.LARV.PelvicFin)+
+  (2*car_vel_today_with_metadata$TREM.LARV.Skin)                
+TREM.ORS<-car_vel_today_with_metadata$TREM.ORS.INTESTINE           
+TREM.SEP<-car_vel_today_with_metadata$TREM.SEP.INTESTINE
+
+
+
+# Now put it all together
+
+car_vel_processed_data<-cbind.data.frame(car_vel_today_with_metadata$CatalogNumber,car_vel_today_with_metadata$YearCollected.x,
+                                         car_vel_today_with_metadata$MonthCollected.x,car_vel_today_with_metadata$DayCollected.x,
+                                         car_vel_today_with_metadata$IndividualFishID,car_vel_today_with_metadata$Dissector,
+                                         car_vel_today_with_metadata$DissectionDate,car_vel_today_with_metadata$Sex,
+                                         car_vel_today_with_metadata$TotalLength_mm,car_vel_today_with_metadata$StandardLength_mm,
+                                         car_vel_today_with_metadata$weight_mg,car_vel_today_with_metadata$CI,
+                                         car_vel_today_with_metadata$combo,
+                                         car_vel_today_with_metadata$Latitude.y,
+                                         car_vel_today_with_metadata$Longitude.y,
+                                         CEST.ARCH,CEST.MEGAN,CEST.TRI,CEST.UNK,CEST.WS,CILI.FU,COPE.HNY,
+                                         TREM.META.UNK,MONO.NID,MYX.BNA,MYX.CM,MYX.E,MYX.F,MYX.G,MYX.GM,
+                                         MYX.KL,MYX.S,MYX.UNK,NEM.CERL,TREM.CV,TREM.LARV,TREM.ORS,TREM.SEP)
+
+# Name the columns
+
+colnames(car_vel_processed_data)[1]<-"CatalogNumber"
+colnames(car_vel_processed_data)[2]<-"YearCollected"
+colnames(car_vel_processed_data)[3]<-"MonthCollected"
+colnames(car_vel_processed_data)[4]<-"DayCollected"
+colnames(car_vel_processed_data)[5]<-"IndividualFishID"
+colnames(car_vel_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(car_vel_processed_data)[7]<-"DissectionDate"
+colnames(car_vel_processed_data)[8]<-"Sex"
+colnames(car_vel_processed_data)[9]<-"TotalLength_mm"
+colnames(car_vel_processed_data)[10]<-"StandardLength_mm"
+colnames(car_vel_processed_data)[11]<-"Weight_mg"
+colnames(car_vel_processed_data)[12]<-"CI"
+colnames(car_vel_processed_data)[13]<-"combo"
+colnames(car_vel_processed_data)[14]<-"Latitude"
+colnames(car_vel_processed_data)[15]<-"Longitude"
+
+
+# One fish is missing a CatalogNumber, so you have to fix that
+
+stuff<-car_vel_processed_data %>%
+  filter(CatalogNumber == 0)
+
+car_vel_processed_data$CatalogNumber[car_vel_processed_data$CatalogNumber=="0"]<-"178358"
+
+stuff<-car_vel_processed_data %>%
+  filter(CatalogNumber==0)
+
+# Some fish are missing combo information
+
+stuff<-car_vel_processed_data %>%
+  filter(is.na(combo))
+
+car_vel_processed_data$CI[car_vel_processed_data$CatalogNumber=="178358"]<-"control"
+car_vel_processed_data$combo[car_vel_processed_data$CatalogNumber=="178358"]<-"control_1994-2003"
+car_vel_processed_data$Latitude[car_vel_processed_data$CatalogNumber=="178358"]<-"30.77611"
+car_vel_processed_data$Longitude[car_vel_processed_data$CatalogNumber=="178358"]<-"-89.82722"
+
+stuff<-car_vel_processed_data %>%
+  filter(CatalogNumber==178358)
+
+
+stuff<-car_vel_processed_data %>%
+  filter(is.na(combo))
+
+car_vel_processed_data$CI[car_vel_processed_data$IndividualFishID=="37943_03"]<-"control"
+car_vel_processed_data$combo[car_vel_processed_data$IndividualFishID=="37943_03"]<-"control_1964-1973"
+car_vel_processed_data$Latitude[car_vel_processed_data$IndividualFishID=="37943_03"]<-"30.76805"
+car_vel_processed_data$Longitude[car_vel_processed_data$IndividualFishID=="37943_03"]<-"-89.83083"
+car_vel_processed_data$CatalogNumber[car_vel_processed_data$IndividualFishID=="37943_03"]<-"37943"
+
+car_vel_processed_data$CI[car_vel_processed_data$IndividualFishID=="37943_01"]<-"control"
+car_vel_processed_data$combo[car_vel_processed_data$IndividualFishID=="37943_01"]<-"control_1964-1973"
+car_vel_processed_data$Latitude[car_vel_processed_data$IndividualFishID=="37943_01"]<-"30.76805"
+car_vel_processed_data$Longitude[car_vel_processed_data$IndividualFishID=="37943_01"]<-"-89.83083"
+car_vel_processed_data$CatalogNumber[car_vel_processed_data$IndividualFishID=="37943_01"]<-"37943"
+
+stuff<-car_vel_processed_data %>%
+  filter(CatalogNumber==37943)
+
+stuff<-car_vel_processed_data %>%
+  filter(is.na(combo))
+
+car_vel_processed_data$CI[car_vel_processed_data$IndividualFishID=="112536_04"]<-"control"
+car_vel_processed_data$combo[car_vel_processed_data$IndividualFishID=="112536_04"]<-"control_1974-1983"
+car_vel_processed_data$Latitude[car_vel_processed_data$IndividualFishID=="112536_04"]<-"30.77861"
+car_vel_processed_data$Longitude[car_vel_processed_data$IndividualFishID=="112536_04"]<-"-89.82972"
+car_vel_processed_data$CatalogNumber[car_vel_processed_data$IndividualFishID=="112536_04"]<-"112536"
+
+stuff<-car_vel_processed_data %>%
+  filter(is.na(combo))
+
+car_vel_processed_data$CI[car_vel_processed_data$IndividualFishID=="99418_01"]<-"control"
+car_vel_processed_data$combo[car_vel_processed_data$IndividualFishID=="99418_01"]<-"control_1974-1983"
+car_vel_processed_data$Latitude[car_vel_processed_data$IndividualFishID=="99418_01"]<-"30.77861"
+car_vel_processed_data$Longitude[car_vel_processed_data$IndividualFishID=="99418_01"]<-"-89.82972"
+car_vel_processed_data$CatalogNumber[car_vel_processed_data$IndividualFishID=="99418_01"]<-"99448"
+car_vel_processed_data$IndividualFishID[car_vel_processed_data$IndividualFishID=="99418_01"]<-"99448_01"
+
+stuff<-car_vel_processed_data %>%
+  filter(CatalogNumber=="99448")
+
+stuff<-car_vel_processed_data %>%
+  filter(is.na(combo))
+
+
+
+# Make the dataset analyzable
+
+car_vel_processed_data_longer<-melt(car_vel_processed_data,id=c("CatalogNumber", "YearCollected", 
+                                                                "MonthCollected", "DayCollected", 
+                                                                "IndividualFishID", "Dissector_and_Examiner",
+                                                                "DissectionDate", "Sex", 
+                                                                "TotalLength_mm", "StandardLength_mm",
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
+
+colnames(car_vel_processed_data_longer)[16]<-"psite_spp"
+colnames(car_vel_processed_data_longer)[17]<-"psite_count"
+
+
+# Export both sheets
+
+write.csv(car_vel_processed_data_longer, file="data/processed/Carpiodes_velifer_processed_machine_readable_UPDATED_2024.08.02.csv")
+write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.01.csv")
+
+
+
+
 ### Put all the sheets together----
 
 # Start by scaling fish body size within fish species
@@ -1322,6 +1534,7 @@ ict_pun_processed_data_longer$scaled_TL<-scale(ict_pun_processed_data_longer$Tot
 not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$TotalLength_mm)
 hyb_nuc_processed_data_longer$scaled_TL<-scale(hyb_nuc_processed_data_longer$TotalLength_mm)
 per_vig_processed_data_longer$scaled_TL<-scale(per_vig_processed_data_longer$TotalLength_mm)
+car_vel_processed_data_longer$scaled_TL<-scale(car_vel_processed_data_longer$TotalLength_mm)
 
 
 # Then make sure that there is a column for the fish species
@@ -1331,10 +1544,11 @@ ict_pun_processed_data_longer$Fish_sp<-c(rep("Ictalurus punctatus",length(ict_pu
 not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_ath_processed_data_longer$CatalogNumber)))
 hyb_nuc_processed_data_longer$Fish_sp<-c(rep("Hybognathus nuchalis",length(hyb_nuc_processed_data_longer$CatalogNumber)))
 per_vig_processed_data_longer$Fish_sp<-c(rep("Percina vigil",length(per_vig_processed_data_longer$CatalogNumber)))
+car_vel_processed_data_longer$Fish_sp<-c(rep("Carpiodes velifer",length(car_vel_processed_data_longer$CatalogNumber)))
 
 full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_data_longer,
-                                          not_ath_processed_data_longer,hyb_nuc_processed_data_longer,
-                               per_vig_processed_data_longer)
+                               not_ath_processed_data_longer,hyb_nuc_processed_data_longer,
+                               per_vig_processed_data_longer,car_vel_processed_data_longer)
 
 full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
 
@@ -1376,4 +1590,4 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.02.csv")
