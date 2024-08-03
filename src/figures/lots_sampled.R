@@ -29,7 +29,7 @@ library(pdftools)
 
 # Load data about TUBRI lots
 
-psite_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv", header = T, sep = ",")
+psite_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.03.csv", header = T, sep = ",")
 str(lots)
 
 
@@ -51,7 +51,7 @@ map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% g
   ylab("")+
   theme(legend.position = "none")+
   theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=4),axis.text.y=element_text(size=8))
+        axis.text.x=element_text(size=10),axis.text.y=element_text(size=10))
 #geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
 #geom_hline(yintercept=35.2102673,linetype="dashed")+
 #geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
@@ -84,7 +84,7 @@ legend
 
 library(wesanderson)
 wes_palette("Zissou1")
-pal<-wes_palette(name = "Zissou1", 5, type = "continuous")
+pal<-wes_palette(name = "Zissou1", 6, type = "continuous")
 
 
 # PIMVIG plot
@@ -137,7 +137,7 @@ fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
            fill = "darkgrey", colour = NA, alpha = 0.75)+
   geom_point(data=fish_sampled,aes(x=YearCollected,fill=Fish_sp.x),
              position=position_jitter(width=0.15),shape=21,size=3)+
-  scale_fill_manual(values=pal[1:5],name='')+
+  scale_fill_manual(values=pal[1:6],name='')+
   xlab("")+
   ylab("")+
   geom_vline(xintercept=1972.5,linetype="dashed")+
@@ -152,7 +152,7 @@ fish_plot
 
 
 # Set the map and the plot side-by-side
-
+library(cowplot)
 final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,5))+
   draw_plot(map,x=0,y=0,width=4,height=5)+
   draw_plot(fish_plot,x=4,y=0,width=6,height=5)
