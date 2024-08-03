@@ -4,7 +4,7 @@
 
 # Read in the dataset
 
-full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv")
+full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.02.csv")
 
 
 # Take out myxos, since they were counted differently (you'll run a parallel analysis for them)
@@ -19,14 +19,18 @@ time_model_draft<-glm.nb(psite_count~YearCollected,data=minus_myxos)
 summary(time_model_draft)
 
 str(minus_myxos)
+minus_myxos$fish
 
-model_draft<-glmer.nb(psite_count~CI*before_after+scaled_TL_mm+(1|Fish_sp.x/psite_spp.x)+(1|CatalogNumber),
+model_draft<-glm.nb(psite_count~YearCollected*CI+Fish_sp.x+Latitude+offset(scaled_TL_mm),data=minus_myxos)
+
+model_draft<-glmer.nb(psite_count~CI*YearCollected+(offset(scaled_TL_mm))+
+                        (1|Fish_sp.x/fish_psite_combo)+(1|CatalogNumber)+(1|Latitude),
                       data=minus_myxos,family="nbinom")
 summary(model_draft)
 
 
 library(ggeffects)
-big_predictions<-ggeffect(model_draft,c("before_after","CI"))
+big_predictions<-ggeffect(model_draft,c("YearCollected","CI"))
 
 big_predictions$group
 
