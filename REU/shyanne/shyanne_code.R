@@ -120,6 +120,7 @@ color_plot<-ggplot(color_predict,aes(c(1.95,0.95,2.05,1.05),predicted),group=Lif
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=rev(levels(color_predict$group)),labels=c("control","impact"))+
+  annotate("text",label="effect of treatment:\np < 0.0001",x = 1.9, y = 0.65, size = 6)+
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=14))
 color_plot
@@ -135,6 +136,11 @@ color_plot
 stuff <- trimmed_data %>%
   group_by(Parasite_taxonomic_group) %>%
   summarize(count = n())
+
+# Take out the copepods
+
+trimmed_data <- trimmed_data %>%
+  filter(Parasite_taxonomic_group!="Copepoda")
 
 library(lme4)
 model_2<-glmer.nb(psite_count~CI*Parasite_taxonomic_group+(1|Fish_sp.x/psite_spp.x)+
@@ -155,7 +161,7 @@ vif(model_2)
 # for the model to run and converge
 
 model_2_output<-stargazer::stargazer(model_2, type = "text")
-write.table(model_2_output,"REU/shyanne/model_2_output_2024.08.01")
+write.table(model_2_output,"REU/shyanne/model_2_output_2024.08.02")
 
 
 # Now let's plot it
@@ -168,7 +174,7 @@ color_predict_2<-ggeffect(model_2,c("Parasite_taxonomic_group","CI"))
 
 # Set up a nice color palette first.
 library(viridis)
-plasma_pal <- c("red", viridis::plasma(n = 6))
+plasma_pal <- c("red", viridis::plasma(n = 5))
 pal<-viridis(n=6)
 
 pal.bands(coolwarm)
@@ -176,10 +182,10 @@ pal.bands(coolwarm)
 par(op)
 color_predict_2$group
 
-color_plot_2<-ggplot(color_predict_2,aes(c(0.85,0.9,0.95,1,1.05,1.1,1.85,1.9,1.95,2,2.05,2.1),predicted),
+color_plot_2<-ggplot(color_predict_2,aes(c(0.85,0.9,0.95,1,1.05,1.85,1.9,1.95,2,2.05),predicted),
                      group=Parasite_taxonomic_group,color=Parasite_taxonomic_group)+
   geom_point(aes(group=x,color=x),size=4,pch=19)+
-  geom_errorbar(data=color_predict_2,mapping=aes(x=c(0.85,0.9,0.95,1,1.05,1.1,1.85,1.9,1.95,2,2.05,2.1),
+  geom_errorbar(data=color_predict_2,mapping=aes(x=c(0.85,0.9,0.95,1,1.05,1.85,1.9,1.95,2,2.05),
                                                  ymin=conf.low,ymax=conf.high,group=x,color=x),width=0.03)+
   geom_line(aes(group=x,color=x))+
   scale_color_manual(name = c("parasite taxonomic group"),values=plasma_pal)+
@@ -255,6 +261,7 @@ myxo_plot<-ggplot(myxo_predict,aes(x,predicted))+
         axis.text.x=element_text(size=18,color=c("cadetblue","burlywood4")),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  annotate("text",label="effect of treatment:\np = 0.058",x = 1.9, y = 0.045, size = 6)+
   scale_x_discrete(limits=(levels(myxo_predict$x)),labels=c("control","impact"))
   
 myxo_plot
