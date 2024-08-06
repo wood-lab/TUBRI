@@ -49,7 +49,7 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.03.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.06.csv", header = T, sep = ",")
 
 colnames(full_data)[20]<-"scaled_TL_mm"
 
@@ -96,7 +96,7 @@ levels(as.factor(trimmed_data$Fish_sp.x))
 
 library(stargazer)
 model_1_output<-stargazer::stargazer(model_1, type = "text")
-write.table(model_1_output,"REU/shyanne/model_1_output_2024.08.01")
+write.table(model_1_output,"REU/shyanne/model_1_output_2024.08.06")
 
 # Check VIFs to make sure that there is no collinearity
 library(car)
@@ -122,7 +122,7 @@ color_plot<-ggplot(color_predict,aes(c(1.95,0.95,2.05,1.05),predicted),group=Lif
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=rev(levels(color_predict$group)),labels=c("control","impact"))+
-  annotate("text",label="effect of treatment:\np < 0.0001",x = 1.9, y = 0.65, size = 6)+
+  annotate("text",label="effect of treatment:\np < 0.0001",x = 1.9, y = 0.45, size = 6)+
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=14))
 color_plot
@@ -163,7 +163,7 @@ vif(model_2)
 # for the model to run and converge
 
 model_2_output<-stargazer::stargazer(model_2, type = "text")
-write.table(model_2_output,"REU/shyanne/model_2_output_2024.08.02")
+write.table(model_2_output,"REU/shyanne/model_2_output_2024.08.06")
 
 
 # Now let's plot it
@@ -263,7 +263,7 @@ myxo_plot<-ggplot(myxo_predict,aes(x,predicted))+
         axis.text.x=element_text(size=18,color=c("cadetblue","burlywood4")),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  annotate("text",label="effect of treatment:\np = 0.058",x = 1.9, y = 0.045, size = 6)+
+  annotate("text",label="effect of treatment:\np = 0.563",x = 1.9, y = 0.043, size = 6)+
   scale_x_discrete(limits=(levels(myxo_predict$x)),labels=c("control","impact"))
   
 myxo_plot
