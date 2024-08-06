@@ -1554,7 +1554,7 @@ full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp
 
 levels(as.factor(full_dataset$fish_psite_combo))
 
-life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.08.03.csv",header=T,sep=",")
+life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.08.06.csv",header=T,sep=",")
 life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psite_spp,sep="_")
 
 
@@ -1592,7 +1592,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.03.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.06.csv")
 
 
 # tallies
