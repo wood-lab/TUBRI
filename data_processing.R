@@ -181,14 +181,15 @@ TREM.UNK<-pim_vig_with_metadata$TREM.UNK.CONNECTIVETISSUE+pim_vig_with_metadata$
 pim_vig_with_metadata$Weight_mg<-(10*as.numeric(pim_vig_with_metadata$Weight_mg))
 
 # Evaluate relationship between total length and weight.
-ggplot(pim_vig_with_metadata,aes(TotalLength_mm,Weight_mg))+
-  geom_point(size=4)
+#ggplot(pim_vig_with_metadata,aes(TotalLength_mm,Weight_mg))+
+#  geom_point(size=4)
 
 # Evaluate ratio between total length and weight. Divide length by weight
-pim_vig_with_metadata$LenWeig <- pim_vig_with_metadata$TotalLength_mm/pim_vig_with_metadata$Weight_mg
+#pim_vig_with_metadata$LenWeig <- pim_vig_with_metadata$TotalLength_mm/pim_vig_with_metadata$Weight_mg
 
 # According to the following histogram the ratio between length and weight is somewhere between 0-0.30
-hist(pim_vig_with_metadata$LenWeig)
+#hist(pim_vig_with_metadata$LenWeig)
+
 
 # Now put it all together
 
@@ -298,9 +299,9 @@ colnames(pim_vig_processed_data_longer)[17]<-"psite_count"
 # Export both sheets
 
 write.csv(pim_vig_processed_data_longer, 
-          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.01.csv")
+          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.08.csv")
 write.csv(pim_vig_processed_data, 
-          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.01.csv")
+          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.08.csv")
 
 
 
@@ -496,13 +497,13 @@ TREM.UNK<-ict_pun_with_metadata$TREM.UNKN.Intestine
 ict_pun_with_metadata$weight_mg<-(10*as.numeric(ict_pun_with_metadata$weight_mg))
 
 #Revise relationship between fish size and weight
-ggplot(ict_pun_with_metadata,aes(TotalLength_mm,weight_mg))+geom_point(size=4)
+#ggplot(ict_pun_with_metadata,aes(TotalLength_mm,weight_mg))+geom_point(size=4)
 
 # Evaluate ratio between total length and weight. Divide length by weight
-ict_pun_with_metadata$LenWeig <- ict_pun_with_metadata$TotalLength_mm/ict_pun_with_metadata$weight_mg
+#ict_pun_with_metadata$LenWeig <- ict_pun_with_metadata$TotalLength_mm/ict_pun_with_metadata$weight_mg
 
 # According to the following histogram the ratio between length and weight is somewhere between 0-0.015
-hist(ict_pun_with_metadata$LenWeig)
+#hist(ict_pun_with_metadata$LenWeig)
 
 # Now put it all together
 
@@ -646,9 +647,9 @@ colnames(ict_pun_processed_data_longer)[17]<-"psite_count"
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, 
-          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.01.csv")
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.08.csv")
 write.csv(ict_pun_processed_data, 
-          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv")
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.08.csv")
 
 
 
@@ -797,31 +798,31 @@ colnames(not_ath_processed_data)[15]<-"Longitude"
 
 
 #Remove #VALUE! entries from Weight_mg with "NA"
-not_ath_processed_data <- not_ath_processed_data %>%
-  mutate(Weight_mg = recode(Weight_mg,
-                           "#VALUE!" = "NA"))
+#not_ath_processed_data <- not_ath_processed_data %>%
+#  mutate(Weight_mg = recode(Weight_mg,
+#                           "#VALUE!" = "NA"))
 
 #Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
-ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 # Evaluate ratio between total length and weight to inform decision about which numbers must be multiplied by ten. For this, divide length by weight
-not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
+#not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
 
 
 # All incorrect weights that must be multiplied by 10 have a ratio below 3 which does not make sense. See the data below to confirm. The weights have a decimal point which should not be the case.
-lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
-View(lenweighb)
+#lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
+#View(lenweighb)
 
 # Therefore, multiply all weights with LenWeig higher than 3 by 10
 
-not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
-                                                       as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
-                                                       as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
-)
+#not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
+#                                                       as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
+#                                                       as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
+#)
 
 
 #Re-evaluate relationship between TotalLength_mm and Weight_mg. Now it is fixed.
-ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 
 # Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
@@ -874,8 +875,8 @@ colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.01.csv")
-write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv")
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.08.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.08.csv")
 
 
 
@@ -1356,7 +1357,7 @@ COPE.HNY<-(2*car_vel_today_with_metadata$COPE.HNY.GILL)+(2*car_vel_today_with_me
 TREM.META.UNK<-car_vel_today_with_metadata$META.UNK.CAUDALFIN+
   car_vel_today_with_metadata$meta.unk.connectivetissues+(2*car_vel_today_with_metadata$meta.unk.eye)+
   car_vel_today_with_metadata$META.UNK.INTESTINE   
-MONO.NID<-car_vel_today_with_metadata$MONO.NID.Flush
+# this is probably Udonella, a commensal of a copepod parasite: MONO.NID<-car_vel_today_with_metadata$MONO.NID.Flush
 MYX.BNA<-as.numeric(car_vel_today_with_metadata$myx.bna.gallbladder)          
 MYX.CM<-as.numeric(car_vel_today_with_metadata$MYX.CM.GALLBLADDER)            
 MYX.E<-(2*car_vel_today_with_metadata$MYX.E.EYE)+(2*car_vel_today_with_metadata$MYX.E.GILL)  
@@ -1413,7 +1414,7 @@ car_vel_processed_data<-cbind.data.frame(car_vel_today_with_metadata$CatalogNumb
                                          car_vel_today_with_metadata$Latitude.y,
                                          car_vel_today_with_metadata$Longitude.y,
                                          CEST.ARCH,CEST.MEGAN,CEST.TRI,CEST.UNK,CEST.WS,CILI.FU,COPE.HNY,
-                                         TREM.META.UNK,MONO.NID,MYX.BNA,MYX.CM,MYX.E,MYX.F,MYX.G,MYX.GM,
+                                         TREM.META.UNK,MYX.BNA,MYX.CM,MYX.E,MYX.F,MYX.G,MYX.GM,
                                          MYX.KL,MYX.S,MYX.UNK,NEM.CERL,TREM.CV,TREM.LARV,TREM.ORS,TREM.SEP)
 
 # Name the columns
@@ -1519,8 +1520,8 @@ colnames(car_vel_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(car_vel_processed_data_longer, file="data/processed/Carpiodes_velifer_processed_machine_readable_UPDATED_2024.08.02.csv")
-write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.01.csv")
+write.csv(car_vel_processed_data_longer, file="data/processed/Carpiodes_velifer_processed_machine_readable_UPDATED_2024.08.08.csv")
+write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.08.csv")
 
 
 
@@ -1592,7 +1593,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.06.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.08.csv")
 
 
 # tallies
