@@ -799,30 +799,35 @@ colnames(not_ath_processed_data)[15]<-"Longitude"
 
 #Remove #VALUE! entries from Weight_mg with "NA"
 #not_ath_processed_data <- not_ath_processed_data %>%
-#  mutate(Weight_mg = recode(Weight_mg,
-#                           "#VALUE!" = "NA"))
+# mutate(Weight_mg = recode(Weight_mg,"#VALUE!" = "NA"))
 
 #Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
-#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 # Evaluate ratio between total length and weight to inform decision about which numbers must be multiplied by ten. For this, divide length by weight
-#not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
+not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
 
 
 # All incorrect weights that must be multiplied by 10 have a ratio below 3 which does not make sense. See the data below to confirm. The weights have a decimal point which should not be the case.
-#lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
-#View(lenweighb)
+lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
+View(lenweighb)
 
 # Therefore, multiply all weights with LenWeig higher than 3 by 10
 
-#not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
-#                                                       as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
-#                                                       as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
-#)
+not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
+                                                       as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
+                                                       as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
+)
 
 
 #Re-evaluate relationship between TotalLength_mm and Weight_mg. Now it is fixed.
-#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
+
+
+# Now that you are done using the lenwei variable, take it out, so that the not_ath dataset can be 
+# sensibly concatenated with the other datasets
+
+not_ath_processed_data<-subset(not_ath_processed_data,select=-c(LenWeig))
 
 
 # Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
@@ -875,8 +880,8 @@ colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.08.csv")
-write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.08.csv")
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.10.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.10.csv")
 
 
 
@@ -1593,7 +1598,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.08.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.10.csv")
 
 
 # tallies
