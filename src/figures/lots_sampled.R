@@ -29,7 +29,7 @@ library(pdftools)
 
 # Load data about TUBRI lots
 
-psite_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.03.csv", header = T, sep = ",")
+psite_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.08.csv", header = T, sep = ",")
 str(lots)
 
 
@@ -151,7 +151,7 @@ fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
 fish_plot
 
 
-# Set the map and the plot side-by-side
+  # Set the map and the plot side-by-side
 library(cowplot)
 final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,5))+
   draw_plot(map,x=0,y=0,width=4,height=5)+

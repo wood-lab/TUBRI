@@ -430,7 +430,7 @@ View(car_vel_dailies)
 
 # You can also do it the old-fashioned way
 
-gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.08.csv")
+gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.09.csv")
 length(gam_aff_today$CatalogNumber)
 
 
@@ -485,10 +485,11 @@ plot(gam_aff_with_metadata$TotalLength_mm~gam_aff_with_metadata$Latitude.y)
 
 # Create a matrix that shows how many fish you are finishing per day
 
-car_vel_dailies<-car_vel_with_metadata %>%
-  group_by(Date_datasheet_complete) %>%
+gam_aff_dailies<-gam_aff_with_metadata %>%
+  group_by(DissectionDate) %>%
   summarize(actual = n())
-View(car_vel_dailies)
+View(gam_aff_dailies)
+
 
 
 
