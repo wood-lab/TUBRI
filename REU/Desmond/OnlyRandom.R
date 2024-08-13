@@ -246,3 +246,6 @@ summary(notrop_model1)
 hybog_model1 <- lmerTest::lmer((Weight/SL)~Year + (1|Cat_Num), data= hybog_desmond)
 summary(hybog_model1)
 
+install.packages("usethis")
+library(usethis)
+use_git_config(user.name= "Fisherguy18", user.email="natureboydesmond@gmail.com")
