@@ -248,4 +248,4 @@ summary(hybog_model1)
 
 install.packages("usethis")
 library(usethis)
-use_git_config(user.name= "Fisherguy18", user.email="natureboydesmond@gmail.com")
+use_git_config(user.name= "Fisherguy18", user.email="djboyd@email.sc.edu")
