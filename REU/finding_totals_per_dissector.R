@@ -261,3 +261,26 @@ view(wide_data)
 #gabby myx.g, trem.cm, mono.dact 
 #connor myx.g, trem.cm, mono.dact 
 #chelsea trem.cm, mono.all, mono.dact
+
+
+#### fish per person
+
+full_data <- read.csv("~/Desktop/UW/TUBRI/data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv") %>%
+  mutate(
+    combined_dissector = coalesce(!!!select(., starts_with("dissector")))
+  ) %>%
+  janitor::clean_names()
+
+
+full_data <- full_data %>%
+  mutate(
+    extracted_initials = sapply(combined_dissector, extract_initials),
+    person = names_map[extracted_initials]
+  ) %>%
+  janitor::clean_names()
+
+
+
+
+
+
