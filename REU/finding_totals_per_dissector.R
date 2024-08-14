@@ -76,10 +76,8 @@ extract_initials <- function(text) {
   matches <- toupper(matches) # Ensure all matches are uppercase
   if (length(matches) == 0) {
     return(NA)
-  } else if (length(matches) >= 2) {
-    return(matches[2])
   } else {
-    return(matches[1])
+    return(tail(matches, 1)) # Return the last match
   }
 }
 
@@ -265,22 +263,76 @@ view(wide_data)
 
 #### fish per person
 
-full_data <- read.csv("~/Desktop/UW/TUBRI/data/processed/Full_dataset_with_psite_life_history_info_2024.08.01.csv") %>%
-  mutate(
-    combined_dissector = coalesce(!!!select(., starts_with("dissector")))
-  ) %>%
+pimvig <- read.csv("~/Desktop/UW/TUBRI/data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'pimvig')
+
+ictpun <- read.csv("~/Desktop/UW/TUBRI/data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'ictpun')
+
+notath <- read.csv("~/Desktop/UW/TUBRI/data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'notath')
+
+hybnuc <- read.csv("~/Desktop/UW/TUBRI/data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'hybnuc')
+
+pervig <- read.csv("~/Desktop/UW/TUBRI/data/processed/Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'pervig')
+
+carvel <- read.csv("~/Desktop/UW/TUBRI/data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.08.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'carvel')
+
+# Combine the datasets using full_join
+# Join datasets
+combined_data <- pimvig %>%
+  full_join(ictpun, by = "individual_fish_id") %>%
+  full_join(notath, by = "individual_fish_id") %>%
+  full_join(hybnuc, by = "individual_fish_id") %>%
+  full_join(pervig, by = "individual_fish_id") %>%
+  full_join(carvel, by = "individual_fish_id") %>%
   janitor::clean_names()
 
+# Coalesce dissector columns
+combined_data <- combined_data %>%
+  mutate(
+    combined_dissector = coalesce(!!!select(., starts_with("dissector")))
+  )
 
-full_data <- full_data %>%
+# Apply the function and create the new column
+combined_data <- combined_data %>%
   mutate(
     extracted_initials = sapply(combined_dissector, extract_initials),
     person = names_map[extracted_initials]
   ) %>%
   janitor::clean_names()
 
+# Summarize the data to count parasites for each person and include fish_sp_x
+combined_data_long <- combined_data %>%
+  pivot_longer(
+    cols = starts_with("species"),
+    names_to = "species_type",
+    values_to = "species"
+  ) %>%
+  filter(!is.na(species)) %>%
+  select(-species_type)  # Remove the species_type column if not needed
 
+# Summarize the data to count parasites for each person and each species
+fish_counts <- combined_data_long %>%
+  group_by(person, species) %>%
+  summarise(fish_count = n(), .groups = 'drop') %>%
+  arrange(desc(fish_count))
 
+# View the table
+view(fish_counts)
 
-
-
+# Optional: Create a ggplot if needed
+ggplot(combined_data, aes(x = person)) + 
+  geom_bar() + 
+  xlab("Person") + 
+  ylab("Parasite count") + 
+  theme_bw()
