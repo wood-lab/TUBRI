@@ -1,37 +1,64 @@
 
 ## for picking out total parasite counts per dissector
 
-pimvig <- read.csv("Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+install.packages("tidyverse")
+install.packages("janitor")
+install.packages("ggeffects")
+install.packages("rmarkdown")
+install.packages("caret")
+install.packages("emmeans")
+install.packages("tibble")
+install.packages("lmerTest")
+install.packages("DHARMa")
+install.packages("ggpmisc")
+install.packages("smatr")
+install.packages("scales")
+
+#### Load packages
+library(ggeffects)
+library(tidyverse)
+library(ggpubr)
+library(stringr)
+library(tibble)
+library(car)
+library(tidyr)
+library(readr)
+library(dbplyr)
+library(ggplot2)
+
+## load datasets
+
+pimvig <- read.csv("data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.08.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
   janitor::clean_names()
 
-ictpun <- read.csv("Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv") %>%
+ictpun <- read.csv("data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.01.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
   janitor::clean_names()
 
-notath <- read.csv("Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+notath <- read.csv("data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.01.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
   janitor::clean_names()
 
-hybnuc <- read_csv("Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+hybnuc <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
   janitor::clean_names()
 
-pervig <- read_csv("Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv") %>%
+pervig <- read_csv("data/processed/Percina_vigil_processed_human_readable_UPDATED_2024.08.01.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
   janitor::clean_names()
 
-carvel <- read_csv("Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.08.csv") %>%
+carvel <- read_csv("data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.08.csv") %>%
   mutate(
     combined_dissector = coalesce(!!!select(., starts_with("dissector")))
   ) %>%
@@ -198,12 +225,12 @@ tc_carvel <- carvel %>%
 
 ## view the tables individually
 
-view(tc_pimvig) 
-view(tc_ictpun) 
-view(tc_notath)
-view(tc_hybnuc)
-view(tc_pervig)
-view(tc_carvel)
+#view(tc_pimvig) 
+#view(tc_ictpun) 
+#view(tc_notath)
+#view(tc_hybnuc)
+#view(tc_pervig)
+#view(tc_carvel)
 
 ## combine the tables
 
