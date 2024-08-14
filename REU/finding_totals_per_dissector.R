@@ -66,8 +66,9 @@ carvel <- read_csv("data/processed/Carpiodes_velifer_processed_human_readable_UP
 
 
 # Define the initials and their corresponding names
-initials <- c("CJW", "GMC", "DMDM", "KL", "CLW")
-names_map <- c("CJW" = "connor", "GMC" = "gabby", "DMDM" = "daki", "KL" = "katie", "CLW" = "chelsea")
+initials <- c("CJW", "GMC", "DMDM", "KL", "CLW", "JT", "IJ", "SC", "DJB")
+names_map <- c("CJW" = "connor", "GMC" = "gabby", "DMDM" = "daki", "KL" = "katie", "CLW" = "chelsea", "JT" = "jolee", 
+               "IJ" = "imani", "SC" = "shyanne", "DJB" = "desmond")
 
 # Function to extract initials and choose the second if two are found
 extract_initials <- function(text) {
