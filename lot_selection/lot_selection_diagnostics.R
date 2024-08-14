@@ -430,7 +430,7 @@ View(car_vel_dailies)
 
 # You can also do it the old-fashioned way
 
-gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.09.csv")
+gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.14.csv")
 length(gam_aff_today$CatalogNumber)
 
 

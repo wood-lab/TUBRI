@@ -1531,6 +1531,250 @@ write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_process
 
 
 
+### GAMAFF: Gambusia affinis----
+
+
+# You can also do it the old-fashioned way
+
+gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.14.csv")
+length(gam_aff_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+gam_aff_today_with_metadata<-merge(gam_aff_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(gam_aff_today_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(gam_aff_today_with_metadata$Latitude.y,30)~jitter(gam_aff_today_with_metadata$YearCollected.y,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+str(gam_aff_today_with_metadata)
+gam_aff_headers<-ls(gam_aff_today_with_metadata)
+gam_aff_headers<-as.factor(gam_aff_headers)
+
+
+# Add parasites across organs and double what needs to be doubled.
+
+ACANTH.BLVE<-gam_aff_today_with_metadata$ACANTH.BLVE.CONNECTIVETISSUE   
+ACANTH.NEMOR<-gam_aff_today_with_metadata$ACANTH.NEMOR.CONNECTIVETISSUE+gam_aff_today_with_metadata$ACANTH.NEMOR.FLUSH+
+  as.numeric(gam_aff_today_with_metadata$ACANTH.NEMOR.Liver)               
+CEST.MIPI<-gam_aff_today_with_metadata$CEST.MIPI.Flush+gam_aff_today_with_metadata$CEST.MIPI.INTESTINE              
+
+# not in ID guide:
+CEST.PROT<-gam_aff_today_with_metadata$CEST.PROT.Flush+gam_aff_today_with_metadata$CEST.PROT.Intestine              
+
+CEST.TRIGA<-gam_aff_today_with_metadata$CEST.TIRGA.INTESTINE             
+CEST.UNK<-gam_aff_today_with_metadata$CEST.UNK.FLUSH+gam_aff_today_with_metadata$CEST.UNK.INTESTINE               
+CEST.WOAD<-gam_aff_today_with_metadata$CEST.WOAD.Intestine             
+CEST.Y<-gam_aff_today_with_metadata$CEST.Y.INTESTINE                
+# not a parasite: CYST.BIG.CAUDALFIN               
+# not a parasite: CYST.FIN.CaudalFin              
+# not a parasite: CYST.FIN.VOUCH                   
+# not a parasite: CYST.SMALL.CaudalFin             
+# not a parasite: CYST.SMALL.PectoralFin          
+# not a parasite: CYST.UNK.ConnectiveTissue        
+# not a parasite: CYST.UNK.GALLBLADDER             
+# not a parasite: CYST.UNK.GILL                   
+# not a parasite: CYST.UNK.SPLEEN                  
+# not a parasite: CYST.UNKN.CAUDALFIN              
+META.BOLISM<-gam_aff_today_with_metadata$META.BOLISM.CONNECTIVETISSUE+gam_aff_today_with_metadata$META.BOLISM.FLUSH+
+  gam_aff_today_with_metadata$META.BOLISM.LIVER                
+META.Z<-(2*gam_aff_today_with_metadata$META.Z.Gill)                     
+MONO.G<-gam_aff_today_with_metadata$MONO.G.AnalFin                   
+MONO.SASE<-(2*gam_aff_today_with_metadata$MONO.SASE.Gill)                   
+MYX.STWY<-gam_aff_today_with_metadata$MYX.STWY.CONNECTIVETISSUE+
+  as.numeric(gam_aff_today_with_metadata$MYX.STWY.GallBladder)             
+MYX.THIN<-gam_aff_today_with_metadata$MYX.THIN.GILL                   
+MYX.UPC<-gam_aff_today_with_metadata$MYX.UPC.GILL                     
+NEM.ESIS<-gam_aff_today_with_metadata$NEM.ESIS.INTESTINE               
+NEM.LARV<-gam_aff_today_with_metadata$NEM.LARV.CONNECTIVETISSUE+gam_aff_today_with_metadata$NEM.LARV.INTESTINE               
+NEM.OODLE<-gam_aff_today_with_metadata$NEM.OODLE.FLUSH+gam_aff_today_with_metadata$NEM.OODLE.INTESTINE              
+NEM.PRETZ<-gam_aff_today_with_metadata$NEM.PRETZ.FLUSH                 
+NEM.UNK<-gam_aff_today_with_metadata$NEM.UNK.INTESTINE                
+NEM.W<-gam_aff_today_with_metadata$NEM.W.INTESTINE                 
+TREM.GA<-gam_aff_today_with_metadata$TREM.GA.Intestine                
+
+# need to tally this with na.rm
+TREM.POS<-gam_aff_today_with_metadata$TREM.IS.CONNECTIVETISSUE+(2*gam_aff_today_with_metadata$TREM.IS.Eye)+
+  gam_aff_today_with_metadata$TREM.IS.FLUSH+gam_aff_today_with_metadata$TREM.POS.ConnectiveTissue+
+  (2*gam_aff_today_with_metadata$TREM.POS.Eye)+gam_aff_today_with_metadata$TREM.POS.FLUSH+
+  gam_aff_today_with_metadata$TREM.POST.ConnectiveTissue+(2*gam_aff_today_with_metadata$TREM.POST.Eye)+
+  gam_aff_today_with_metadata$TREM.POST.FLUSH+as.numeric(gam_aff_today_with_metadata$TREM.POST.Kidney)                
+
+TREM.SCORP<-(2*gam_aff_today_with_metadata$TREM.SCORP.EYE)                   
+TREM.SHY<-(2*gam_aff_today_with_metadata$TREM.SHY.EYE)                     
+TREM.UNK<-gam_aff_today_with_metadata$TREM.UNK.CONNECTIVETISSUE
+
+
+
+# Now put it all together
+
+gam_aff_processed_data<-cbind.data.frame(gam_aff_today_with_metadata$CatalogNumber,gam_aff_today_with_metadata$YearCollected.x,
+                                         gam_aff_today_with_metadata$MonthCollected.x,gam_aff_today_with_metadata$DayCollected.x,
+                                         gam_aff_today_with_metadata$IndividualFishID,gam_aff_today_with_metadata$Dissector,
+                                         gam_aff_today_with_metadata$DissectionDate,gam_aff_today_with_metadata$Sex,
+                                         gam_aff_today_with_metadata$TotalLength_mm,gam_aff_today_with_metadata$StandardLength_mm,
+                                         gam_aff_today_with_metadata$weight_mg,gam_aff_today_with_metadata$CI.y,
+                                         gam_aff_today_with_metadata$combo,
+                                         gam_aff_today_with_metadata$Latitude.y,
+                                         gam_aff_today_with_metadata$Longitude.y,
+                                         ACANTH.BLVE,ACANTH.NEMOR,CEST.MIPI,CEST.PROT,CEST.TRIGA,CEST.UNK,
+                                         CEST.WOAD,CEST.Y,META.BOLISM,META.Z,MONO.G,MONO.SASE,MYX.STWY,
+                                         MYX.THIN,MYX.UPC,NEM.ESIS,NEM.LARV,NEM.OODLE,NEM.PRETZ,NEM.UNK,
+                                         NEM.W,TREM.GA,TREM.POS,TREM.SCORP,TREM.SHY,TREM.UNK)
+
+# Name the columns
+
+colnames(gam_aff_processed_data)[1]<-"CatalogNumber"
+colnames(gam_aff_processed_data)[2]<-"YearCollected"
+colnames(gam_aff_processed_data)[3]<-"MonthCollected"
+colnames(gam_aff_processed_data)[4]<-"DayCollected"
+colnames(gam_aff_processed_data)[5]<-"IndividualFishID"
+colnames(gam_aff_processed_data)[6]<-"Dissector_and_Examiner"
+colnames(gam_aff_processed_data)[7]<-"DissectionDate"
+colnames(gam_aff_processed_data)[8]<-"Sex"
+colnames(gam_aff_processed_data)[9]<-"TotalLength_mm"
+colnames(gam_aff_processed_data)[10]<-"StandardLength_mm"
+colnames(gam_aff_processed_data)[11]<-"Weight_mg"
+colnames(gam_aff_processed_data)[12]<-"CI"
+colnames(gam_aff_processed_data)[13]<-"combo"
+colnames(gam_aff_processed_data)[14]<-"Latitude"
+colnames(gam_aff_processed_data)[15]<-"Longitude"
+
+View(gam_aff_processed_data)
+
+# A lot of specimens (especially older specimens) are missing their CI/combo/lat/long, probably because these
+# fish were missing from the meta-data sheet to start with. Check for them in iDigBio
+
+stuff<-gam_aff_processed_data %>%
+  filter(is.na(Latitude))
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="30981"]<-30.705
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="30981"]<--89.84611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="30981"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="30981"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31064"]<-30.76222
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31064"]<--89.83111
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31064"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31064"]<-"control_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31238"]<-30.75667
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31238"]<--89.82611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31238"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31238"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31242"]<-30.74
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31242"]<--89.82777
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31242"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31242"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31250"]<-30.705
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31250"]<--89.84611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31250"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31250"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31257"]<-30.76805
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31257"]<--89.83083
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31257"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31257"]<-"control_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31272"]<-30.705
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31272"]<--89.84611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31272"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31272"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="31538"]<-30.75667
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="31538"]<--89.82611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="31538"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="31538"]<-"impact_1954-1963"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="33223"]<-30.76805
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="33223"]<--89.83083
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="33223"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="33223"]<-"control_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="37941"]<-30.76805
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="37941"]<--89.83083
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="37941"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="37941"]<-"control_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="40083"]<-30.70222
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="40083"]<--89.84417
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="40083"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="40083"]<-"impact_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="40393"]<-30.70222
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="40393"]<--89.84417
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="40393"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="40393"]<-"impact_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="40980"]<-30.76805
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="40980"]<--89.83083
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="40980"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="40980"]<-"control_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="42432"]<-30.70222
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="42432"]<--89.84417
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="42432"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="42432"]<-"impact_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="68702"]<-30.77861
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="68702"]<--89.82972
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="68702"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="68702"]<-"control_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="68735"]<-30.705
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="68735"]<--89.84611
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="68735"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="68735"]<-"impact_1964-1973"
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="68757"]<-30.70222
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="68757"]<--89.84417
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="68757"]<-"impact"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="68757"]<-"impact_1964-1973"
+
+stuff<-gam_aff_processed_data %>%
+  filter(is.na(Latitude))
+
+
+# For that last one, it is a data entry error - the CatalogNumber is 145183, not 14583. The date collected
+# is also incorrect.
+
+gam_aff_processed_data$Latitude[gam_aff_processed_data$CatalogNumber=="14583"]<-30.77583
+gam_aff_processed_data$Longitude[gam_aff_processed_data$CatalogNumber=="14583"]<--89.82722
+gam_aff_processed_data$CI[gam_aff_processed_data$CatalogNumber=="14583"]<-"control"
+gam_aff_processed_data$combo[gam_aff_processed_data$CatalogNumber=="14583"]<-"control_1984-1993"
+gam_aff_processed_data$DayCollected[gam_aff_processed_data$CatalogNumber=="14583"]<-24
+gam_aff_processed_data$CatalogNumber[gam_aff_processed_data$CatalogNumber=="14583"]<-145183
+
+stuff<-gam_aff_processed_data %>%
+  filter(CatalogNumber==145183)
+
+
+# Make the dataset analyzable
+
+gam_aff_processed_data_longer<-melt(gam_aff_processed_data,id=c("CatalogNumber", "YearCollected", 
+                                                                "MonthCollected", "DayCollected", 
+                                                                "IndividualFishID", "Dissector_and_Examiner",
+                                                                "DissectionDate", "Sex", 
+                                                                "TotalLength_mm", "StandardLength_mm",
+                                                                "Weight_mg","CI","combo","Latitude","Longitude"))
+
+colnames(gam_aff_processed_data_longer)[16]<-"psite_spp"
+colnames(gam_aff_processed_data_longer)[17]<-"psite_count"
+
+
+# Export both sheets
+
+write.csv(gam_aff_processed_data_longer, file="data/processed/Gambusia_affinis_processed_machine_readable_UPDATED_2024.08.14.csv")
+write.csv(gam_aff_processed_data, file="data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.14.csv")
+
+
+
+
 ### Put all the sheets together----
 
 # Start by scaling fish body size within fish species
@@ -1541,6 +1785,7 @@ not_ath_processed_data_longer$scaled_TL<-scale(not_ath_processed_data_longer$Tot
 hyb_nuc_processed_data_longer$scaled_TL<-scale(hyb_nuc_processed_data_longer$TotalLength_mm)
 per_vig_processed_data_longer$scaled_TL<-scale(per_vig_processed_data_longer$TotalLength_mm)
 car_vel_processed_data_longer$scaled_TL<-scale(car_vel_processed_data_longer$TotalLength_mm)
+gam_aff_processed_data_longer$scaled_TL<-scale(gam_aff_processed_data_longer$TotalLength_mm)
 
 
 # Then make sure that there is a column for the fish species
@@ -1551,10 +1796,12 @@ not_ath_processed_data_longer$Fish_sp<-c(rep("Notropis atherinoides",length(not_
 hyb_nuc_processed_data_longer$Fish_sp<-c(rep("Hybognathus nuchalis",length(hyb_nuc_processed_data_longer$CatalogNumber)))
 per_vig_processed_data_longer$Fish_sp<-c(rep("Percina vigil",length(per_vig_processed_data_longer$CatalogNumber)))
 car_vel_processed_data_longer$Fish_sp<-c(rep("Carpiodes velifer",length(car_vel_processed_data_longer$CatalogNumber)))
+gam_aff_processed_data_longer$Fish_sp<-c(rep("Gambusia affinis",length(gam_aff_processed_data_longer$CatalogNumber)))
 
 full_dataset<-rbind.data.frame(pim_vig_processed_data_longer,ict_pun_processed_data_longer,
                                not_ath_processed_data_longer,hyb_nuc_processed_data_longer,
-                               per_vig_processed_data_longer,car_vel_processed_data_longer)
+                               per_vig_processed_data_longer,car_vel_processed_data_longer,
+                               gam_aff_processed_data_longer)
 
 full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp,sep="_")
 
@@ -1598,7 +1845,7 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.10.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.14.csv")
 
 
 # tallies
