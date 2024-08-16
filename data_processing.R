@@ -1558,7 +1558,8 @@ gam_aff_headers<-as.factor(gam_aff_headers)
 # Add parasites across organs and double what needs to be doubled.
 
 ACANTH.BLVE<-gam_aff_today_with_metadata$ACANTH.BLVE.CONNECTIVETISSUE   
-ACANTH.NEMOR<-gam_aff_today_with_metadata$ACANTH.NEMOR.CONNECTIVETISSUE+gam_aff_today_with_metadata$ACANTH.NEMOR.FLUSH+
+ACANTH.NEMOR<-gam_aff_today_with_metadata$ACANTH.NEMOR.CONNECTIVETISSUE+
+  gam_aff_today_with_metadata$ACANTH.NEMOR.FLUSH+
   as.numeric(gam_aff_today_with_metadata$ACANTH.NEMOR.Liver)               
 CEST.MIPI<-gam_aff_today_with_metadata$CEST.MIPI.Flush+gam_aff_today_with_metadata$CEST.MIPI.INTESTINE              
 
@@ -1596,12 +1597,25 @@ NEM.UNK<-gam_aff_today_with_metadata$NEM.UNK.INTESTINE
 NEM.W<-gam_aff_today_with_metadata$NEM.W.INTESTINE                 
 TREM.GA<-gam_aff_today_with_metadata$TREM.GA.Intestine                
 
-# need to tally this with na.rm
-TREM.POS<-gam_aff_today_with_metadata$TREM.IS.CONNECTIVETISSUE+(2*gam_aff_today_with_metadata$TREM.IS.Eye)+
-  gam_aff_today_with_metadata$TREM.IS.FLUSH+gam_aff_today_with_metadata$TREM.POS.ConnectiveTissue+
-  (2*gam_aff_today_with_metadata$TREM.POS.Eye)+gam_aff_today_with_metadata$TREM.POS.FLUSH+
-  gam_aff_today_with_metadata$TREM.POST.ConnectiveTissue+(2*gam_aff_today_with_metadata$TREM.POST.Eye)+
-  gam_aff_today_with_metadata$TREM.POST.FLUSH+as.numeric(gam_aff_today_with_metadata$TREM.POST.Kidney)                
+### Just check that there were no doubles here - everything tracked in only one column:
+
+### TREM.POS were found in many organs. Sometimes, those were organs that were not found in all fish
+### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
+### we would have seen TREM.POS in those organs, even if the organs themselves were just perceived as part 
+### of the visceral mush inside of fish. Therefore, it wouldn't be appropriate to propagate NAs across the entire
+### TREM.POS count within a fish (across organs). The code below allows the sum of TREM.POS within an individual
+### fish ignore the NAs, and therefore provide a total number of MYX.GO cysts regardless of whether one of the organs
+### was "missing".
+
+gam_aff_today_with_metadata$TREM.IS.Eye.DUB<-2*gam_aff_today_with_metadata$TREM.IS.Eye
+gam_aff_today_with_metadata$TREM.POS.Eye.DUB<-2*gam_aff_today_with_metadata$TREM.POS.Eye
+gam_aff_today_with_metadata$TREM.POST.Eye.DUB<-2*gam_aff_today_with_metadata$TREM.POST.Eye
+gam_aff_today_with_metadata$TREM.POST.Kidney<-as.numeric(gam_aff_today_with_metadata$TREM.POST.Kidney)
+
+TREM.POS<-rowSums(gam_aff_today_with_metadata[,c("TREM.IS.CONNECTIVETISSUE","TREM.IS.Eye.DUB",
+                                         "TREM.IS.FLUSH","TREM.POS.ConnectiveTissue","TREM.POS.FLUSH",
+                                         "TREM.POST.ConnectiveTissue","TREM.POS.Eye.DUB","TREM.POST.Eye.DUB",
+                                         "TREM.POST.FLUSH","TREM.POST.Kidney")], na.rm=TRUE)
 
 TREM.SCORP<-(2*gam_aff_today_with_metadata$TREM.SCORP.EYE)                   
 TREM.SHY<-(2*gam_aff_today_with_metadata$TREM.SHY.EYE)                     
@@ -1643,7 +1657,6 @@ colnames(gam_aff_processed_data)[13]<-"combo"
 colnames(gam_aff_processed_data)[14]<-"Latitude"
 colnames(gam_aff_processed_data)[15]<-"Longitude"
 
-View(gam_aff_processed_data)
 
 # A lot of specimens (especially older specimens) are missing their CI/combo/lat/long, probably because these
 # fish were missing from the meta-data sheet to start with. Check for them in iDigBio
