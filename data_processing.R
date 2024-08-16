@@ -181,15 +181,8 @@ TREM.UNK<-pim_vig_with_metadata$TREM.UNK.CONNECTIVETISSUE+pim_vig_with_metadata$
 pim_vig_with_metadata$Weight_mg<-(10*as.numeric(pim_vig_with_metadata$Weight_mg))
 
 # Evaluate relationship between total length and weight.
-#ggplot(pim_vig_with_metadata,aes(TotalLength_mm,Weight_mg))+
-#  geom_point(size=4)
-
-# Evaluate ratio between total length and weight. Divide length by weight
-#pim_vig_with_metadata$LenWeig <- pim_vig_with_metadata$TotalLength_mm/pim_vig_with_metadata$Weight_mg
-
-# According to the following histogram the ratio between length and weight is somewhere between 0-0.30
-#hist(pim_vig_with_metadata$LenWeig)
-
+# ggplot(pim_vig_with_metadata,aes(TotalLength_mm,Weight_mg))+
+#geom_point(size=4)
 
 # Now put it all together
 
@@ -498,12 +491,6 @@ ict_pun_with_metadata$weight_mg<-(10*as.numeric(ict_pun_with_metadata$weight_mg)
 
 #Revise relationship between fish size and weight
 #ggplot(ict_pun_with_metadata,aes(TotalLength_mm,weight_mg))+geom_point(size=4)
-
-# Evaluate ratio between total length and weight. Divide length by weight
-#ict_pun_with_metadata$LenWeig <- ict_pun_with_metadata$TotalLength_mm/ict_pun_with_metadata$weight_mg
-
-# According to the following histogram the ratio between length and weight is somewhere between 0-0.015
-#hist(ict_pun_with_metadata$LenWeig)
 
 # Now put it all together
 
@@ -824,11 +811,12 @@ not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,  
 ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 
-# Now that you are done using the lenwei variable, take it out, so that the not_ath dataset can be 
+# Now that you are done using the lenweig variable, take it out, so that the not_ath dataset can be 
 # sensibly concatenated with the other datasets
 
 not_ath_processed_data<-subset(not_ath_processed_data,select=-c(LenWeig))
 
+View(not_ath_processed_data)
 
 # Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
 # Replace weird weights with NAs.
@@ -1048,35 +1036,6 @@ colnames(hyb_nuc_processed_data)[12]<-"CI"
 colnames(hyb_nuc_processed_data)[13]<-"combo"
 colnames(hyb_nuc_processed_data)[14]<-"Latitude"
 colnames(hyb_nuc_processed_data)[15]<-"Longitude"
-
-
-
-#Remove #VALUE! entries from Weight_mg with "NA"
-#not_ath_processed_data <- not_ath_processed_data %>%
-#  mutate(Weight_mg = recode(Weight_mg,
-#                            "#VALUE!" = "NA"))
-
-#Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
-# ggplot(hyb_nuc_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
-
-# Evaluate ratio between total length and weight to inform decision about which numbers must be multiplied by ten. For this, divide length by weight
-# not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
-
-
-# All incorrect weights that must be multiplied by 10 have a ratio below 3 which does not make sense. See the data below to confirm. The weights have a decimal point which should not be the case.
-# lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
-# View(lenweighb)
-
-# Therefore, multiply all weights with LenWeig higher than 3 by 10
-
-#not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
-#                                           as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
-#                                           as.numeric(not_ath_processed_data$Weight_mg)       # what if condition is FALSE
-#)
-
-
-#Re-evaluate relationship between TotalLength_mm and Weight_mg. Now it is fixed.
-#ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 
 # It looks like meta-data are missing for some of the fish.
