@@ -1563,9 +1563,6 @@ ACANTH.NEMOR<-gam_aff_today_with_metadata$ACANTH.NEMOR.CONNECTIVETISSUE+
   as.numeric(gam_aff_today_with_metadata$ACANTH.NEMOR.Liver)               
 CEST.MIPI<-gam_aff_today_with_metadata$CEST.MIPI.Flush+gam_aff_today_with_metadata$CEST.MIPI.INTESTINE              
 
-# not in ID guide:
-CEST.PROT<-gam_aff_today_with_metadata$CEST.PROT.Flush+gam_aff_today_with_metadata$CEST.PROT.Intestine              
-
 CEST.TRIGA<-gam_aff_today_with_metadata$CEST.TIRGA.INTESTINE             
 CEST.UNK<-gam_aff_today_with_metadata$CEST.UNK.FLUSH+gam_aff_today_with_metadata$CEST.UNK.INTESTINE               
 CEST.WOAD<-gam_aff_today_with_metadata$CEST.WOAD.Intestine             
@@ -1598,6 +1595,9 @@ NEM.W<-gam_aff_today_with_metadata$NEM.W.INTESTINE
 TREM.GA<-gam_aff_today_with_metadata$TREM.GA.Intestine                
 
 ### Just check that there were no doubles here - everything tracked in only one column:
+
+# not in ID guide:
+CEST.PROT<-gam_aff_today_with_metadata$CEST.PROT.Flush+gam_aff_today_with_metadata$CEST.PROT.Intestine              
 
 ### TREM.POS were found in many organs. Sometimes, those were organs that were not found in all fish
 ### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
