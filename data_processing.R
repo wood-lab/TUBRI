@@ -1749,6 +1749,7 @@ write.csv(gam_aff_processed_data, file="data/processed/Gambusia_affinis_processe
 
 ### Put all the sheets together----
 
+
 # Start by scaling fish body size within fish species
 
 pim_vig_processed_data_longer$scaled_TL<-scale(pim_vig_processed_data_longer$TotalLength_mm)
@@ -1826,3 +1827,31 @@ length(unique(full_dataset_with_LH$IndividualFishID))
 sum(full_dataset_with_LH$psite_count,na.rm=T)
 min(full_dataset_with_LH$YearCollected)
 max(full_dataset_with_LH$YearCollected)
+
+
+###Double check weights and lengths. For Daki, to be deleted later.
+
+Full_data <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.14.csv")
+
+#Check condition index as indicator of "correct weights and lengths"
+Full_data$Fulton <- (as.numeric(Full_data$Weight_mg) / as.numeric(Full_data$StandardLength_mm) ^ 3) * 100 
+
+ggplot(Full_data,aes(Fish_sp.x,Fulton))+geom_point(size=4)
+
+
+#Re-evaluate relationship between TotalLength_mm and Weight_mg
+
+ggplot(Full_data,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) + facet_wrap("Fish_sp.x")
+
+#Re-evaluate relationship between TotalLength_mm and Weight_mg
+ggplot(pim_vig_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #fine
+ggplot(ict_pun_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #fine
+ggplot(not_ath_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #fine
+ggplot(hyb_nuc_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #not fine
+ggplot(per_vig_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #not fine
+ggplot(car_vel_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #fine
+ggplot(gam_aff_processed_data_longer,aes(StandardLength_mm,Weight_mg))+geom_point(size=4) #not fine
+
+
+
+
