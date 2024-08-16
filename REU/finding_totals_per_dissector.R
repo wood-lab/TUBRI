@@ -64,6 +64,12 @@ carvel <- read_csv("data/processed/Carpiodes_velifer_processed_human_readable_UP
   ) %>%
   janitor::clean_names()
 
+gamaff <- read_csv("data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.14.csv") %>%
+  mutate(
+    combined_dissector = coalesce(!!!select(., starts_with("dissector")))
+  ) %>%
+  janitor::clean_names()
+
 
 # Define the initials and their corresponding names
 initials <- c("CJW", "GMC", "DMDM", "KL", "CLW", "JT", "IJ", "SC", "DJB")
@@ -125,6 +131,13 @@ carvel <- carvel %>%
   ) %>%
   janitor::clean_names()
 
+gamaff <- gamaff %>%
+  mutate(
+    extracted_initials = sapply(combined_dissector, extract_initials),
+    person = names_map[extracted_initials]
+  ) %>%
+  janitor::clean_names()
+
 ## define and modulate expected columns
 
 expected_columns <- c(
@@ -160,7 +173,12 @@ expected_columns <- c(
   "myx_s", "myx_f", "myx_e", "myx_g", "myx_cm",
   "myx_bna", "myx_kl", "myx_gm", "acanth_cya",
   "acanth_thin", "trem_sk", "trem_chonk", "trem_endous",
-  "trem_cl", "trem_ispot"
+  "trem_cl", "trem_ispot", "acanth_nemor", "acanth_blve", "cest_woad", 
+  "cest_y", "cest_mipi", "cest_triga", "cest_unk", "nem_oodle", "nem_w",
+  "nem_pretz", "nem_larv", "nem_esis", "nem_unk", "trem_ga", "trem_pos", 
+  "trem_post", "meta_bolism", "trem_shy", "trem_is", "trem_scorp", 
+  "meta_z", "mono_sase", "mono_g", "myx_stwy", "myx_thin", "myx_upc", 
+  "cyst_fin", "cyst_big"
 )
 
 ## filter to include only existing columns per dataset
@@ -176,6 +194,8 @@ existing_columns_hybnuc <- intersect(expected_columns, colnames(hybnuc))
 existing_columns_pervig <- intersect(expected_columns, colnames(pervig))
 
 existing_columns_carvel <- intersect(expected_columns, colnames(carvel))
+
+existing_columns_gamaff <- intersect(expected_columns, colnames(gamaff))
 
 
 ## select each dataset to group by the dissector
@@ -222,6 +242,13 @@ tc_carvel <- carvel %>%
   summarize(total_count = sum(count, na.rm = TRUE), .groups = 'drop') %>%
   pivot_wider(names_from = "parasite_type", values_from = "total_count", values_fill = list(total_count = 0))
 
+tc_gamaff <- gamaff %>%
+  select(person, all_of(existing_columns_gamaff)) %>%
+  pivot_longer(cols = all_of(existing_columns_gamaff), names_to = "parasite_type", values_to = "count") %>%
+  group_by(person, parasite_type) %>%
+  summarize(total_count = sum(count, na.rm = TRUE), .groups = 'drop') %>%
+  pivot_wider(names_from = "parasite_type", values_from = "total_count", values_fill = list(total_count = 0))
+
 ## view the tables individually
 
 #view(tc_pimvig) 
@@ -239,6 +266,7 @@ combined_data <- tc_pimvig %>%
   full_join(tc_hybnuc, by = "person") %>%
   full_join(tc_pervig, by = "person") %>%
   full_join(tc_carvel, by = "person") %>%
+  full_join(tc_gamaff, by = "person") %>%
   janitor::clean_names()
 
 
@@ -287,6 +315,10 @@ carvel <- read.csv("~/Desktop/UW/TUBRI/data/processed/Carpiodes_velifer_processe
   janitor::clean_names() %>%
   mutate(species = 'carvel')
 
+gamaff <- read_csv("data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.14.csv") %>%
+  janitor::clean_names() %>%
+  mutate(species = 'gamaff')
+
 # Combine the datasets using full_join
 # Join datasets
 combined_data <- pimvig %>%
@@ -295,6 +327,7 @@ combined_data <- pimvig %>%
   full_join(hybnuc, by = "individual_fish_id") %>%
   full_join(pervig, by = "individual_fish_id") %>%
   full_join(carvel, by = "individual_fish_id") %>%
+  full_join(gamaff, by = "individual_fish_id") %>%
   janitor::clean_names()
 
 # Coalesce dissector columns
