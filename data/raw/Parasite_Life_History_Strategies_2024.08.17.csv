@@ -62,7 +62,7 @@ TREM.META.GG,Ictalurus punctatus,Complex,Trematoda,,,
 MYX.TAIL,Ictalurus punctatus,Complex,Myxozoa,Henneguya ,sp.,Henneguya  sp.
 TREM.META.UNK,Ictalurus punctatus,Complex,Trematoda,,, 
 TREM.LG,Ictalurus punctatus,Complex,Trematoda,,, 
-TREM.PHYLS,Ictalurus punctatus,Complex,Trematoda,Phyllodistomum,sp.,Phyllodistomum sp.
+TREM.PHYLS,Ictalurus punctatus,Complex,Trematoda,Phyllodistomum,spp.,Phyllodistomum spp.
 TREM.LIP,Ictalurus punctatus,Complex,Trematoda,Polylekithum ,sp.,Polylekithum  sp.
 TREM.MEGICT,Ictalurus punctatus,Complex,Trematoda,Megalogonia,ictaluri,Megalogonia ictaluri
 TREM.SMILE,Ictalurus punctatus,Complex,Trematoda,,, 
@@ -130,7 +130,7 @@ TREM.CHONK,Percina vigil,Complex,Trematoda,,,
 TREM.CL,Percina vigil,Complex,Trematoda,,, 
 TREM.ENDOUS,Percina vigil,Complex,Trematoda,,, 
 TREM.ISPOT,Percina vigil,Complex,Trematoda,,, 
-TREM.PHLB,Percina vigil,Complex,Trematoda,,, 
+TREM.PHLB,Percina vigil,Complex,Trematoda,Phyllodistomum,spp.,Phyllodistomum spp.
 TREM.SK,Percina vigil,Complex,Trematoda,,, 
 CEST.UNK,Carpiodes velifer,Complex,Cestoda,,, 
 CEST.WS,Carpiodes velifer,Complex,Cestoda,,, 
