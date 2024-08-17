@@ -1827,9 +1827,6 @@ full_dataset_with_LH$before_after
 
 full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
 
-#Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
-ggplot(full_dataset_with_LH,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)+facet_wrap("Fish_sp.x")
-
 
 # Export the sheet
 
