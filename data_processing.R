@@ -1521,7 +1521,6 @@ ACANTH.NEMOR<-gam_aff_today_with_metadata$ACANTH.NEMOR.CONNECTIVETISSUE+
   gam_aff_today_with_metadata$ACANTH.NEMOR.FLUSH+
   as.numeric(gam_aff_today_with_metadata$ACANTH.NEMOR.Liver)               
 CEST.MIPI<-gam_aff_today_with_metadata$CEST.MIPI.Flush+gam_aff_today_with_metadata$CEST.MIPI.INTESTINE              
-
 CEST.TRIGA<-gam_aff_today_with_metadata$CEST.TIRGA.INTESTINE             
 CEST.UNK<-gam_aff_today_with_metadata$CEST.UNK.FLUSH+gam_aff_today_with_metadata$CEST.UNK.INTESTINE               
 CEST.WOAD<-gam_aff_today_with_metadata$CEST.WOAD.Intestine             
@@ -1553,11 +1552,6 @@ NEM.UNK<-gam_aff_today_with_metadata$NEM.UNK.INTESTINE
 NEM.W<-gam_aff_today_with_metadata$NEM.W.INTESTINE                 
 TREM.GA<-gam_aff_today_with_metadata$TREM.GA.Intestine                
 
-### Just check that there were no doubles here - everything tracked in only one column:
-
-# not in ID guide:
-CEST.PROT<-gam_aff_today_with_metadata$CEST.PROT.Flush+gam_aff_today_with_metadata$CEST.PROT.Intestine              
-
 ### TREM.POS were found in many organs. Sometimes, those were organs that were not found in all fish
 ### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
 ### we would have seen TREM.POS in those organs, even if the organs themselves were just perceived as part 
@@ -1574,7 +1568,8 @@ gam_aff_today_with_metadata$TREM.POST.Kidney<-as.numeric(gam_aff_today_with_meta
 TREM.POS<-rowSums(gam_aff_today_with_metadata[,c("TREM.IS.CONNECTIVETISSUE","TREM.IS.Eye.DUB",
                                          "TREM.IS.FLUSH","TREM.POS.ConnectiveTissue","TREM.POS.FLUSH",
                                          "TREM.POST.ConnectiveTissue","TREM.POS.Eye.DUB","TREM.POST.Eye.DUB",
-                                         "TREM.POST.FLUSH","TREM.POST.Kidney")], na.rm=TRUE)
+                                         "TREM.POST.FLUSH","TREM.POST.Kidney","CEST.PROT.Flush",
+                                         "CEST.PROT.Intestine")], na.rm=TRUE)
 
 TREM.SCORP<-(2*gam_aff_today_with_metadata$TREM.SCORP.EYE)                   
 TREM.SHY<-(2*gam_aff_today_with_metadata$TREM.SHY.EYE)                     
@@ -1593,7 +1588,7 @@ gam_aff_processed_data<-cbind.data.frame(gam_aff_today_with_metadata$CatalogNumb
                                          gam_aff_today_with_metadata$combo,
                                          gam_aff_today_with_metadata$Latitude.y,
                                          gam_aff_today_with_metadata$Longitude.y,
-                                         ACANTH.BLVE,ACANTH.NEMOR,CEST.MIPI,CEST.PROT,CEST.TRIGA,CEST.UNK,
+                                         ACANTH.BLVE,ACANTH.NEMOR,CEST.MIPI,CEST.TRIGA,CEST.UNK,
                                          CEST.WOAD,CEST.Y,META.BOLISM,META.Z,MONO.G,MONO.SASE,MYX.STWY,
                                          MYX.THIN,MYX.UPC,NEM.ESIS,NEM.LARV,NEM.OODLE,NEM.PRETZ,NEM.UNK,
                                          NEM.W,TREM.GA,TREM.POS,TREM.SCORP,TREM.SHY,TREM.UNK)
@@ -1741,8 +1736,8 @@ colnames(gam_aff_processed_data_longer)[17]<-"psite_count"
 
 # Export both sheets
 
-write.csv(gam_aff_processed_data_longer, file="data/processed/Gambusia_affinis_processed_machine_readable_UPDATED_2024.08.14.csv")
-write.csv(gam_aff_processed_data, file="data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.14.csv")
+write.csv(gam_aff_processed_data_longer, file="data/processed/Gambusia_affinis_processed_machine_readable_UPDATED_2024.08.17.csv")
+write.csv(gam_aff_processed_data, file="data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.17.csv")
 
 
 
@@ -1779,7 +1774,7 @@ full_dataset$fish_psite_combo<-paste(full_dataset$Fish_sp,full_dataset$psite_spp
 
 levels(as.factor(full_dataset$fish_psite_combo))
 
-life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.08.06.csv",header=T,sep=",")
+life_histories<-read.csv("data/raw/Parasite_Life_History_Strategies_2024.08.17.csv",header=T,sep=",")
 life_histories$fish_psite_combo<-paste(life_histories$Fish_sp,life_histories$psite_spp,sep="_")
 
 
@@ -1817,12 +1812,13 @@ full_dataset_with_LH$before_after
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.14.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.17.csv")
 
 
 # tallies
 
 length(unique(full_dataset_with_LH$IndividualFishID))
+length(unique(full_dataset_with_LH$psite_spp.x))
 sum(full_dataset_with_LH$psite_count,na.rm=T)
 min(full_dataset_with_LH$YearCollected)
 max(full_dataset_with_LH$YearCollected)
