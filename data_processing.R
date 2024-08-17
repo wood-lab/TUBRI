@@ -288,13 +288,17 @@ pim_vig_processed_data_longer<-melt(pim_vig_processed_data,id=c("CatalogNumber",
 colnames(pim_vig_processed_data_longer)[16]<-"psite_spp"
 colnames(pim_vig_processed_data_longer)[17]<-"psite_count"
 
+# Fix data type for weight. Otherwise, it is read as a character and weight is plotted wrong.
+
+pim_vig_processed_data_longer$Weight_mg <- as.numeric(pim_vig_processed_data_longer$Weight_mg)
+
 
 # Export both sheets
 
 write.csv(pim_vig_processed_data_longer, 
-          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.08.csv")
+          file="data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.16.csv")
 write.csv(pim_vig_processed_data, 
-          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.08.csv")
+          file="data/processed/Pimephales_vigilax_processed_human_readable_UPDATED_2024.08.16.csv")
 
 
 
@@ -630,13 +634,16 @@ ict_pun_processed_data_longer<-melt(ict_pun_processed_data,id=c("CatalogNumber",
 colnames(ict_pun_processed_data_longer)[16]<-"psite_spp"
 colnames(ict_pun_processed_data_longer)[17]<-"psite_count"
 
+# Fix data type for weight. Otherwise, it is read as a character and weight is plotted wrong.
+
+ict_pun_processed_data_longer$Weight_mg <- as.numeric(ict_pun_processed_data_longer$Weight_mg)
 
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, 
-          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.08.csv")
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.16.csv")
 write.csv(ict_pun_processed_data, 
-          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.08.csv")
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.16.csv")
 
 
 
@@ -794,12 +801,7 @@ ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 # Evaluate ratio between total length and weight to inform decision about which numbers must be multiplied by ten. For this, divide length by weight
 not_ath_processed_data$LenWeig <- as.numeric(not_ath_processed_data$Weight_mg)/not_ath_processed_data$TotalLength_mm
 
-
-# All incorrect weights that must be multiplied by 10 have a ratio below 3 which does not make sense. See the data below to confirm. The weights have a decimal point which should not be the case.
-lenweighb <- subset(not_ath_processed_data, LenWeig<3) 
-View(lenweighb)
-
-# Therefore, multiply all weights with LenWeig higher than 3 by 10
+# Multiply all weights with LenWeig higher than 3 by 10
 
 not_ath_processed_data$Weight_mg <- ifelse(not_ath_processed_data$LenWeig < 3,                # condition
                                                        as.numeric(not_ath_processed_data$Weight_mg)*10,    # what if condition is TRUE
@@ -816,7 +818,6 @@ ggplot(not_ath_processed_data,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)
 
 not_ath_processed_data<-subset(not_ath_processed_data,select=-c(LenWeig))
 
-View(not_ath_processed_data)
 
 # Some of the weights are screwy. Connor and Jolee discovered this during their exploration of fish body size.
 # Replace weird weights with NAs.
@@ -866,10 +867,13 @@ not_ath_processed_data_longer<-melt(not_ath_processed_data,id=c("CatalogNumber",
 colnames(not_ath_processed_data_longer)[16]<-"psite_spp"
 colnames(not_ath_processed_data_longer)[17]<-"psite_count"
 
+# Fix variable type so that weight is read as numeric and not as a character
+not_ath_processed_data_longer$Weight_mg <- as.numeric(not_ath_processed_data_longer$Weight_mg)
+
 # Export both sheets
 
-write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.10.csv")
-write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.10.csv")
+write.csv(not_ath_processed_data_longer, file="data/processed/Notropis_atherinoides_processed_machine_readable_UPDATED_2024.08.16.csv")
+write.csv(not_ath_processed_data, file="data/processed/Notropis_atherinoides_processed_human_readable_UPDATED_2024.08.16.csv")
 
 
 
@@ -1123,6 +1127,8 @@ hyb_nuc_processed_data_longer<-melt(hyb_nuc_processed_data,id=c("CatalogNumber",
 colnames(hyb_nuc_processed_data_longer)[16]<-"psite_spp"
 colnames(hyb_nuc_processed_data_longer)[17]<-"psite_count"
 
+# Fix variable type so that weight is read as numeric and not as a character
+hyb_nuc_processed_data_longer$Weight_mg <- as.numeric(hyb_nuc_processed_data_longer$Weight_mg)
 
 # Export both sheets
 
@@ -1269,6 +1275,8 @@ per_vig_processed_data_longer<-melt(per_vig_processed_data,id=c("CatalogNumber",
 colnames(per_vig_processed_data_longer)[16]<-"psite_spp"
 colnames(per_vig_processed_data_longer)[17]<-"psite_count"
 
+# Fix variable type so that weight is read as numeric and not as a character
+per_vig_processed_data_longer$Weight_mg <- as.numeric(per_vig_processed_data_longer$Weight_mg)
 
 # Export both sheets
 
@@ -1481,11 +1489,13 @@ car_vel_processed_data_longer<-melt(car_vel_processed_data,id=c("CatalogNumber",
 colnames(car_vel_processed_data_longer)[16]<-"psite_spp"
 colnames(car_vel_processed_data_longer)[17]<-"psite_count"
 
+# Fix variable type so that weight is read as numeric and not as a character
+car_vel_processed_data_longer$Weight_mg <- as.numeric(car_vel_processed_data_longer$Weight_mg)
 
 # Export both sheets
 
-write.csv(car_vel_processed_data_longer, file="data/processed/Carpiodes_velifer_processed_machine_readable_UPDATED_2024.08.08.csv")
-write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.08.csv")
+write.csv(car_vel_processed_data_longer, file="data/processed/Carpiodes_velifer_processed_machine_readable_UPDATED_2024.08.16.csv")
+write.csv(car_vel_processed_data, file="data/processed/Carpiodes_velifer_processed_human_readable_UPDATED_2024.08.16.csv")
 
 
 
@@ -1733,6 +1743,9 @@ gam_aff_processed_data_longer<-melt(gam_aff_processed_data,id=c("CatalogNumber",
 colnames(gam_aff_processed_data_longer)[16]<-"psite_spp"
 colnames(gam_aff_processed_data_longer)[17]<-"psite_count"
 
+# Fix variable type so that weight is read as numeric and not as a character
+gam_aff_processed_data_longer$Weight_mg <- as.numeric(gam_aff_processed_data_longer$Weight_mg)
+
 
 # Export both sheets
 
@@ -1743,6 +1756,7 @@ write.csv(gam_aff_processed_data, file="data/processed/Gambusia_affinis_processe
 
 
 ### Put all the sheets together----
+
 
 # Start by scaling fish body size within fish species
 
@@ -1809,10 +1823,21 @@ for(i in 1:length(full_dataset_with_LH$fish_psite_combo)) {
 full_dataset_with_LH$before_after     
               
 
+# Fix data type for weight. Otherwise, it is read as a character and weight is plotted wrong.
+
+full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
+
+#Evaluate relationship between TotalLength_mm and Weight_mg. There is evidently a mistake. Some values must be multiplied by 10.
+ggplot(full_dataset_with_LH,aes(TotalLength_mm,Weight_mg))+geom_point(size=4)+facet_wrap("Fish_sp.x")
+
 
 # Export the sheet
 
+<<<<<<< HEAD
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.17.csv")
+=======
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.16.csv")
+>>>>>>> 768469bdbfa22c41f9d77007d82fadf38d13783f
 
 
 # tallies
