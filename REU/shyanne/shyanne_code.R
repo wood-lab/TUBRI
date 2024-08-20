@@ -49,7 +49,7 @@ summary(lm(pim_vig_data$MONO.IP~pim_vig_data$Latitude))
 
 ### PRELIMINARY ANALYSIS - CHELSEA, 26 JULY 2024
 
-full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.06.csv", header = T, sep = ",")
+full_data<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.08.csv", header = T, sep = ",")
 
 colnames(full_data)[20]<-"scaled_TL_mm"
 
@@ -83,8 +83,6 @@ model_1<-glmer.nb(psite_count~CI*Life_History+(1|Fish_sp.x/psite_spp.x)+
                     offset(log(scaled_TL_mm)),data=trimmed_data,family="nbinom")
 
 summary(model_1)
-
-levels(as.factor(trimmed_data$Fish_sp.x))
 
 
 # At some point, you should probably control for season

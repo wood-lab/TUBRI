@@ -103,7 +103,6 @@ summary(lm(hybograw$StandardLength_mm~hybograw$YearCollected))
 
 #######################################################SIZE DATA FROM FULLY RESELECTED FISHES
 
-install.packages("googlesheets4")
 desmond_data <- read_sheet("https://docs.google.com/spreadsheets/d/1Ix7ZkoTA7AZDOnA3Rqmxt8cB9hPGSwEiwbmCek9uUOQ/edit?gid=0#gid=0") #paste the URL of the google sheet, then follow the prompts
 gs4_auth(scopes="spreadsheets.readonly") #says that people with access to this code can only read the spreadsheet! follow prompts and ALLOW tidyverse to see your spreadsheets
 
@@ -236,3 +235,17 @@ hybog_w2SL_only <- ggplot(hybog_desmond, aes(Year,weight_to_sl))+
   theme_minimal()+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 hybog_w2SL_only
+
+#Possible weight/SL~Year Summaries
+ict_model1 <- lmerTest::lmer((Weight/SL)~Year + (1|Cat_Num), data= ict_desmond)
+summary(ict_model1)
+
+notrop_model1 <- lmerTest::lmer((Weight/SL)~Year + (1|Cat_Num), data= notrop_desmond)
+summary(notrop_model1)
+
+hybog_model1 <- lmerTest::lmer((Weight/SL)~Year + (1|Cat_Num), data= hybog_desmond)
+summary(hybog_model1)
+
+install.packages("usethis")
+library(usethis)
+use_git_config(user.name= "Fisherguy18", user.email="djboyd@email.sc.edu")

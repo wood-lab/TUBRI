@@ -393,6 +393,7 @@ gam_aff_matrix<-gam_aff_selected %>%
 
 plot(jitter(gam_aff_selected$Latitude,5)~gam_aff_selected$YearCollected)+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
 
+write.csv(gam_aff_matrix,file="lot_selection/desired_replication/gam_aff_goal.csv")
 
 #HYB_NUC
 hyb_nuc<-lots_MS_lower %>%

@@ -1,0 +1,182 @@
+psite_spp,Fish_sp,Life_History,Parasite_taxonomic_group,Parasite_genus,Parasite_epithet,Parasite_species
+ACANTH.BIGB,Pimephales vigilax,Complex,Acanthocephala,,, 
+ACANTH.BKR,Pimephales vigilax,Complex,Acanthocephala,,, 
+CEST.COMP,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.GODZ,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.L,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.NTG,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.PEA,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.UNK,Pimephales vigilax,Complex,Cestoda,,, 
+CEST.VIT,Pimephales vigilax,Complex,Cestoda,,, 
+COPE.CL,Pimephales vigilax,Direct,Copepoda,,, 
+COPE.GRAB,Pimephales vigilax,Direct,Copepoda,,, 
+META.HS,Pimephales vigilax,Complex,Trematoda,,, 
+META.UNK,Pimephales vigilax,Complex,Trematoda,,, 
+MONO.DACT,Pimephales vigilax,Direct,Monogenea,Dactylogyrus ,spp.,Dactylogyrus  spp.
+MONO.GYRO,Pimephales vigilax,Direct,Monogenea,Gyrodactylus ,spp.,Gyrodactylus  spp.
+MONO.LG,Pimephales vigilax,Direct,Monogenea,Gyrodactylus ,spp.,Gyrodactylus  spp.
+MYX.GEOM,Pimephales vigilax,Complex,Myxozoa,,, 
+MYX.GO,Pimephales vigilax,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.THEL,Pimephales vigilax,Complex,Myxozoa,Thelohanellus,notatus,Thelohanellus notatus
+MYXO.BC,Pimephales vigilax,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYXO.SBAD,Pimephales vigilax,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYXO.UNK,Pimephales vigilax,Complex,Myxozoa,,, 
+MYXO.UP,Pimephales vigilax,Complex,Myxozoa,,, 
+NEM.CAP,Pimephales vigilax,NA,Nematoda,Capillaria ,sp.,Capillaria  sp.
+NEM.CONA,Pimephales vigilax,NA,Nematoda,,, 
+NEM.DICH,Pimephales vigilax,NA,Nematoda,,, 
+NEM.CYST,Pimephales vigilax,Complex,Nematoda,,, 
+NEM.LARV,Pimephales vigilax,Complex,Nematoda,,, 
+NEM.TRBK,Pimephales vigilax,NA,Nematoda,,, 
+NEM.UNK,Pimephales vigilax,NA,Nematoda,,, 
+TREM.BUC,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.MET,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.METAF,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.METAGS,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.MS,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.NEA,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.RNDA,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.SSS,Pimephales vigilax,Complex,Trematoda,,, 
+TREM.UNK,Pimephales vigilax,Complex,Trematoda,,, 
+ACAN.OSTR,Ictalurus punctatus,Complex,Acanthocephala,,, 
+CEST.COMP,Ictalurus punctatus,Complex,Cestoda,,, 
+CEST.MEG,Ictalurus punctatus,Complex,Cestoda,Megathylacoides ,sp.,Megathylacoides  sp.
+LEECH.KUT,Ictalurus punctatus,NA,Hirudinea,,, 
+MONO.IP,Ictalurus punctatus,Direct,Monogenea,Ligictaluridus ,pricei,Ligictaluridus  pricei
+MONO.UNK,Ictalurus punctatus,Direct,Monogenea,,, 
+MYX.GEOM,Ictalurus punctatus,Complex,Myxozoa,,, 
+NEM.CYST,Ictalurus punctatus,Complex,Nematoda,,, 
+NEM.NMTS,Ictalurus punctatus,NA,Nematoda,,, 
+NEM.PHAR,Ictalurus punctatus,Complex,Nematoda,Rhabdochona ,sp.,Rhabdochona  sp.
+NEM.PTY,Ictalurus punctatus,NA,Nematoda,,, 
+NEM.SP,Ictalurus punctatus,Complex,Nematoda,Spinitectus ,spp.,Spinitectus  spp.
+NEM.TAF,Ictalurus punctatus,NA,Nematoda,,, 
+NEM.UNK,Ictalurus punctatus,NA,Nematoda,,, 
+NMORPH,Ictalurus punctatus,NA,Nematomorpha,,, 
+TREM.2,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.ALLO,Ictalurus punctatus,Complex,Trematoda,Alloglossidium ,spp.,Alloglossidium  spp.
+TREM.BLE,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.CREP,Ictalurus punctatus,Complex,Trematoda,Crepidostomum ,sp.,Crepidostomum  sp.
+TREM.F,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.META.GG,Ictalurus punctatus,Complex,Trematoda,,, 
+MYX.TAIL,Ictalurus punctatus,Complex,Myxozoa,Henneguya ,sp.,Henneguya  sp.
+TREM.META.UNK,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.LG,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.PHYLS,Ictalurus punctatus,Complex,Trematoda,Phyllodistomum,spp.,Phyllodistomum spp.
+TREM.LIP,Ictalurus punctatus,Complex,Trematoda,Polylekithum ,sp.,Polylekithum  sp.
+TREM.MEGICT,Ictalurus punctatus,Complex,Trematoda,Megalogonia,ictaluri,Megalogonia ictaluri
+TREM.SMILE,Ictalurus punctatus,Complex,Trematoda,,, 
+TREM.UNK,Ictalurus punctatus,Complex,Trematoda,,, 
+CEST.COMP,Notropis atherinoides,Complex,Cestoda,Diphyllobothrium ,sp.,Diphyllobothrium  sp.
+CEST.HYD,Notropis atherinoides,Complex,Cestoda,Proteocephalus ,sp.,Proteocephalus  sp.
+CEST.LVS,Notropis atherinoides,Complex,Cestoda,Bothriocephalus ,sp.,Bothriocephalus  sp.
+CEST.TRI,Notropis atherinoides,Complex,Cestoda,,, 
+COPE.A,Notropis atherinoides,Direct,Copepoda,,, 
+MONO.ALL,Notropis atherinoides,Direct,Monogenea,Dactylogyrus ,spp.,Dactylogyrus  spp.
+MONO.UNK,Notropis atherinoides,Direct,Monogenea,,, 
+MYX.ROUND,Notropis atherinoides,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.SP,Notropis atherinoides,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+NEM.BRAN,Notropis atherinoides,NA,Nematoda,,, 
+NEM.CAP,Notropis atherinoides,Complex,Nematoda,Capillaria ,sp.,Capillaria  sp.
+NEM.CYST,Notropis atherinoides,NA,Nematoda,,, 
+NEM.SPKY,Notropis atherinoides,NA,Nematoda,,, 
+NEM.TFS,Notropis atherinoides,Complex,Nematoda,Dichelyne ,sp.,Dichelyne  sp.
+NEM.TWAS,Notropis atherinoides,NA,Nematoda,,, 
+NEM.UNKN,Notropis atherinoides,NA,Nematoda,,, 
+TREM.CYST,Notropis atherinoides,Complex,Trematoda,,, 
+TREM.GB,Notropis atherinoides,Complex,Trematoda,,, 
+TREM.L,Notropis atherinoides,Complex,Trematoda,,, 
+TREM.LARV,Notropis atherinoides,Complex,Trematoda,,, 
+TREM.META,Notropis atherinoides,Complex,Trematoda,,, 
+ACAN.AD,Hybognathus nuchalis,Complex,Acanthocephala,,, 
+CEST.BB,Hybognathus nuchalis,Complex,Cestoda,,, 
+CEST.UNK,Hybognathus nuchalis,Complex,Cestoda,,, 
+COPE.POOD,Hybognathus nuchalis,Direct,Copepoda,,, 
+META.UNK,Hybognathus nuchalis,Complex,Trematoda,,, 
+MONO.DACT,Hybognathus nuchalis,Direct,Monogenea,Dactylogyrus,spp.,Dactylogyrus spp.
+MONO.GDAC,Hybognathus nuchalis,Direct,Monogenea,Gyrodactylus ,spp.,Gyrodactylus  spp.
+MYX.AK,Hybognathus nuchalis,Complex,Myxozoa,Myxidium ,spp.,Myxidium  spp.
+MYX.EYE,Hybognathus nuchalis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.FI,Hybognathus nuchalis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.GC,Hybognathus nuchalis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.GL,Hybognathus nuchalis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.OT,Hybognathus nuchalis,Complex,Myxozoa,Unicauda ,sp.,Unicauda  sp.
+MYX.TIN,Hybognathus nuchalis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+NEM.BUD,Hybognathus nuchalis,NA,Nematoda,,, 
+NEM.DAFT,Hybognathus nuchalis,NA,Nematoda,,, 
+NEM.UNK,Hybognathus nuchalis,NA,Nematoda,,, 
+TREM.ASS,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.BC,Hybognathus nuchalis,Complex,Trematoda,Neascus,sp. ,Neascus sp. 
+TREM.CM,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.DIPLO,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META.ES,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META.GO,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META.HET,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META.SP,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.META.UNK,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.NS,Hybognathus nuchalis,Complex,Trematoda,,, 
+TREM.UNK,Hybognathus nuchalis,Complex,Trematoda,,, 
+ACANTH.BB,Percina vigil,Complex,Acanthocephala,,, 
+ACANTH.CYA,Percina vigil,Complex,Acanthocephala,,, 
+ACANTH.THIN,Percina vigil,Complex,Acanthocephala,,, 
+CEST.BOT,Percina vigil,Complex,Cestoda,,, 
+MONO.GYRO,Percina vigil,Direct,Monogenea,Gyrodactylus ,spp.,Gyrodactylus  spp.
+NEM.HEATH,Percina vigil,NA,Nematoda,,, 
+NEM.LARV,Percina vigil,Complex,Nematoda,,, 
+NEM.SQUIG,Percina vigil,NA,Nematoda,,, 
+NEM.UNK,Percina vigil,NA,Nematoda,,, 
+TREM.CHONK,Percina vigil,Complex,Trematoda,,, 
+TREM.CL,Percina vigil,Complex,Trematoda,,, 
+TREM.ENDOUS,Percina vigil,Complex,Trematoda,,, 
+TREM.ISPOT,Percina vigil,Complex,Trematoda,,, 
+TREM.PHLB,Percina vigil,Complex,Trematoda,Phyllodistomum,spp.,Phyllodistomum spp.
+TREM.SK,Percina vigil,Complex,Trematoda,,, 
+CEST.UNK,Carpiodes velifer,Complex,Cestoda,,, 
+CEST.WS,Carpiodes velifer,Complex,Cestoda,,, 
+CILI.FU,Carpiodes velifer,NA,Protozoa,Apiosoma,sp.,Apiosoma sp.
+COPE.HNY,Carpiodes velifer,Direct,Copepoda,,, 
+TREM.META.UNK,Carpiodes velifer,Complex,Trematoda,,, 
+MONO.NID,Carpiodes velifer,Direct,Monogenea,,, 
+MYX.BNA,Carpiodes velifer,Complex,Myxozoa,,, 
+MYX.CM,Carpiodes velifer,Complex,Myxozoa,Chloromyxum ,sp.,Chloromyxum  sp.
+MYX.E,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.F,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.G,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.GM,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.KL,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.S,Carpiodes velifer,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.UNK,Carpiodes velifer,Complex,Myxozoa,,, 
+NEM.CERL,Carpiodes velifer,NA,Nematoda,,, 
+TREM.CV,Carpiodes velifer,Complex,Trematoda,,, 
+TREM.LARV,Carpiodes velifer,Complex,Trematoda,,, 
+TREM.ORS,Carpiodes velifer,Complex,Trematoda,,, 
+TREM.SEP,Carpiodes velifer,Complex,Trematoda,,, 
+CEST.ARCH,Carpiodes velifer,Complex,Cestoda,,, 
+CEST.MEGAN,Carpiodes velifer,Complex,Cestoda,,, 
+CEST.TRI,Carpiodes velifer,Complex,Cestoda,Megancestus,carpiodi ,Megancestus carpiodi 
+ACANTH.BLVE,Gambusia affinis,Complex,Acanthocephala,,, 
+ACANTH.NEMOR,Gambusia affinis,Complex,Acanthocephala,,, 
+CEST.MIPI,Gambusia affinis,Complex,Cestoda,,, 
+CEST.TRIGA,Gambusia affinis,Complex,Cestoda,,, 
+CEST.UNK,Gambusia affinis,Complex,Cestoda,,, 
+CEST.WOAD,Gambusia affinis,Complex,Cestoda,,, 
+CEST.Y,Gambusia affinis,Complex,Cestoda,,, 
+META.BOLISM,Gambusia affinis,Complex,Trematoda,,, 
+META.Z,Gambusia affinis,Complex,Trematoda,,, 
+MONO.G,Gambusia affinis,Direct,Monogenea,Gyrodactylus ,sp.,Gyrodactylus  sp.
+MONO.SASE,Gambusia affinis,Direct,Monogenea,Salsuginus,seculus,Salsuginus seculus
+MYX.STWY,Gambusia affinis,Complex,Myxozoa,Myxidium ,sp.,Myxidium  sp.
+MYX.THIN,Gambusia affinis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+MYX.UPC,Gambusia affinis,Complex,Myxozoa,Myxobolus,spp.,Myxobolus spp.
+NEM.ESIS,Gambusia affinis,NA,Nematoda,Spinitectus,sp.,Spinitectus sp.
+NEM.LARV,Gambusia affinis,Complex,Nematoda,,, 
+NEM.OODLE,Gambusia affinis,NA,Nematoda,,, 
+NEM.PRETZ,Gambusia affinis,NA,Nematoda,,, 
+NEM.UNK,Gambusia affinis,NA,Nematoda,,, 
+NEM.W,Gambusia affinis,NA,Nematoda,,, 
+TREM.GA,Gambusia affinis,Complex,Trematoda,,, 
+TREM.POS,Gambusia affinis,Complex,Trematoda,Posthodiplostomum,spp.,Posthodiplostomum spp.
+TREM.SCORP,Gambusia affinis,Complex,Trematoda,,, 
+TREM.SHY,Gambusia affinis,Complex,Trematoda,,, 
+TREM.UNK,Gambusia affinis,Complex,Trematoda,,, 

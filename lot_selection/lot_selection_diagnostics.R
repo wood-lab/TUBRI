@@ -425,6 +425,74 @@ car_vel_dailies<-car_vel_with_metadata %>%
 View(car_vel_dailies)
 
 
+
+### GAMAFF
+
+# You can also do it the old-fashioned way
+
+gam_aff_today<-read.csv("data/raw/Gambusia_affinis_Datasheet_2024.08.14.csv")
+length(gam_aff_today$CatalogNumber)
+
+
+# Now merge dissection data with meta-data (all.x makes sure that you keep all individual fish from the same lot, even though
+# they have the same catalog number).
+
+gam_aff_with_metadata<-merge(gam_aff_today, meta_data, by.x = "CatalogNumber", by.y = "CatalogNumber", all.x = TRUE)
+length(gam_aff_with_metadata$CatalogNumber)
+
+
+# Plot to see where the dissected fish fall
+
+plot(jitter(gam_aff_with_metadata$Latitude.y,30)~jitter(gam_aff_with_metadata$YearCollected.x,5))+abline(a = 30.76, b = 0, lty = 2)+abline(v = 1973, lty = 2)
+
+
+# Desired level of replication
+
+gam_aff_desired<-read.csv(file="lot_selection/desired_replication/car_vel_goal.csv")
+gam_aff_desired<-gam_aff_desired[,-1]
+colnames(gam_aff_desired)[2]<-"n_lots_desired"
+gam_aff_desired$individual_fish_desired<-gam_aff_desired$n_lots_desired*4
+sum(gam_aff_desired$individual_fish_desired)
+
+
+# Actual level of replication
+
+gam_aff_actual<-gam_aff_with_metadata %>%
+  group_by(combo) %>%
+  summarize(actual = n())
+
+
+# Merge desired and actual
+
+gam_aff_remaining<-merge(gam_aff_desired, gam_aff_actual, by.x = "combo", by.y = "combo", all.x = TRUE, all.y = TRUE)
+
+
+# Calculate how many you have left
+
+gam_aff_remaining$to_go<-(gam_aff_remaining$individual_fish_desired-ifelse(is.na(gam_aff_remaining$actual),0,gam_aff_remaining$actual))
+gam_aff_remaining<-na.omit(gam_aff_remaining)
+sum(gam_aff_remaining$actual,na.rm=T)
+sum(gam_aff_remaining$to_go,na.rm=T)
+
+
+# Check that body size is invariant through time
+
+summary(glm(gam_aff_with_metadata$TotalLength_mm~gam_aff_with_metadata$YearCollected.x))
+plot(gam_aff_with_metadata$TotalLength_mm~gam_aff_with_metadata$YearCollected.x)
+summary(glm(gam_aff_with_metadata$TotalLength_mm~gam_aff_with_metadata$Latitude.y))
+plot(gam_aff_with_metadata$TotalLength_mm~gam_aff_with_metadata$Latitude.y)
+
+
+# Create a matrix that shows how many fish you are finishing per day
+
+gam_aff_dailies<-gam_aff_with_metadata %>%
+  group_by(DissectionDate) %>%
+  summarize(actual = n())
+View(gam_aff_dailies)
+
+
+
+
 # Calculate how many fish you need to do per day to hit your target
 
 working_days_remaining<-41
