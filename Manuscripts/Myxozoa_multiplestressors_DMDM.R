@@ -74,6 +74,15 @@ ggplot(full_dataset_myxo_bca,aes(Latitude,psite_count, color = Parasite_genus,gr
   apatheme
 
 
+# Plot myxozoan abundance against time 
+
+ggplot(full_dataset_myxo,aes(YearCollected,psite_count,shape = CI, color = Parasite_genus,group = Parasite_genus))+
+  geom_point(size=2)+
+  facet_wrap("Fish_sp.x")+
+  geom_vline(xintercept=1972, linetype="dashed", color = "black", size=0.5)+
+  apatheme
+
+
 # GLM for the probability of finding myxozoans along the river
 glm_presence<-glm(psite_presence ~ poly(Latitude,2),
              data = full_dataset_myxo_bca,family=binomial())
