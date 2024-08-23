@@ -26,6 +26,8 @@ library(effects)
 library(glmmTMB)
 library(itsadug)
 library(mgcv)
+library(readr)
+library(dplyr)
 
 
 ## Import data
@@ -47,6 +49,17 @@ full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,   
 
 ## Remove columns with myxozoans that aren't confirmed to be myxozoans and therefore are not identified
 full_dataset_myxo <- subset(full_dataset_myxo, !is.na(Parasite_genus))
+
+
+## Create subset per fish species
+
+pimvig_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Pimephales vigilax")
+gamaff_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Gambusia affinis")
+ictpun_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Ictalurus punctatus")
+notath_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Notropis atherinoides")
+carvel_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Carpiodes velifer")
+hybnuc_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Hybognathus nuchalis")
+
 
 
 ## Make a subset for data before the clean water act
@@ -115,5 +128,95 @@ plot(mydf,rawdata=TRUE)+
   apatheme+
   geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)
   
+
+
+
+### Myxozoan prevalence across time----
+
+#Set a theme for all your plots
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+# Plot myxozoan prevalence against time 
+
+pimvig_prevalence <-ggerrorplot(pimvig_myxo, x = "YearCollected", y = "psite_presence",
+                      ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                      position=position_dodge(0.5),width=0.00, size=0.3)+
+                      facet_wrap("Parasite_genus")+
+                      apatheme+
+                      xlab("Year")+ylab("Prevalence of infection")+
+                      ylim(0,1)
+
+pimvig_prevalence
+
+# Plot myxozoan prevalence against time - GAMAFF
+
+gamaff_prevalence <-ggerrorplot(gamaff_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+gamaff_prevalence
+
+# Plot myxozoan prevalence against time - ICTPUN
+
+ictpun_prevalence <-ggerrorplot(ictpun_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+ictpun_prevalence
+
+
+# Plot myxozoan prevalence against time - NOTATH
+
+notath_prevalence <-ggerrorplot(notath_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+notath_prevalence
+
+# Plot myxozoan prevalence against time - CARVEL
+
+carvel_prevalence <-ggerrorplot(carvel_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+carvel_prevalence
+
+
+# Plot myxozoan prevalence against time - HYBNUC
+
+hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+hybnuc_prevalence
+
+
+
 
 
