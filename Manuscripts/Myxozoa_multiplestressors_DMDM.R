@@ -148,9 +148,9 @@ pimvig_prevalence <-ggerrorplot(pimvig_myxo, x = "YearCollected", y = "psite_pre
                       ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                       position=position_dodge(0.5),width=0.00, size=0.3)+
                       facet_wrap("Parasite_genus")+
-                      apatheme+
+                      apatheme+ggtitle("Pimephales vigilax")+
                       xlab("Year")+ylab("Prevalence of infection")+
-                      ylim(0,1)
+                                          ylim(0,1)
 
 pimvig_prevalence
 
@@ -159,10 +159,10 @@ pimvig_prevalence
 gamaff_prevalence <-ggerrorplot(gamaff_myxo, x = "YearCollected", y = "psite_presence",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+                                facet_wrap("Parasite_genus")+
+                                apatheme+ggtitle("Gambusia affinis")+
+                                xlab("Year")+ylab("Prevalence of infection")+
+                                ylim(0,1)
 
 gamaff_prevalence
 
@@ -172,7 +172,7 @@ ictpun_prevalence <-ggerrorplot(ictpun_myxo, x = "YearCollected", y = "psite_pre
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
-  apatheme+
+  apatheme+ggtitle("Ictalurus punctatus")+
   xlab("Year")+ylab("Prevalence of infection")+
   ylim(0,1)
 
@@ -185,7 +185,7 @@ notath_prevalence <-ggerrorplot(notath_myxo, x = "YearCollected", y = "psite_pre
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
-  apatheme+
+  apatheme+ggtitle("Notropis atherinoides")+
   xlab("Year")+ylab("Prevalence of infection")+
   ylim(0,1)
 
@@ -197,7 +197,7 @@ carvel_prevalence <-ggerrorplot(carvel_myxo, x = "YearCollected", y = "psite_pre
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
-  apatheme+
+  apatheme+ggtitle("Carpiodes velifer")+
   xlab("Year")+ylab("Prevalence of infection")+
   ylim(0,1)
 
@@ -210,7 +210,7 @@ hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_pre
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
-  apatheme+
+  apatheme+ggtitle("Hybognathus nuchalis")+
   xlab("Year")+ylab("Prevalence of infection")+
   ylim(0,1)
 
