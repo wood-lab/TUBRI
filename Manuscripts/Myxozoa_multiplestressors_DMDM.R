@@ -248,6 +248,146 @@ plot(s)
 
 
 #With the plot()function
+mydf <- ggpredict(glm_presence, c("Latitude[n=100]","Parasite_genus")) 
+
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+plot(mydf,rawdata=TRUE)+
+  labs(x = 'Latitude', y = 'Probability of myxozoan presence (%)',title=NULL)+
+  apatheme+
+  geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)+
+  scale_x_reverse()
+
+
+
+
+
+
+
+### Myxozoan abundace across time----
+
+## Make a subset for data before the clean water act
+
+full_dataset_myxo_bca <- subset(full_dataset_myxo, YearCollected < 1973)
+
+
+#Set a theme for all your plots
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+# Plot myxozoan prevalence against time 
+
+pimvig_prevalence <-ggerrorplot(pimvig_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Pimephales vigilax")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+pimvig_prevalence
+
+# Plot myxozoan prevalence against time - GAMAFF
+
+gamaff_prevalence <-ggerrorplot(gamaff_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Gambusia affinis")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+gamaff_prevalence
+
+# Plot myxozoan prevalence against time - ICTPUN
+
+ictpun_prevalence <-ggerrorplot(ictpun_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Ictalurus punctatus")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+ictpun_prevalence
+
+
+# Plot myxozoan prevalence against time - NOTATH
+
+notath_prevalence <-ggerrorplot(notath_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Notropis atherinoides")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+notath_prevalence
+
+# Plot myxozoan prevalence against time - CARVEL
+
+carvel_prevalence <-ggerrorplot(carvel_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Carpiodes velifer")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+carvel_prevalence
+
+
+# Plot myxozoan prevalence against time - HYBNUC
+
+hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Parasite_genus")+
+  apatheme+ggtitle("Hybognathus nuchalis")+
+  xlab("Year")+ylab("Prevalence of infection")+
+  ylim(0,1)
+
+hybnuc_prevalence
+
+
+# GLM for the probability of finding myxozoans
+glm_presence <- glmer(psite_presence ~ YearCollected+CI*Parasite_genus+
+                        (1|Fish_sp.x/CatalogNumber),
+                      data = full_dataset_myxo,family=binomial())
+
+glm_presence <- glmer(psite_presence ~ poly(Latitude,3)+YearCollected+
+                        CI*Parasite_genus+scaled_TL_mm+
+                        (1|Fish_sp.x/IndividualFishID)+
+                        (1|MonthCollected),
+                      data = full_dataset_myxo,family=binomial())
+
+
+glm_presence <- glmmTMB(psite_presence ~ poly(Latitude,3)+YearCollected+CI*Parasite_genus+scaled_TL_mm+
+                          (1|Fish_sp.x/IndividualFishID)+
+                          (1|MonthCollected),
+                        data = full_dataset_myxo,family=binomial())
+
+
+
+summary(glm_presence)
+
+#Evaluate residuals
+#Not suitable for GLM-quasipoisson but for the other models
+s=simulateResiduals(fittedModel=glm_presence,n=250)
+s$scaledResiduals
+plot(s)
+
+
+#With the plot()function
 mydf <- ggpredict(glm_presence, c("Latitude [all]","CI","Parasite_genus")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
