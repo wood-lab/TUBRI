@@ -38,10 +38,6 @@ full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_in
 
 full_dataset_myxo <- subset(full_dataset, Parasite_taxonomic_group == "Myxozoa")
 
-## Make Parasite_genus a factor
-
-full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
-
 ## Create column for presence and absence of myxozoans
 full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,                # condition
                                                1,    # what if condition is TRUE
@@ -49,6 +45,12 @@ full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,   
 
 ## Remove columns with myxozoans that aren't confirmed to be myxozoans and therefore are not identified
 full_dataset_myxo <- subset(full_dataset_myxo, !is.na(Parasite_genus))
+
+#Revise variable types
+full_dataset_myxo$IndividualFishID <- as.factor(full_dataset_myxo$IndividualFishID)
+full_dataset_myxo$CI <- as.factor(full_dataset_myxo$CI)
+full_dataset_myxo$Fish_sp.x <- as.factor(full_dataset_myxo$Fish_sp.x)
+full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
 
 
 ## Create subset per fish species
@@ -215,6 +217,50 @@ hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_pre
   ylim(0,1)
 
 hybnuc_prevalence
+
+
+# GLM for the probability of finding myxozoans
+glm_presence <- glmer(psite_presence ~ YearCollected+CI*Parasite_genus+
+                        (1|Fish_sp.x/CatalogNumber),
+                  data = full_dataset_myxo,family=binomial())
+
+glm_presence <- glmer(psite_presence ~ poly(Latitude,3)+YearCollected+
+                        CI*Parasite_genus+scaled_TL_mm+
+                      (1|Fish_sp.x/IndividualFishID)+
+                      (1|MonthCollected),
+                    data = full_dataset_myxo,family=binomial())
+
+
+glm_presence <- glmmTMB(psite_presence ~ poly(Latitude,3)+YearCollected+CI*Parasite_genus+scaled_TL_mm+
+                        (1|Fish_sp.x/IndividualFishID)+
+                        (1|MonthCollected),
+                      data = full_dataset_myxo,family=binomial())
+
+
+
+summary(glm_presence)
+
+#Evaluate residuals
+#Not suitable for GLM-quasipoisson but for the other models
+s=simulateResiduals(fittedModel=glm_presence,n=250)
+s$scaledResiduals
+plot(s)
+
+
+#With the plot()function
+mydf <- ggpredict(glm_presence, c("Latitude [all]","CI","Parasite_genus")) 
+
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+plot(mydf,rawdata=TRUE)+
+  labs(x = 'Latitude', y = 'Probability of myxozoan presence (%)',title=NULL)+
+  apatheme+
+  geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)
+
 
 
 
