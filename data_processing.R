@@ -510,7 +510,7 @@ ict_pun_processed_data<-cbind.data.frame(ict_pun_with_metadata$CatalogNumber,ict
                                          LEECH.KUT, MONO.IP, MONO.UNK, MYX.GEOM, NEM.CYST, NEM.NMTS, NEM.PHAR, 
                                          NEM.PTY, NEM.SP, NEM.TAF, NEM.UNK, NMORPH, TREM.2, TREM.ALLO, TREM.BLE, 
                                          TREM.CREP, TREM.F, TREM.META.GG, MYX.TAIL, TREM.META.UNK, 
-                                         TREM.LG, TREM.LIP, TREM.MEGICT, TREM.SMILE, TREM.UNK)
+                                         TREM.LG, TREM.LIP, TREM.MEGICT, TREM.PHYLS, TREM.SMILE, TREM.UNK)
 
 # Name the columns
 
@@ -641,9 +641,9 @@ ict_pun_processed_data_longer$Weight_mg <- as.numeric(ict_pun_processed_data_lon
 # Export both sheets
 
 write.csv(ict_pun_processed_data_longer, 
-          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.16.csv")
+          file="data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
 write.csv(ict_pun_processed_data, 
-          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.16.csv")
+          file="data/processed/Ictalurus_punctatus_processed_human_readable.csv_UPDATED_2024.08.25.csv")
 
 
 
@@ -1830,11 +1830,9 @@ full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
 
 # Export the sheet
 
-<<<<<<< HEAD
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.17.csv")
-=======
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.16.csv")
->>>>>>> 768469bdbfa22c41f9d77007d82fadf38d13783f
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.25.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.25.csv")
+
 
 
 # tallies
