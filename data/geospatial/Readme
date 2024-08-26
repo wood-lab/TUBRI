@@ -8,6 +8,8 @@ This data set includes a lot of physical parameters measured by USGS at the Pear
 Data accessed: August 26, 2024
 Data source: https://waterdata.usgs.gov/download-samples/#monitoringLocationIdentifier=USGS-02489500&dataProfile=basicphyschem&sampleMedia=Water&characteristicGroup=Physical&startDate=1963-01-01&endDate=2005-08-31
 
+See also the following for more: https://waterdata.usgs.gov/download-samples/#monitoringLocationIdentifier=USGS-02489500&dataProfile=basicphyschem&sampleMedia=Air&characteristicGroup=Information&startDate=1963-01-01&endDate=2005-08-31
+
 
 
 ## pearlrivercatchment_annualmeans_temp_precipitation_era5-x0.25_1950-2022
