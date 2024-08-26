@@ -356,6 +356,7 @@ hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_pre
   xlab("Year")+ylab("Prevalence of infection")+
   ylim(0,1)
 
+
 hybnuc_prevalence
 
 
@@ -405,4 +406,27 @@ plot(mydf,rawdata=TRUE)+
 
 
 
+
+
+### Streamflow----
+
+## Import data
+
+physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
+
+View(physicalUSGS)
+
+
+streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
+streamflow_msq <- subset(streamflow, Unit=="m3/sec")
+
+# Plot stream flow against time 
+
+streamflow_plot <-ggerrorplot(streamflow_msq, x = "Year", y = "Result",
+                                ggtheme = theme_bw(),rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  ggtitle("Streamflow")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
+
+streamflow_plot
 
