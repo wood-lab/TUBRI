@@ -1,5 +1,15 @@
 ### Below is a description of the data files available in the geospatial data folder.
 
+
+## Physicaldata_USGS.xlsx
+
+This data set includes a lot of physical parameters measured by USGS at the Pearl River near Bogalusa. The sampling station is located at latitude 30.7932614161365, longitude -89.8209117246503 (just north of highway 10). Parameters include water temperature, streamflow, suspended solids etc. DMDM deleted those columns which were totally empty. Measurements are available monthly from 1963-1995 but there are several gaps, especially for the months.
+
+Data accessed: August 26, 2024
+Data source: https://waterdata.usgs.gov/download-samples/#monitoringLocationIdentifier=USGS-02489500&dataProfile=basicphyschem&sampleMedia=Water&characteristicGroup=Physical&startDate=1963-01-01&endDate=2005-08-31
+
+
+
 ## pearlrivercatchment_annualmeans_temp_precipitation_era5-x0.25_1950-2022
 ## pearlrivercatchment_monthlymeans_temp_precipitation_era5-x0.25_1950-2022
 
