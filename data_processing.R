@@ -1077,6 +1077,12 @@ hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$IndividualFishID=="156660
 hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"-89.83222"
 hyb_nuc_processed_data$MonthCollected[hyb_nuc_processed_data$IndividualFishID=="149280_01"]<-"07"
 hyb_nuc_processed_data$DayCollected[hyb_nuc_processed_data$IndividualFishID=="149280_01"]<-"14"
+hyb_nuc_processed_data$MonthCollected[hyb_nuc_processed_data$IndividualFishID=="149280_02"]<-"07"
+hyb_nuc_processed_data$DayCollected[hyb_nuc_processed_data$IndividualFishID=="149280_02"]<-"14"
+hyb_nuc_processed_data$MonthCollected[hyb_nuc_processed_data$IndividualFishID=="149280_03"]<-"07"
+hyb_nuc_processed_data$DayCollected[hyb_nuc_processed_data$IndividualFishID=="149280_03"]<-"14"
+hyb_nuc_processed_data$MonthCollected[hyb_nuc_processed_data$IndividualFishID=="149280_04"]<-"07"
+hyb_nuc_processed_data$DayCollected[hyb_nuc_processed_data$IndividualFishID=="149280_04"]<-"14"
 
 stuff<-hyb_nuc_processed_data %>%
   filter(CatalogNumber=="156660")
@@ -1832,8 +1838,8 @@ full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
 
 # Export the sheet
 
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.25.csv")
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.25.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
 
 
 
