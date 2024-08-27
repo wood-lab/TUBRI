@@ -1075,6 +1075,8 @@ hyb_nuc_processed_data$CI[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<
 hyb_nuc_processed_data$combo[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"control_1984-1993"
 hyb_nuc_processed_data$Latitude[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"30.76528"
 hyb_nuc_processed_data$Longitude[hyb_nuc_processed_data$IndividualFishID=="156660_01"]<-"-89.83222"
+hyb_nuc_processed_data$MonthCollected[hyb_nuc_processed_data$IndividualFishID=="149280_01"]<-"07"
+hyb_nuc_processed_data$DayCollected[hyb_nuc_processed_data$IndividualFishID=="149280_01"]<-"14"
 
 stuff<-hyb_nuc_processed_data %>%
   filter(CatalogNumber=="156660")
