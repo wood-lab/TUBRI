@@ -145,6 +145,9 @@ full_dataset_myxo$IndividualFishID <- as.factor(full_dataset_myxo$IndividualFish
 full_dataset_myxo$CI <- as.factor(full_dataset_myxo$CI)
 full_dataset_myxo$Fish_sp.x <- as.factor(full_dataset_myxo$Fish_sp.x)
 full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
+full_dataset_myxo$before_after <- as.factor(full_dataset_myxo$before_after)
+full_dataset_myxo$season_temp <- as.factor(full_dataset_myxo$season_temp)
+full_dataset_myxo$MonthCollected <- as.factor(full_dataset_myxo$MonthCollected)
 
 
 ## Create subset per fish species
@@ -156,7 +159,7 @@ notath_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Notropis atherinoides")
 carvel_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Carpiodes velifer")
 hybnuc_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Hybognathus nuchalis")
 
-## Create subset per paraasite genus with river physical data
+## Create subset per parasite genus with river physical data
 
 myxobolus_physical <- subset(full_dataset_myxo, Parasite_genus == "Myxobolus")
 chloromyxum_physical <- subset(full_dataset_myxo, Parasite_genus == "Chloromyxum")
@@ -164,6 +167,19 @@ henneguya_physical <- subset(full_dataset_myxo, Parasite_genus == "Henneguya")
 myxidium_physical<- subset(full_dataset_myxo, Parasite_genus == "Myxidium")
 unicauda_physical <- subset(full_dataset_myxo, Parasite_genus == "Unicauda")
 thelohanellus_physical <- subset(full_dataset_myxo, Parasite_genus == "Thelohanellus")
+
+## Crease subset for myxozoans that can be counted
+
+myxo_count <- subset(full_dataset_myxo, Parasite_genus == "Myxobolus"|Parasite_genus == "Henneguya"|Parasite_genus == "Unicauda"|Parasite_genus == "Thelohanellus")
+
+## Create subset of myxo_count per fish species
+
+pimvig_count <- subset(myxo_count, Fish_sp.x == "Pimephales vigilax")
+gamaff_count <- subset(myxo_count, Fish_sp.x == "Gambusia affinis")
+ictpun_count <- subset(myxo_count, Fish_sp.x == "Ictalurus punctatus")
+notath_count <- subset(myxo_count, Fish_sp.x == "Notropis atherinoides")
+carvel_count <- subset(myxo_count, Fish_sp.x == "Carpiodes velifer")
+hybnuc_count <- subset(myxo_count, Fish_sp.x == "Hybognathus nuchalis")
 
 
 ### Before clean water act, impact of distance from pulp mill on prevalence----
@@ -449,24 +465,59 @@ hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_pre
 hybnuc_prevalence
 
 
-# GLM for the probability of finding myxozoans
-glm_presence <- glmer(psite_presence ~ YearCollected+CI*Parasite_genus+
-                        (1|Fish_sp.x/CatalogNumber),
-                  data = full_dataset_myxo,family=binomial())
+# GLM for the probability of finding myxozoans taking all fish in consideration
 
-glm_presence <- glmer(psite_presence ~ poly(Latitude,3)+YearCollected+
-                        CI*Parasite_genus+scaled_TL_mm+
-                      (1|Fish_sp.x/IndividualFishID)+
-                      (1|MonthCollected),
-                    data = full_dataset_myxo,family=binomial())
-
-
-glm_presence <- glmmTMB(psite_presence ~ YearCollected+
-                          CI*Fish_sp.x+
-                          meanFlow*Fish_sp.x+scaled_TL_mm+
+glm_presence <- glmmTMB(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
+                          CI*Parasite_genus*Fish_sp.x+
+                          meanFlow*Parasite_genus*Fish_sp.x
+                        +scaled_TL_mm+
                         (1|MonthCollected),
-                      data = myxobolus_physical,family=binomial())
+                      data = full_dataset_myxo,family=binomial())
+    # This model did not converge. Let's make it simpler by rerunning the models per fish species
 
+
+# GLM for the probability of finding myxozoans for CARVEL
+
+glm_presence <- glmmTMB(psite_presence ~ meanTemp*CI*meanFlow+
+                          CI*before_after+
+                          StandardLength_mm+
+                          meanTemp*Parasite_genus+
+                          meanFlow*Parasite_genus+
+                          CI*Parasite_genus+
+                          (1|MonthCollected),
+                        data = carvel_myxo,family=binomial()) #terrible fit
+
+glm_presence <- glmer(psite_presence ~ YearCollected+
+                        meanTemp*CI*meanFlow+
+                          CI*before_after+
+                          StandardLength_mm+
+                          meanTemp*Parasite_genus+
+                          meanFlow*Parasite_genus+
+                          CI*Parasite_genus+
+                          (1|MonthCollected),
+                        data = carvel_myxo,family=binomial()) #terrible fit
+
+
+summary(glm_presence)
+
+# Let's make things simpler by running the model per parasite
+
+carvel_myxobolus <- subset(carvel_myxo, Parasite_genus=="Myxobolus")
+carvel_chloromyxum <- subset(carvel_myxo, Parasite_genus=="Chloromyxum")
+
+# GLM for the probability of finding myxozoans for CARVEL infected with Myxobolus
+
+glm_presence <- glmmTMB(psite_presence ~ meanTemp*CI*meanFlow+
+                          CI*before_after+
+                          StandardLength_mm+
+                          (1|MonthCollected),
+                        data = carvel_myxobolus,family=binomial()) #terrible fit
+
+glm_presence <- glmer(psite_presence ~ meanTemp*CI*meanFlow+
+                          CI*before_after+
+                          StandardLength_mm+
+                          (1|MonthCollected),
+                        data = carvel_myxobolus,family=binomial()) #terrible fit
 
 
 summary(glm_presence)
@@ -482,8 +533,13 @@ plot(s)
 plot_model(glm_presence)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
 
-mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI","Fish_sp.x")) 
-mydf <- ggpredict(glm_presence, c("YearCollected[all]","CI","Fish_sp.x")) 
+mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI","Parasite_genus")) 
+mydf <- ggpredict(glm_presence, c("meanTemp[all]","CI","Parasite_genus")) 
+
+
+mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI")) 
+mydf <- ggpredict(glm_presence, c("meanTemp[all]","CI")) 
+mydf <- ggpredict(glm_presence, c("CI","before_after")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -497,17 +553,6 @@ plot(mydf,rawdata=TRUE)+
 
 ### Myxozoan abundace across time----
 
-## Make a subset for data before the clean water act
-
-full_dataset_myxo_bca <- subset(full_dataset_myxo, YearCollected < 1973)
-
-
-glm_presence <- glmmTMB(psite_presence ~ poly(Latitude,2)*Parasite_genus+YearCollected+scaled_TL_mm+
-                          (1|Fish_sp.x/IndividualFishID)+
-                          (1|MonthCollected),
-                        data = full_dataset_myxo_bcalat,family=binomial())
-
-
 #Set a theme for all your plots
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -517,112 +562,108 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
-# Plot myxozoan prevalence against time 
+# Plot myxozoan abundance against time 
 
-pimvig_prevalence <-ggerrorplot(pimvig_myxo, x = "YearCollected", y = "psite_presence",
+pimvig_abundance <-ggerrorplot(pimvig_count, x = "YearCollected", y = "psite_count",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Pimephales vigilax")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+  xlab("Year")+ylab("Abundance")
 
-pimvig_prevalence
+pimvig_abundance
 
-# Plot myxozoan prevalence against time - GAMAFF
+# Plot myxozoan abundance against time - GAMAFF
 
-gamaff_prevalence <-ggerrorplot(gamaff_myxo, x = "YearCollected", y = "psite_presence",
+gamaff_abundance <-ggerrorplot(gamaff_count, x = "YearCollected", y = "psite_count",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Gambusia affinis")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+  xlab("Year")+ylab("Abundance")
 
-gamaff_prevalence
+gamaff_abundance
 
-# Plot myxozoan prevalence against time - ICTPUN
+# Plot myxozoan abundance against time - ICTPUN
 
-ictpun_prevalence <-ggerrorplot(ictpun_myxo, x = "YearCollected", y = "psite_presence",
+ictpun_abundance <-ggerrorplot(ictpun_count, x = "YearCollected", y = "psite_count",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Ictalurus punctatus")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+  xlab("Year")+ylab("Abundance")
 
-ictpun_prevalence
+ictpun_abundance
 
 
-# Plot myxozoan prevalence against time - NOTATH
-
-notath_prevalence <-ggerrorplot(notath_myxo, x = "YearCollected", y = "psite_presence",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Notropis atherinoides")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
-
-notath_prevalence
+# NOTATH does not play a role here because it is only infected with myxidium and that can only be analyzed in terms of presence and absence
 
 # Plot myxozoan prevalence against time - CARVEL
 
-carvel_prevalence <-ggerrorplot(carvel_myxo, x = "YearCollected", y = "psite_presence",
+carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_count",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Carpiodes velifer")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+  xlab("Year")+ylab("Abundance")
 
-carvel_prevalence
+carvel_abundance
 
 
 # Plot myxozoan prevalence against time - HYBNUC
 
-hybnuc_prevalence <-ggerrorplot(hybnuc_myxo, x = "YearCollected", y = "psite_presence",
+hybnuc_abundance <-ggerrorplot(hybnuc_count, x = "YearCollected", y = "psite_count",
                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Hybognathus nuchalis")+
-  xlab("Year")+ylab("Prevalence of infection")+
-  ylim(0,1)
+  xlab("Year")+ylab("Abundance")
 
 
-hybnuc_prevalence
+hybnuc_abundance
 
 
-# GLM for the probability of finding myxozoans
-glm_presence <- glmer(psite_presence ~ YearCollected+CI*Parasite_genus+
-                        (1|Fish_sp.x/CatalogNumber),
-                      data = full_dataset_myxo,family=binomial())
+# GLM for the abundance of  myxozoans
+glm_abundance <- glmmTMB(psite_count ~ 
+                           meanTemp*CI*meanFlow+
+                           CI*before_after+
+                           meanTemp*Parasite_genus+
+                           meanFlow*Parasite_genus+
+                           CI*Parasite_genus+
+                           StandardLength_mm+
+                           (1|MonthCollected),
+                         data = myxo_count,
+                         family = nbinom1) #not converging
 
-glm_presence <- glmer(psite_presence ~ poly(Latitude,3)+YearCollected+
-                        CI*Parasite_genus+scaled_TL_mm+
-                        (1|Fish_sp.x/IndividualFishID)+
+glm_abundance <- glmer.nb(psite_count ~ YearCollected+
+                        meanTemp*CI*meanFlow+
+                        CI*before_after+
+                        StandardLength_mm+
                         (1|MonthCollected),
-                      data = full_dataset_myxo,family=binomial())
+                      data = carvel_count) #terrible fit
+
+glm_abundance <- glmmTMB(psite_count ~ 
+                            meanTemp*CI*meanFlow+
+                            CI*before_after+
+                            StandardLength_mm+
+                            (1|MonthCollected),
+                          data = carvel_count,
+                         family = nbinom2) #terrible fit
 
 
-glm_presence <- glmmTMB(psite_presence ~ poly(Latitude,3)+YearCollected+CI*Parasite_genus+scaled_TL_mm+
-                          (1|Fish_sp.x/IndividualFishID)+
-                          (1|MonthCollected),
-                        data = full_dataset_myxo,family=binomial())
-
-
-
-summary(glm_presence)
+summary(glm_abundance)
 
 #Evaluate residuals
 #Not suitable for GLM-quasipoisson but for the other models
-s=simulateResiduals(fittedModel=glm_presence,n=250)
+s=simulateResiduals(fittedModel=glm_abundance,n=250)
 s$scaledResiduals
 plot(s)
 
 
 #With the plot()function
-mydf <- ggpredict(glm_presence, c("Latitude [all]","CI","Parasite_genus")) 
+mydf <- ggpredict(glm_abundance, c("meanFlow [all]","CI","before_after")) 
+mydf <- ggpredict(glm_abundance, c("meanTemp [all]","CI","before_after")) 
+mydf <- ggpredict(glm_abundance, c("before_after","CI")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -630,10 +671,9 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         panel.border=element_blank(),
         axis.line=element_line())
 
-plot(mydf,rawdata=TRUE)+
-  labs(x = 'Latitude', y = 'Probability of myxozoan presence (%)',title=NULL)+
-  apatheme+
-  geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)
+plot(mydf,show_data=TRUE, jitter = 0.3,dodge = TRUE)+
+  labs(x = 'Treatment', y = 'Abundance of myxozoans',title=NULL)+
+  apatheme
 
 ### Streamflow visualization----
 
@@ -649,7 +689,7 @@ streamflow_plot
 
 # Plot stream flow as raw data per year
 
-ggplot(streamflow_ms, aes(x= as.factor(Year),
+ggplot(streamflow_ms, aes(x= as.factor(YearCollected),
                   y=Result))+
   geom_point()+apatheme+
   ggtitle("Streamflow per year")+
@@ -659,6 +699,15 @@ ggplot(streamflow_ms, aes(x= as.factor(Year),
 
 ggplot(streamflow_ms, aes(x= as.factor(Month),
                            y=Result))+
+  geom_point()+apatheme+
+  ggtitle("Streamflow per month")+
+  xlab("Month")+ylab("Streamflow (m3/sec)")
+
+# Plot stream flow as raw data per month
+
+ggplot(Full_dataset_physical, aes(x= meanFlow,
+                          y=psite_count))+
+  facet_wrap("before_after")+
   geom_point()+apatheme+
   ggtitle("Streamflow per month")+
   xlab("Month")+ylab("Streamflow (m3/sec)")
@@ -696,3 +745,18 @@ ggplot(Full_dataset_physical, aes(x= as.factor(season_temp),
   geom_hline(yintercept=20, linetype="dashed", color = "black", size=0.5)
 
 
+# Plot Temperature against flow
+
+ggplot(Full_dataset_physical, aes(x= meanTemp,
+                                  y=meanFlow))+
+  geom_point()+apatheme+
+  ggtitle("Streamflow as as function of temperature")+
+  xlab("Temperature")+ylab("Streamflow")
+
+# Plot Temperature against year
+
+ggplot(Full_dataset_physical, aes(x= YearCollected,
+                                  y=meanTemp))+
+  geom_point()+apatheme+
+  ggtitle("Streamflow as as function of temperature")+
+  xlab("Temperature")+ylab("Streamflow")
