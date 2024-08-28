@@ -6,7 +6,7 @@
 
 ### Preparation of data frames----
 
-##Install packages
+##Load packages
 
 library(readxl)
 library(stats)
@@ -34,9 +34,9 @@ library(dplyr)
 
 full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
 
-## Merge with stream flow data
+## Merge with physical data
 
-
+# Stream flow
 # Create a yearflow column for later merging
 
 full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
@@ -80,12 +80,57 @@ streamflow_mean <- streamflow_clean %>% group_by(yearflow) %>%
   summarise(meanFlow=mean(Result),
             .groups = 'drop')
 
-Full_dataset_physical <-merge(full_dataset, streamflow_mean, by.x = "yearflow", by.y = "yearflow", all.x = TRUE)
+# Merge with parasite data
 
+Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "yearflow", by.y = "yearflow", all.x = TRUE)
+
+# Adding water temperature data
+# Create a yearseason column in our data for later merging
+
+Full_dataset_streamflow$MonthCollected <- as.numeric(Full_dataset_streamflow$MonthCollected)
+
+Full_dataset_streamflow$season_temp <- ifelse(Full_dataset_streamflow$MonthCollected > 4 &
+                                                Full_dataset_streamflow$MonthCollected < 10,                # condition
+                                   'summer',    # what if condition is TRUE
+                                   'winter')       # what if condition is FALSE
+
+Full_dataset_streamflow$yearseason <- paste(as.character(Full_dataset_streamflow$YearCollected),as.character(Full_dataset_streamflow$season_temp),sep="_")
+
+# Make a subset of only water temperature
+wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
+
+# Create a yearseason column in USGS data for later merging
+
+wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
+
+wtemp$season_temp <- ifelse(wtemp$MonthCollected > 4 &
+                              wtemp$MonthCollected < 10,                # condition
+                                    'summer',    # what if condition is TRUE
+                                    'winter')       # what if condition is FALSE
+
+wtemp$yearseason <- paste(as.character(wtemp$YearCollected),as.character(wtemp$season_temp),sep="_")
+
+# Get rid of columns we do not need
+wtemp_clean <- cbind.data.frame(wtemp$yearseason,wtemp$Result)
+
+# Name the columns
+
+colnames(wtemp_clean)[1]<-"yearseason"
+colnames(wtemp_clean)[2]<-"Result"
+
+# Summarize by taking the mean stream flow per 'yearseason'
+
+wtemp_mean <- wtemp_clean %>% group_by(yearseason) %>% 
+  summarise(meanTemp=mean(Result),
+            .groups = 'drop')
+
+# Merge with parasite data
+
+Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_mean, by.x = "yearseason", by.y = "yearseason", all.x = TRUE)
 
 ## Make a subset for myxozoans
 
-full_dataset_myxo <- subset(full_dataset, Parasite_taxonomic_group == "Myxozoa")
+full_dataset_myxo <- subset(Full_dataset_physical, Parasite_taxonomic_group == "Myxozoa")
 
 ## Create column for presence and absence of myxozoans
 full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,                # condition
@@ -111,173 +156,119 @@ notath_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Notropis atherinoides")
 carvel_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Carpiodes velifer")
 hybnuc_myxo <- subset(full_dataset_myxo, Fish_sp.x == "Hybognathus nuchalis")
 
+## Create subset per paraasite genus with river physical data
+
+myxobolus_physical <- subset(full_dataset_myxo, Parasite_genus == "Myxobolus")
+chloromyxum_physical <- subset(full_dataset_myxo, Parasite_genus == "Chloromyxum")
+henneguya_physical <- subset(full_dataset_myxo, Parasite_genus == "Henneguya")
+myxidium_physical<- subset(full_dataset_myxo, Parasite_genus == "Myxidium")
+unicauda_physical <- subset(full_dataset_myxo, Parasite_genus == "Unicauda")
+thelohanellus_physical <- subset(full_dataset_myxo, Parasite_genus == "Thelohanellus")
 
 
-## Make a subset for data before the clean water act
-
-full_dataset_myxo_bca <- subset(full_dataset_myxo, YearCollected < 1973)
-
-
-### Before clean water act----
-
-# Include only impacted sites (between latitudes 30.60-30.76)
-full_dataset_myxo_bcalat <- subset(full_dataset_myxo_bca, CI == "impact")
-
-# Make a subset for each parasite genera
-full_dataset_myxo_bcamyxobolus <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Myxobolus")
-full_dataset_myxo_bcamyxidium <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Myxidium")
-full_dataset_myxo_bcaChloromyxum <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Chloromyxum")
-full_dataset_myxo_bcaHenneguya <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Henneguya")
-full_dataset_myxo_bcaThelohanellus <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Thelohanellus")
-full_dataset_myxo_bcaUnicauda <- subset(full_dataset_myxo_bcalat, Parasite_genus == "Unicauda")
-
-# Make subsets only for CARVEL
-full_dataset_myxo_bcamyxoboluscarvel <- subset(full_dataset_myxo_bcamyxobolus, Fish_sp.x == "Carpiodes velifer")
-full_dataset_myxo_bcaChloromyxumcarvel <- subset(full_dataset_myxo_bcaChloromyxum, Fish_sp.x == "Carpiodes velifer")
+### Before clean water act, impact of distance from pulp mill on prevalence----
 
 ## What is the impact of distance from pulp mill on the abundance of myxozoans?
 
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+## Make a subset for data before the clean water act
+full_dataset_myxo_bca <- subset(full_dataset_myxo, YearCollected < 1973)
 
 
+## General plots
 # Error plot for prevalence for all myxozoan genera along latitude
 
 lat_myxo <-ggerrorplot(full_dataset_myxo_bca, x = "Latitude", y = "psite_presence",
-                            ggtheme = theme_bw(), color="Parasite_genus",rawdata=TRUE,
-                            position=position_dodge(0.5),width=0.00, size=0.3)+
+                       ggtheme = theme_bw(), color="Parasite_genus",rawdata=TRUE,
+                       position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Fish_sp.x")+
   apatheme+
   xlab("Latitude")+ylab("Prevalence of infection")+
   ylim(0,1)+
   geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
 
-# Error plot for prevalence for each myxozoan genera along latitude
-
-lat_myxobolus <-ggerrorplot(full_dataset_myxo_bcamyxobolus, x = "Latitude", y = "psite_presence",
-                                ggtheme = theme_bw(), rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-  
-lat_myxidium <-ggerrorplot(full_dataset_myxo_bcamyxidium, x = "Latitude", y = "psite_presence",
-                            ggtheme = theme_bw(), rawdata=TRUE,
-                            position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_chloro <-ggerrorplot(full_dataset_myxo_bcaChloromyxumcarvel, x = "Latitude", y = "psite_presence",
-                           ggtheme = theme_bw(), rawdata=TRUE,
-                           position=position_dodge(0.5),width=0.00, size=0.3)+
-  apatheme+
-  facet_wrap("Fish_sp.x")+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_henne <-ggerrorplot(full_dataset_myxo_bcaHenneguya, x = "Latitude", y = "psite_presence",
-                         ggtheme = theme_bw(), rawdata=TRUE,
-                         position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_thelo <-ggerrorplot(full_dataset_myxo_bcaThelohanellus, x = "Latitude", y = "psite_presence",
-                        ggtheme = theme_bw(), rawdata=TRUE,
-                        position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_uni <-ggerrorplot(full_dataset_myxo_bcaUnicauda, x = "Latitude", y = "psite_presence",
-                        ggtheme = theme_bw(), rawdata=TRUE,
-                        position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  ylim(0,1)+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-
-# Error plot for abundance
-
-lat_myxobolus <-ggerrorplot(full_dataset_myxo_bcamyxobolus, x = "Latitude", y = "psite_count",
-                            ggtheme = theme_bw(), rawdata=TRUE,
-                            position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Parasite abundance")+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_myxidium <-ggerrorplot(full_dataset_myxo_bcamyxidium, x = "Latitude", y = "psite_count",
-                           ggtheme = theme_bw(), rawdata=TRUE,
-                           position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_chloro <-ggerrorplot(full_dataset_myxo_bcaChloromyxum, x = "Latitude", y = "psite_count",
-                         ggtheme = theme_bw(), rawdata=TRUE,
-                         position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Parasite abundance")
-
-lat_henne <-ggerrorplot(full_dataset_myxo_bcaHenneguya, x = "Latitude", y = "psite_count",
-                        ggtheme = theme_bw(), rawdata=TRUE,
-                        position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_thelo <-ggerrorplot(full_dataset_myxo_bcaThelohanellus, x = "Latitude", y = "psite_count",
-                        ggtheme = theme_bw(), rawdata=TRUE,
-                        position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
-lat_uni <-ggerrorplot(full_dataset_myxo_bcaUnicauda, x = "Latitude", y = "psite_count",
-                      ggtheme = theme_bw(), rawdata=TRUE,
-                      position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+
-  xlab("Latitude")+ylab("Prevalence of infection")+
-  geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
-
+## Test the effect of distance from the pulp mill (with latitude as proxy for distance) on the prevalence of myxozoanss
 
 # GLM for the probability of finding myxozoans along the river
 
-glm_presence<-glmmTMB(psite_presence ~ Latitude+
-                                      scaled_TL_mm+
-                                      (1|MonthCollected),
-                      data = full_dataset_myxo_bcamyxoboluscarvel,
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
+                        Latitude*CI*Fish_sp.x+
+                        scaled_TL_mm+
+                        (1|MonthCollected),
+                      data = full_dataset_myxo_bca,
                       family=binomial())
 
-glm_presence<-glmmTMB(psite_presence ~ Latitude+
-                        (1|MonthCollected),
-                      data = full_dataset_myxo_bcaChloromyxumcarvel,
-                      family=binomial()) #removed the term length because it gave issues
+      # This model failed to converge. Let's make it a bit simpler by running the model per fish species
 
-summary(glm_presence)
+# GLM for the probability of finding myxozoans in CARVEL along the river
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = carvel_myxo,
+                      family=binomial())
+
+
+summary(glm_presence) 
+      # Model converged, diagnostics are great, no significances at all
+
+
+# GLM for the probability of finding myxozoans in PIMVIG along the river
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = pimvig_myxo,
+                      family=binomial())
+
+
+summary(glm_presence) 
+      # Model converged, diagnostics are great, only fish size was significant (p < 0.01, estimate = -4.182e-02)
+
+# GLM for the probability of finding myxozoans in GAMAFF along the river
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = gamaff_myxo,
+                      family=binomial())
+
+
+summary(glm_presence) 
+      # Model did not converge, however not much to see here since prevalence of infection was really low overall
+
+
+# GLM for the probability of finding myxozoans in ICTPUN along the river, in this case no interaction with parasite genus because there is only one genus for this fish
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = ictpun_myxo,
+                      family=binomial())
+
+summary(glm_presence) 
+      # Model did not converge,  however not much to see here since prevalence of infection was really low overall
+
+
+# GLM for the probability of finding myxozoans in NOTATH along the river, , in this case no interaction with parasite genus because there is only one genus for this fish
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = notath_myxo,
+                      family=binomial())
+
+
+summary(glm_presence) 
+      # Model converged, diagnostics are great, no significances
+
+
+# GLM for the probability of finding myxozoans in HYBNUC along the river, , in this case no interaction with parasite genus because there is only one genus for this fish
+glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
+                        StandardLength_mm+
+                        (1|MonthCollected),
+                      data = hybnuc_myxo,
+                      family=binomial())
+
+
+summary(glm_presence) 
+      # Model did not converge, however not much to see here since prevalence of infection was really low
+
 
 # Evaluate residuals
 # Not suitable for GLM-quasipoisson but for the other models
@@ -287,7 +278,7 @@ plot(s)
 
 
 # With the plot()function
-mydf <- ggpredict(glm_presence, c("Latitude")) 
+mydf <- ggpredict(glm_presence, c("Latitude[all]","Parasite_genus")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -298,34 +289,12 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
 
 plot(mydf,show_data=TRUE)+
   labs(x = 'Latitude', y = 'Probability of myxozoan presence (%)',title=NULL)+
-  apatheme+
-  scale_x_reverse()
+  apatheme
 
-# GLM for the abundance of myxozoans along the river
-glm_count<-glmmTMB(psite_count ~ Latitude+
-                        scaled_TL_mm+
-                        (1|MonthCollected),
-                      data = full_dataset_myxo_bcamyxoboluscarvel,
-                      family=nbinom1())
+# In conclusion, although there was a trend for Myxobolous and Chloromyxum in CARVEl to decrease in prevalence with distance downstream of the pulpmill, there was not a significant effect of distance from pulp mill on the probability of finding myxozoans in fish. 
 
-glm_count<-glmmTMB(psite_count ~ Latitude+
-                     scaled_TL_mm+
-                     (1|MonthCollected),
-                   data = full_dataset_myxo_bcaChloromyxumcarvel,
-                   family=nbinom1()) # not converging even with nbinom2 and removing fish length
-
-summary(glm_count)
-
-#Evaluate residuals
-#Not suitable for GLM-quasipoisson but for the other models
-s=simulateResiduals(fittedModel=glm_count,n=250)
-s$scaledResiduals
-plot(s)
-
-
-#With the plot()function
-mydf <- ggpredict(glm_count, c("Latitude")) 
-
+### Impact of stream flow on parasite presence----
+#Set a theme for all your plots
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
@@ -333,10 +302,66 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         axis.line=element_line(),
         axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-plot(mydf,rawdata=TRUE)+
-  labs(x = 'Latitude', y = 'Myxozoan abundance',title=NULL)+
-  apatheme+
-  scale_x_reverse()
+
+# Plot myxozoan prevalence against streamflow 
+
+myxobolus_flow_plot <-ggerrorplot(myxobolus_physical, x = "meanFlow", y = "psite_presence",
+                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Myxobolus")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+myxobolus_flow_plot
+
+chloromyxum_flow_plot <-ggerrorplot(chloromyxum_physical, x = "meanFlow", y = "psite_presence",
+                                  ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                  position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Chloromyxum")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+chloromyxum_flow_plot
+
+
+henneguya_flow_plot <-ggerrorplot(henneguya_physical, x = "meanFlow", y = "psite_presence",
+                                    ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                    position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Henneguya")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+henneguya_flow_plot
+
+
+myxidium_flow_plot <-ggerrorplot(myxidium_physical, x = "meanFlow", y = "psite_presence",
+                                  ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                  position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Myxidium")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+myxidium_flow_plot
+
+
+thelohanellus_flow_plot <-ggerrorplot(thelohanellus_physical, x = "meanFlow", y = "psite_presence",
+                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                 position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Thelohanellus")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+thelohanellus_flow_plot
+
+Unicauda_flow_plot <-ggerrorplot(unicauda_physical, x = "meanFlow", y = "psite_presence",
+                                      ggtheme = theme_bw(), color="CI",rawdata=TRUE,
+                                      position=position_dodge(0.5),width=0.00, size=0.3)+
+  facet_wrap("Fish_sp.x")+
+  apatheme+ggtitle("Unicauda")+
+  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
+
+Unicauda_flow_plot
+
 
 ### Myxozoan prevalence across time----
 
@@ -436,10 +461,11 @@ glm_presence <- glmer(psite_presence ~ poly(Latitude,3)+YearCollected+
                     data = full_dataset_myxo,family=binomial())
 
 
-glm_presence <- glmmTMB(psite_presence ~ YearCollected+CI*Parasite_genus+scaled_TL_mm+
-                        (1|Fish_sp.x/IndividualFishID)+
+glm_presence <- glmmTMB(psite_presence ~ YearCollected+
+                          CI*Fish_sp.x+
+                          meanFlow*Fish_sp.x+scaled_TL_mm+
                         (1|MonthCollected),
-                      data = full_dataset_myxo,family=binomial())
+                      data = myxobolus_physical,family=binomial())
 
 
 
@@ -453,7 +479,11 @@ plot(s)
 
 
 #With the plot()function
-mydf <- ggpredict(glm_presence, c("Latitude[all]","Parasite_genus")) 
+plot_model(glm_presence)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+
+mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI","Fish_sp.x")) 
+mydf <- ggpredict(glm_presence, c("YearCollected[all]","CI","Fish_sp.x")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -462,10 +492,8 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         axis.line=element_line())
 
 plot(mydf,rawdata=TRUE)+
-  labs(x = 'Latitude', y = 'Probability of myxozoan presence (%)',title=NULL)+
-  apatheme+
-  geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)+
-  scale_x_reverse()
+  labs(x = 'Stream flow (m3/sec)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+  apatheme
 
 ### Myxozoan abundace across time----
 
@@ -607,19 +635,9 @@ plot(mydf,rawdata=TRUE)+
   apatheme+
   geom_vline(xintercept=30.76, linetype="dashed", color = "black", size=0.5)
 
-### Streamflow----
+### Streamflow visualization----
 
-## Import data
-
-physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
-
-View(physicalUSGS)
-
-
-streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
-streamflow_ms <- subset(streamflow, Unit=="m3/sec")
-
-# Plot stream flow against time 
+# Plot stream flow as means throught time
 
 streamflow_plot <-ggerrorplot(streamflow_ms, x = "Year", y = "Result",
                                 ggtheme = theme_bw(),rawdata=TRUE,
@@ -629,11 +647,15 @@ streamflow_plot <-ggerrorplot(streamflow_ms, x = "Year", y = "Result",
 
 streamflow_plot
 
+# Plot stream flow as raw data per year
+
 ggplot(streamflow_ms, aes(x= as.factor(Year),
                   y=Result))+
   geom_point()+apatheme+
   ggtitle("Streamflow per year")+
   xlab("Year")+ylab("Streamflow (m3/sec)")
+
+# Plot stream flow as raw data per month
 
 ggplot(streamflow_ms, aes(x= as.factor(Month),
                            y=Result))+
@@ -642,19 +664,9 @@ ggplot(streamflow_ms, aes(x= as.factor(Month),
   xlab("Month")+ylab("Streamflow (m3/sec)")
 
 
-### Water Temperature USGS----
-
-## Import data
-
-physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
-
-View(physicalUSGS)
-
-
-wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
-
-# Plot stream flow against time 
-
+### Water Temperature USGS visualization----
+# Plot stream flow as means throughout time 
+Full_dataset_physical
 wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
                               ggtheme = theme_bw(),rawdata=TRUE,
                               position=position_dodge(0.5),width=0.00, size=0.3)+
@@ -665,14 +677,7 @@ wtemp_plot
 
 # Water temperature per month
 
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line())
-
-
-ggplot(wtemp, aes(x= as.factor(Month),
+ggplot(wtemp, aes(x= as.factor(MonthCollected),
                             y=Result))+
   geom_point()+apatheme+
   ggtitle("Water temperature per month")+
@@ -680,5 +685,14 @@ ggplot(wtemp, aes(x= as.factor(Month),
   geom_hline(yintercept=20, linetype="dashed", color = "black", size=0.5)
 
 
+# USGS data merged with our data, to double check
+# Water temperature per month
+
+ggplot(Full_dataset_physical, aes(x= as.factor(season_temp),
+                  y=meanTemp))+
+  geom_point()+apatheme+
+  ggtitle("Water temperature per month")+
+  xlab("Month")+ylab("Temperature (degC)")+
+  geom_hline(yintercept=20, linetype="dashed", color = "black", size=0.5)
 
 
