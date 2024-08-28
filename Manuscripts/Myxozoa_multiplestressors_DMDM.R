@@ -4,7 +4,7 @@
 
 
 
-### Preparation of data frames----
+### Load packages----
 
 ##Load packages
 
@@ -29,7 +29,7 @@ library(mgcv)
 library(readr)
 library(dplyr)
 
-
+###Prepare data frames-----
 ## Import data
 
 full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
