@@ -37,15 +37,51 @@ full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_in
 ## Merge with stream flow data
 
 
-# Create a season column for later merging
-
+# Create a yearflow column for later merging
 
 full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
 
 full_dataset$season_flow <- ifelse(full_dataset$MonthCollected > 5 &
                                      full_dataset$MonthCollected < 12,                # condition
-                                             'lowflow',    # what if condition is TRUE
-                                             'highflow')       # what if condition is FALSE
+                                             'low',    # what if condition is TRUE
+                                             'high')       # what if condition is FALSE
+
+full_dataset$yearflow <- paste(as.character(full_dataset$YearCollected),as.character(full_dataset$season_flow),sep="_")
+
+# Read physical data
+physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
+
+# Make a subset only for stream flow in m3/sec
+streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
+streamflow_ms <- subset(streamflow, Unit=="m3/sec")
+
+# Create a yearflow column for later merging
+
+streamflow_ms$MonthCollected <- as.numeric(streamflow_ms$MonthCollected)
+
+streamflow_ms$season_flow <- ifelse(streamflow_ms$MonthCollected > 5 &
+                                      streamflow_ms$MonthCollected < 12,                # condition
+                                   'low',    # what if condition is TRUE
+                                   'high')       # what if condition is FALSE
+
+streamflow_ms$yearflow <- paste(as.character(streamflow_ms$YearCollected),as.character(streamflow_ms$season_flow),sep="_")
+
+# Get rid of columns we do not need
+streamflow_clean <- cbind.data.frame(streamflow_ms$yearflow,streamflow_ms$Result)
+
+# Name the columns
+
+colnames(streamflow_clean)[1]<-"yearflow"
+colnames(streamflow_clean)[2]<-"Result"
+
+# Summarize by taking the mean stream flow per 'yearflow'
+
+streamflow_mean <- streamflow_clean %>% group_by(yearflow) %>% 
+  summarise(meanFlow=mean(Result),
+            .groups = 'drop')
+
+Full_dataset_physical <-merge(full_dataset, streamflow_mean, by.x = "yearflow", by.y = "yearflow", all.x = TRUE)
+
 
 ## Make a subset for myxozoans
 
@@ -581,11 +617,11 @@ View(physicalUSGS)
 
 
 streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
-streamflow_msq <- subset(streamflow, Unit=="m3/sec")
+streamflow_ms <- subset(streamflow, Unit=="m3/sec")
 
 # Plot stream flow against time 
 
-streamflow_plot <-ggerrorplot(streamflow_msq, x = "Year", y = "Result",
+streamflow_plot <-ggerrorplot(streamflow_ms, x = "Year", y = "Result",
                                 ggtheme = theme_bw(),rawdata=TRUE,
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   ggtitle("Streamflow")+
@@ -593,13 +629,13 @@ streamflow_plot <-ggerrorplot(streamflow_msq, x = "Year", y = "Result",
 
 streamflow_plot
 
-ggplot(streamflow_msq, aes(x= as.factor(Year),
+ggplot(streamflow_ms, aes(x= as.factor(Year),
                   y=Result))+
   geom_point()+apatheme+
   ggtitle("Streamflow per year")+
   xlab("Year")+ylab("Streamflow (m3/sec)")
 
-ggplot(streamflow_msq, aes(x= as.factor(Month),
+ggplot(streamflow_ms, aes(x= as.factor(Month),
                            y=Result))+
   geom_point()+apatheme+
   ggtitle("Streamflow per month")+
