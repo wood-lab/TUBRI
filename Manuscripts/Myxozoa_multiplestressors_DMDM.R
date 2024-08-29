@@ -212,9 +212,7 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         scaled_TL_mm+
                         (1|MonthCollected),
                       data = full_dataset_myxo_bca,
-                      family=binomial())
-
-      # This model failed to converge. Let's make it a bit simpler by running the model per fish species
+                      family=binomial()) # This model failed to converge. Let's make it a bit simpler by running the model per fish species
 
 # GLM for the probability of finding myxozoans in CARVEL along the river
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
@@ -224,8 +222,7 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                       family=binomial())
 
 
-summary(glm_presence) 
-      # Model converged, diagnostics are great, no significances at all
+summary(glm_presence) # Model converged, diagnostics are great, no significances at all
 
 
 # GLM for the probability of finding myxozoans in PIMVIG along the river
@@ -236,8 +233,7 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                       family=binomial())
 
 
-summary(glm_presence) 
-      # Model converged, diagnostics are great, only fish size was significant (p < 0.01, estimate = -4.182e-02)
+summary(glm_presence) # Model converged, diagnostics are great, only fish size was significant (p < 0.01, estimate = -4.182e-02)
 
 # GLM for the probability of finding myxozoans in GAMAFF along the river
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
@@ -247,8 +243,7 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                       family=binomial())
 
 
-summary(glm_presence) 
-      # Model did not converge, however not much to see here since prevalence of infection was really low overall
+summary(glm_presence) # Model did not converge, however not much to see here since prevalence of infection was really low overall
 
 
 # GLM for the probability of finding myxozoans in ICTPUN along the river, in this case no interaction with parasite genus because there is only one genus for this fish
@@ -258,8 +253,7 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI+
                       data = ictpun_myxo,
                       family=binomial())
 
-summary(glm_presence) 
-      # Model did not converge,  however not much to see here since prevalence of infection was really low overall
+summary(glm_presence)  # Model did not converge,  however not much to see here since prevalence of infection was really low overall
 
 
 # GLM for the probability of finding myxozoans in NOTATH along the river, , in this case no interaction with parasite genus because there is only one genus for this fish
@@ -270,11 +264,10 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI+
                       family=binomial())
 
 
-summary(glm_presence) 
-      # Model converged, diagnostics are great, no significances
+summary(glm_presence) # Model converged, diagnostics are great, no significances
 
 
-# GLM for the probability of finding myxozoans in HYBNUC along the river, , in this case no interaction with parasite genus because there is only one genus for this fish
+# GLM for the probability of finding myxozoans in HYBNUC along the river, in this case no interaction with parasite genus because there is only one genus for this fish
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         StandardLength_mm+
                         (1|MonthCollected),
@@ -282,12 +275,10 @@ glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                       family=binomial())
 
 
-summary(glm_presence) 
-      # Model did not converge, however not much to see here since prevalence of infection was really low
+summary(glm_presence) # Model did not converge, however not much to see here since prevalence of infection was really low
 
 
 # Evaluate residuals
-# Not suitable for GLM-quasipoisson but for the other models
 s=simulateResiduals(fittedModel=glm_presence,n=250)
 s$scaledResiduals
 plot(s)
@@ -309,76 +300,6 @@ plot(mydf,show_data=TRUE)+
 
 # In conclusion, although there was a trend for Myxobolous and Chloromyxum in CARVEl to decrease in prevalence with distance downstream of the pulpmill, there was not a significant effect of distance from pulp mill on the probability of finding myxozoans in fish. 
 
-### Impact of stream flow on parasite presence----
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# Plot myxozoan prevalence against streamflow 
-
-myxobolus_flow_plot <-ggerrorplot(myxobolus_physical, x = "meanFlow", y = "psite_presence",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Myxobolus")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-myxobolus_flow_plot
-
-chloromyxum_flow_plot <-ggerrorplot(chloromyxum_physical, x = "meanFlow", y = "psite_presence",
-                                  ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                  position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Chloromyxum")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-chloromyxum_flow_plot
-
-
-henneguya_flow_plot <-ggerrorplot(henneguya_physical, x = "meanFlow", y = "psite_presence",
-                                    ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                    position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Henneguya")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-henneguya_flow_plot
-
-
-myxidium_flow_plot <-ggerrorplot(myxidium_physical, x = "meanFlow", y = "psite_presence",
-                                  ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                  position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Myxidium")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-myxidium_flow_plot
-
-
-thelohanellus_flow_plot <-ggerrorplot(thelohanellus_physical, x = "meanFlow", y = "psite_presence",
-                                 ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                 position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Thelohanellus")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-thelohanellus_flow_plot
-
-Unicauda_flow_plot <-ggerrorplot(unicauda_physical, x = "meanFlow", y = "psite_presence",
-                                      ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                      position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Fish_sp.x")+
-  apatheme+ggtitle("Unicauda")+
-  xlab("Stream flow (m3/sec)")+ylab("Prevalence of infection")
-
-Unicauda_flow_plot
-
-
 ### Myxozoan prevalence across time----
 
 #Set a theme for all your plots
@@ -390,7 +311,7 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
-# Plot myxozoan prevalence against time 
+# Plot myxozoan prevalence against time - PIMVIG
 
 pimvig_prevalence <-ggerrorplot(pimvig_myxo, x = "YearCollected", y = "psite_presence",
                       ggtheme = theme_bw(), color="CI",rawdata=TRUE,
@@ -469,11 +390,22 @@ hybnuc_prevalence
 
 glm_presence <- glmmTMB(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
                           CI*Parasite_genus*Fish_sp.x+
-                          meanFlow*Parasite_genus*Fish_sp.x
-                        +scaled_TL_mm+
+                          meanFlow*Parasite_genus*Fish_sp.x+
+                        meanTemp*CI*meanFlow+
+                        scaled_TL_mm+
                         (1|MonthCollected),
                       data = full_dataset_myxo,family=binomial())
-    # This model did not converge. Let's make it simpler by rerunning the models per fish species
+
+glm_presence <- glmer(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
+                          CI*Parasite_genus*Fish_sp.x+
+                          meanFlow*Parasite_genus*Fish_sp.x+
+                          meanTemp*CI*meanFlow+
+                          scaled_TL_mm+
+                          (1|MonthCollected),
+                        data = full_dataset_myxo,family=binomial())
+
+
+# The last two models did not converge. Let's make it simpler by rerunning the models per fish species
 
 
 # GLM for the probability of finding myxozoans for CARVEL
@@ -500,7 +432,7 @@ glm_presence <- glmer(psite_presence ~ YearCollected+
 
 summary(glm_presence)
 
-# Let's make things simpler by running the model per parasite
+# Since these models did not work, let's make things simpler by running the model per parasite
 
 carvel_myxobolus <- subset(carvel_myxo, Parasite_genus=="Myxobolus")
 carvel_chloromyxum <- subset(carvel_myxo, Parasite_genus=="Chloromyxum")
@@ -511,9 +443,10 @@ glm_presence <- glmmTMB(psite_presence ~ meanTemp*CI*meanFlow+
                           CI*before_after+
                           StandardLength_mm+
                           (1|MonthCollected),
-                        data = carvel_myxobolus,family=binomial()) #terrible fit
+                        data = carvel_myxobolus,family=binomial()) #did not converge
 
-glm_presence <- glmer(psite_presence ~ meanTemp*CI*meanFlow+
+glm_presence <- glmer(psite_presence ~
+                        meanTemp*CI*meanFlow+
                           CI*before_after+
                           StandardLength_mm+
                           (1|MonthCollected),
@@ -530,7 +463,7 @@ plot(s)
 
 
 #With the plot()function
-plot_model(glm_presence)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+plot_model(glm_presence,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
 
 mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI","Parasite_genus")) 
@@ -538,8 +471,10 @@ mydf <- ggpredict(glm_presence, c("meanTemp[all]","CI","Parasite_genus"))
 
 
 mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI")) 
-mydf <- ggpredict(glm_presence, c("meanTemp[all]","CI")) 
-mydf <- ggpredict(glm_presence, c("CI","before_after")) 
+mydf <- ggpredict(glm_presence, c("before_after","CI"))
+mydf <- ggpredict(glm_presence, c("CI"))
+
+mydf <- ggpredict(glm_presence, c("meanTemp[n=300]","CI")) 
 
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -547,8 +482,8 @@ apatheme= theme_bw(base_size = 11,base_family = "sans")+
         panel.border=element_blank(),
         axis.line=element_line())
 
-plot(mydf,rawdata=TRUE)+
-  labs(x = 'Stream flow (m3/sec)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+plot(mydf,rawdata=TRUE,jitter=0.05)+
+  labs(x = 'Temperature (C)', y = 'Probability of myxozoan presence (%)',title=NULL)+
   apatheme
 
 ### Myxozoan abundace across time----
