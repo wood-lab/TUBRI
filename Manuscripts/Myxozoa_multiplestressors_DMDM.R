@@ -28,6 +28,7 @@ library(itsadug)
 library(mgcv)
 library(readr)
 library(dplyr)
+library(MuMIn)
 
 ###Prepare data frames-----
 ## Import data
@@ -89,6 +90,20 @@ Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "yearflow
 
 Full_dataset_streamflow$MonthCollected <- as.numeric(Full_dataset_streamflow$MonthCollected)
 
+#Full_dataset_streamflow <- Full_dataset_streamflow %>% 
+ # mutate(season_temp = case_when(MonthCollected >= 6 &
+  #                                 MonthCollected <= 8 ~ "summer", # both tests: group A
+   #                              MonthCollected >= 9 &
+    #                               MonthCollected <= 11 ~ "fall",
+     #                            MonthCollected >= 1 &
+      #                             MonthCollected <= 2 
+       #                          ~ "winter",
+        #                         MonthCollected >= 3 &
+         #                          MonthCollected <= 5 ~ "fall",
+          #                       MonthCollected == 12 ~ "winter"
+  #))
+
+
 Full_dataset_streamflow$season_temp <- ifelse(Full_dataset_streamflow$MonthCollected > 4 &
                                                 Full_dataset_streamflow$MonthCollected < 10,                # condition
                                    'summer',    # what if condition is TRUE
@@ -103,10 +118,24 @@ wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
 
 wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
 
+
+#wtemp <- wtemp %>% 
+ # mutate(season_temp = case_when(MonthCollected >= 6 &
+  #                           MonthCollected <= 8 ~ "summer", # both tests: group A
+   #                        MonthCollected >= 9 &
+    #                         MonthCollected <= 11 ~ "fall",
+     #                      MonthCollected >= 1 &
+      #                       MonthCollected <= 2 
+       #                       ~ "winter",
+        #                   MonthCollected >= 3 &
+         #                    MonthCollected <= 5 ~ "fall",
+          #                 MonthCollected == 12 ~ "winter"
+  #))
+
 wtemp$season_temp <- ifelse(wtemp$MonthCollected > 4 &
-                              wtemp$MonthCollected < 10,                # condition
-                                    'summer',    # what if condition is TRUE
-                                    'winter')       # what if condition is FALSE
+                            wtemp$MonthCollected < 10,                # condition
+                                   'summer',    # what if condition is TRUE
+                                  'winter')       # what if condition is FALSE
 
 wtemp$yearseason <- paste(as.character(wtemp$YearCollected),as.character(wtemp$season_temp),sep="_")
 
@@ -118,7 +147,7 @@ wtemp_clean <- cbind.data.frame(wtemp$yearseason,wtemp$Result)
 colnames(wtemp_clean)[1]<-"yearseason"
 colnames(wtemp_clean)[2]<-"Result"
 
-# Summarize by taking the mean stream flow per 'yearseason'
+# Summarize by taking the mean temperature 'yearseason'
 
 wtemp_mean <- wtemp_clean %>% group_by(yearseason) %>% 
   summarise(meanTemp=mean(Result),
@@ -180,6 +209,25 @@ ictpun_count <- subset(myxo_count, Fish_sp.x == "Ictalurus punctatus")
 notath_count <- subset(myxo_count, Fish_sp.x == "Notropis atherinoides")
 carvel_count <- subset(myxo_count, Fish_sp.x == "Carpiodes velifer")
 hybnuc_count <- subset(myxo_count, Fish_sp.x == "Hybognathus nuchalis")
+
+## Do a quick check for collinearity
+# Get only columns for which we want to check collinearity -scaled
+colfull_dataset_myxo <- cbind.data.frame(scale(full_dataset_myxo$meanFlow),
+                                         scale(full_dataset_myxo$meanTemp),
+                                         scale(full_dataset_myxo$YearCollected),
+                                         full_dataset_myxo$scaled_TL_mm)
+
+
+cor(colfull_dataset_myxo) 
+
+# Get only columns for which we want to check collinearity - unscaled
+colfull_dataset_myxo <- cbind.data.frame(full_dataset_myxo$meanFlow,
+                                         full_dataset_myxo$meanTemp,
+                                         full_dataset_myxo$YearCollected,
+                                         full_dataset_myxo$scaled_TL_mm)
+
+
+cor(colfull_dataset_myxo) 
 
 
 ### Before clean water act, impact of distance from pulp mill on prevalence----
@@ -393,6 +441,7 @@ glm_presence <- glmmTMB(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
                           meanFlow*Parasite_genus*Fish_sp.x+
                         meanTemp*CI*meanFlow+
                         scaled_TL_mm+
+                          (1|IndividualFishID)+
                         (1|MonthCollected),
                       data = full_dataset_myxo,family=binomial())
 
@@ -401,6 +450,7 @@ glm_presence <- glmer(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
                           meanFlow*Parasite_genus*Fish_sp.x+
                           meanTemp*CI*meanFlow+
                           scaled_TL_mm+
+                        (1|IndividualFishID)+
                           (1|MonthCollected),
                         data = full_dataset_myxo,family=binomial())
 
@@ -408,52 +458,40 @@ glm_presence <- glmer(psite_presence ~ meanTemp*Parasite_genus*Fish_sp.x+
 # The last two models did not converge. Let's make it simpler by rerunning the models per fish species
 
 
-# GLM for the probability of finding myxozoans for CARVEL
+## GLM for the probability of finding myxozoans for CARVEL
+carvel_myxo$Parasite_genus <- relevel(carvel_myxo$Parasite_genus, ref = "Myxobolus")
+carvel_myxo$before_after <- relevel(carvel_myxo$before_after, ref = "before")
 
-glm_presence <- glmmTMB(psite_presence ~ meanTemp*CI*meanFlow+
-                          CI*before_after+
-                          StandardLength_mm+
-                          meanTemp*Parasite_genus+
-                          meanFlow*Parasite_genus+
-                          CI*Parasite_genus+
-                          (1|MonthCollected),
-                        data = carvel_myxo,family=binomial()) #terrible fit
-
-glm_presence <- glmer(psite_presence ~ YearCollected+
-                        meanTemp*CI*meanFlow+
-                          CI*before_after+
-                          StandardLength_mm+
-                          meanTemp*Parasite_genus+
-                          meanFlow*Parasite_genus+
-                          CI*Parasite_genus+
-                          (1|MonthCollected),
-                        data = carvel_myxo,family=binomial()) #terrible fit
+glm_presence <- glmer(psite_presence ~ scale(YearCollected)*
+                        scale(meanTemp)*CI*scale(meanFlow)*Parasite_genus+
+                        scaled_TL_mm+
+                        (1|IndividualFishID)+
+                        (1|MonthCollected),
+                      data = carvel_myxo,family=binomial()) #did not converge
 
 
-summary(glm_presence)
+glm_presence <- glmmTMB(psite_presence ~ scale(YearCollected)*
+                        scale(meanTemp)*CI*scale(meanFlow)*Parasite_genus+
+                        scaled_TL_mm+
+                      (1|IndividualFishID)+
+                      (1|MonthCollected),
+                      data = carvel_myxo,family=binomial()) #did not converge
 
-# Since these models did not work, let's make things simpler by running the model per parasite
 
-carvel_myxobolus <- subset(carvel_myxo, Parasite_genus=="Myxobolus")
-carvel_chloromyxum <- subset(carvel_myxo, Parasite_genus=="Chloromyxum")
-
-# GLM for the probability of finding myxozoans for CARVEL infected with Myxobolus
-
-glm_presence <- glmmTMB(psite_presence ~ meanTemp*CI*meanFlow+
-                          CI*before_after+
-                          StandardLength_mm+
-                          (1|MonthCollected),
-                        data = carvel_myxobolus,family=binomial()) #did not converge
-
-glm_presence <- glmer(psite_presence ~
-                        meanTemp*CI*meanFlow+
-                          CI*before_after+
-                          StandardLength_mm+
-                          (1|MonthCollected),
-                        data = carvel_myxobolus,family=binomial()) #terrible fit
+glm_presence <- glmer(psite_presence ~ scale(YearCollected)+
+                        scale(meanTemp)*CI*scale(meanFlow)+
+                        CI*before_after+
+                        scaled_TL_mm+
+                        scale(meanTemp)*Parasite_genus+
+                        scale(meanFlow)*Parasite_genus+
+                        CI*Parasite_genus+
+                        (1|IndividualFishID)+
+                        (1|MonthCollected),
+                      data = carvel_myxo,family=binomial()) #singular fit, diagnostics are OK
 
 
 summary(glm_presence)
+
 
 #Evaluate residuals
 #Not suitable for GLM-quasipoisson but for the other models
@@ -465,25 +503,90 @@ plot(s)
 #With the plot()function
 plot_model(glm_presence,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
+# Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI","Parasite_genus")) 
-mydf <- ggpredict(glm_presence, c("meanTemp[all]","CI","Parasite_genus")) 
+mydf <- ggpredict(glm_presence, c("meanFlow[n=200]","CI","Parasite_genus")) 
+
+    plot(mydf,rawdata=TRUE,jitter=0.05)+
+      labs(x = 'Stream flow (m3/sec)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+      apatheme
+
+# Temperature with CI and psite_genus
+mydf <- ggpredict(glm_presence, c("meanTemp[n=200]","CI","Parasite_genus")) 
+
+    plot(mydf,show_data = TRUE, show_ci = TRUE, jitter=0.05)+
+      labs(x = 'Temperature (C)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+      apatheme
+
+# only temperature
+mydf <- ggpredict(glm_presence, c("meanTemp[n=200]")) 
+
+        plot(mydf,show_data = TRUE, show_ci = TRUE, jitter=0.05)+
+          labs(x = 'Temperature (C)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+          apatheme
+
+# only flow
+mydf <- ggpredict(glm_presence, c("meanFlow[n=200]")) 
+
+          plot(mydf,rawdata=TRUE,jitter=0.05)+
+        labs(x = 'Stream flow (m3/sec)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+        apatheme
+          
+          
+## GLM for the probability of finding myxozoans for HYBNUC
+glm_presence <- glmer(psite_presence ~ scale(YearCollected)*
+                                  scale(meanTemp)*CI*scale(meanFlow)*Parasite_genus+
+                                  scaled_TL_mm+
+                                  (1|IndividualFishID)+
+                                  (1|MonthCollected),
+                                data = hybnuc_myxo,family=binomial()) #did not converge
+          
+          
+glm_presence <- glmmTMB(psite_presence ~ scale(YearCollected)*
+                          scale(meanTemp)*CI*scale(meanFlow)*Parasite_genus+
+                          scaled_TL_mm+
+                          (1|IndividualFishID)+
+                          (1|MonthCollected),
+                        data = hybnuc_myxo,family=binomial()) #did not converge
+          
+          
+glm_presence <- glmer(psite_presence ~ scale(YearCollected)+
+                        scale(meanTemp)*CI*scale(meanFlow)+
+                        CI*before_after+
+                        scaled_TL_mm+
+                        scale(meanTemp)*Parasite_genus+
+                        scale(meanFlow)*Parasite_genus+
+                        CI*Parasite_genus+
+                        (1|IndividualFishID)+
+                        (1|MonthCollected),
+                      data = hybnuc_myxo,family=binomial()) #singular fit, diagnostics are OK
 
 
-mydf <- ggpredict(glm_presence, c("meanFlow[all]","CI")) 
-mydf <- ggpredict(glm_presence, c("before_after","CI"))
-mydf <- ggpredict(glm_presence, c("CI"))
+summary(glm_presence)
+          
+          
+#Evaluate residuals
+  #Not suitable for GLM-quasipoisson but for the other models
+  s=simulateResiduals(fittedModel=glm_presence,n=250)
+  s$scaledResiduals
+  plot(s)
+          
+          
+# With the plot()function
+plot_model(glm_presence,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+  
+# only temperature
+mydf <- ggpredict(glm_presence, c("CI","before_after")) 
 
-mydf <- ggpredict(glm_presence, c("meanTemp[n=300]","CI")) 
+plot(mydf,show_data = TRUE, show_ci = TRUE, jitter=0.05)+
+  labs(x = 'Temperature (C)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+  apatheme
 
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line())
+# only flow
+mydf <- ggpredict(glm_presence, c("meanFlow[n=200]")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature (C)', y = 'Probability of myxozoan presence (%)',title=NULL)+
+  labs(x = 'Stream flow (m3/sec)', y = 'Probability of myxozoan presence (%)',title=NULL)+
   apatheme
 
 ### Myxozoan abundace across time----
@@ -650,7 +753,7 @@ ggplot(Full_dataset_physical, aes(x= meanFlow,
 
 ### Water Temperature USGS visualization----
 # Plot stream flow as means throughout time 
-Full_dataset_physical
+
 wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
                               ggtheme = theme_bw(),rawdata=TRUE,
                               position=position_dodge(0.5),width=0.00, size=0.3)+
@@ -666,9 +769,11 @@ ggplot(wtemp, aes(x= as.factor(MonthCollected),
   geom_point()+apatheme+
   ggtitle("Water temperature per month")+
   xlab("Month")+ylab("Temperature (degC)")+
-  geom_hline(yintercept=20, linetype="dashed", color = "black", size=0.5)
+  geom_hline(yintercept=15, linetype="dashed", color = "black", size=0.5)+
+  geom_hline(yintercept=25, linetype="dashed", color = "black", size=0.5)+
+  geom_hline(yintercept=35, linetype="dashed", color = "black", size=0.5)
 
-
+hist(wtemp$Result)
 # USGS data merged with our data, to double check
 # Water temperature per month
 
@@ -685,6 +790,14 @@ ggplot(Full_dataset_physical, aes(x= as.factor(season_temp),
 ggplot(Full_dataset_physical, aes(x= meanTemp,
                                   y=meanFlow))+
   geom_point()+apatheme+
+  ggtitle("Streamflow as as function of temperature")+
+  xlab("Temperature")+ylab("Streamflow")
+
+
+ggplot(carvel_myxo, aes(x= YearCollected,
+                                  y=meanTemp,color=season_temp))+
+  geom_point()+apatheme+
+  facet_wrap("Parasite_genus")+
   ggtitle("Streamflow as as function of temperature")+
   xlab("Temperature")+ylab("Streamflow")
 
