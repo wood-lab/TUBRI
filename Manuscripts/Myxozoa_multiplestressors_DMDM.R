@@ -229,6 +229,13 @@ colfull_dataset_myxo <- cbind.data.frame(full_dataset_myxo$meanFlow,
 
 cor(colfull_dataset_myxo) 
 
+# Set a theme for all your plots
+apatheme= theme_bw(base_size = 11,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 ### Before clean water act, impact of distance from pulp mill on prevalence----
 
@@ -591,51 +598,6 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 ### Myxozoan abundace across time. CARVEL----
 
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# Plot myxozoan abundance against time 
-
-pimvig_abundance <-ggerrorplot(pimvig_count, x = "YearCollected", y = "psite_count",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Pimephales vigilax")+
-  xlab("Year")+ylab("Abundance")
-
-pimvig_abundance
-
-# Plot myxozoan abundance against time - GAMAFF
-
-gamaff_abundance <-ggerrorplot(gamaff_count, x = "YearCollected", y = "psite_count",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Gambusia affinis")+
-  xlab("Year")+ylab("Abundance")
-
-gamaff_abundance
-
-# Plot myxozoan abundance against time - ICTPUN
-
-ictpun_abundance <-ggerrorplot(ictpun_count, x = "YearCollected", y = "psite_count",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Ictalurus punctatus")+
-  xlab("Year")+ylab("Abundance")
-
-ictpun_abundance
-
-
-# NOTATH does not play a role here because it is only infected with myxidium and that can only be analyzed in terms of presence and absence
-
 # Plot myxozoan prevalence against time - CARVEL
 
 carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_count",
@@ -643,42 +605,60 @@ carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_cou
                                 position=position_dodge(0.5),width=0.00, size=0.3)+
   facet_wrap("Parasite_genus")+
   apatheme+ggtitle("Carpiodes velifer")+
-  xlab("Year")+ylab("Abundance")
+  xlab("Year")+ylab("Abundance")+
+  geom_vline(xintercept="1972", linetype="dashed", color = "black", size=0.5)
+
 
 carvel_abundance
 
-
-# Plot myxozoan prevalence against time - HYBNUC
-
-hybnuc_abundance <-ggerrorplot(hybnuc_count, x = "YearCollected", y = "psite_count",
-                                ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Hybognathus nuchalis")+
-  xlab("Year")+ylab("Abundance")
-
-
-hybnuc_abundance
-
 ## GLM for CARVEL
 
+# For the random effects: there are multiple entries for one fish individual which creates pseudoreplicates. Also, we still have to account for the dependency between fish sampled from the same lot (CatalogNumber). IndividualFishID is nested in CatalogNumber.
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
-                       scaled_TL_mm+
-                       (1|CatalogNumber)+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber/IndividualFishID)+ 
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #four way interaction is too much
+                     data = carvel_count,family=nbinom2()) #NA for four way interaction. four way interaction is too much
 
-
+# We try by letting YearCollected on its own to account changes throughout time, but the stressors we keep them interacting. Multicollinearity was checked and there was none.
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                         scale(meanTemp)*CI*scale(meanFlow)+
                         CI*before_after+
                         offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
+                        (1|CatalogNumber/IndividualFishID)+
                         (1|MonthCollected),
-                      data = carvel_count,family=nbinom2()) #good convergence, good diagnostics, 
+                      data = carvel_count,family=nbinom2()) #this converged, but overdispersed
 
+# We try the same but with zero-inflation
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber/IndividualFishID)+
+                       (1|MonthCollected),
+                     ziformula=~1,
+                     data = carvel_count,family=nbinom2()) #still bad diagnostics
+
+# Lets try with nbinom1
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber/IndividualFishID)+
+                       (1|MonthCollected),
+                     data = carvel_count,family=nbinom1()) #did not converge
+
+
+# Nbinom1 with zi
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber/IndividualFishID)+
+                       (1|MonthCollected),
+                     data = carvel_count,family=nbinom1()) #did not converge
 
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
@@ -686,21 +666,54 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
+                     ziformula=~1,
                      data = carvel_count,family=nbinom1()) #good convergence, good diagnostics, 
 
-glm_count <- glmer.nb(psite_count ~ scale(YearCollected)+
+
+
+## Let's simplify the random structure by accounting only for the lot (CatalogNumber)
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count) #good convergence, bad diagnostics, 
+                     data = carvel_count,family=nbinom2()) #this converged, but overdispersed
+
+# We try the same but with zero-inflation
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     ziformula=~1,
+                     data = carvel_count,family=nbinom2()) #still bad diagnostics
+
+# nbinom1 without zi
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = carvel_count,family=nbinom1()) #this converged, but bad diagnostics
+
+# We try the same but with zero-inflation
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     ziformula=~1,
+                     data = carvel_count,family=nbinom1()) #good convergence and diagnostics
+
 
 summary(glm_count)
 
 
 #Evaluate residuals
-#Not suitable for GLM-quasipoisson but for the other models
 s=simulateResiduals(fittedModel=glm_count,n=250)
 s$scaledResiduals
 plot(s)
@@ -731,7 +744,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 mydf <- ggpredict(glm_count, c("YearCollected[n=200]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
+  labs(x = 'Year', y = 'Abundance of myxozoans',title=NULL)+
   apatheme
 
 
@@ -746,63 +759,6 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 ### Myxozoan abundace across time. HYBNUC----
 
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# Plot myxozoan abundance against time 
-
-pimvig_abundance <-ggerrorplot(pimvig_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Pimephales vigilax")+
-  xlab("Year")+ylab("Abundance")
-
-pimvig_abundance
-
-# Plot myxozoan abundance against time - GAMAFF
-
-gamaff_abundance <-ggerrorplot(gamaff_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Gambusia affinis")+
-  xlab("Year")+ylab("Abundance")
-
-gamaff_abundance
-
-# Plot myxozoan abundance against time - ICTPUN
-
-ictpun_abundance <-ggerrorplot(ictpun_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Ictalurus punctatus")+
-  xlab("Year")+ylab("Abundance")
-
-ictpun_abundance
-
-
-# NOTATH does not play a role here because it is only infected with myxidium and that can only be analyzed in terms of presence and absence
-
-# Plot myxozoan prevalence against time - CARVEL
-
-carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Carpiodes velifer")+
-  xlab("Year")+ylab("Abundance")
-
-carvel_abundance
-
-
 # Plot myxozoan prevalence against time - HYBNUC
 
 hybnuc_abundance <-ggerrorplot(hybnuc_count, x = "YearCollected", y = "psite_count",
@@ -817,13 +773,46 @@ hybnuc_abundance
 
 ## GLM for CARVEL
 
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*Parasite_genus*
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       scaled_TL_mm+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count,family=nbinom1()) #five way interaction is too much with both nbinom1, nbinom2
+
+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)*Parasite_genus+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count,family=nbinom1()) #bad convergence, four way interaction too much with both nbinom1, nbinom2
+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       scale(meanTemp)*Parasite_genus+
+                       scale(meanFlow)*Parasite_genus+
+                       CI*Parasite_genus+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count,family=nbinom2()) #bad convergence we simplify by creating a subset by parasite genus
+
+# Create a subset for unicauda. For Myxobolus abundances are below three cysts per fish.
+
+hybnuc_count_uni <- subset(hybnuc_count,Parasite_genus == "Unicauda")
+
+# Full interaction model
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        scaled_TL_mm+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #four way interaction is too much
+                     data = hybnuc_count_uni,family=nbinom1()) #four way interaction is too much with both nbinom1, nbinom2
 
 
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
@@ -832,8 +821,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #good convergence, good diagnostics, 
-
+                     data = hybnuc_count_uni,family=poisson()) #bad convergence
 
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
@@ -841,17 +829,33 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #good convergence, good diagnostics, 
+                     data = hybnuc_count_uni,family=nbinom1()) #bad convergence
 
-glm_count <- glmer.nb(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
-                        (1|MonthCollected),
-                      data = carvel_count) #good convergence, bad diagnostics, 
+glm_count <- glmmTMB(psite_count ~ 
+                       scale(meanTemp)*CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count_uni,family=nbinom1()) #bad convergence
 
-summary(glm_count)
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count_uni,family=nbinom1()) #bad convergence
+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)*scale(meanFlow)+
+                       CI+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = hybnuc_count_uni,family=nbinom1()) #bad convergence
+
+
 
 
 #Evaluate residuals
@@ -892,7 +896,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("before_after","CI")) 
+mydf <- ggpredict(glm_count, c("CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
   labs(x = 'Clean water act', y = 'Abundance of myxozoans',title=NULL)+
@@ -901,36 +905,6 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 ### Myxozoan abundace across time. ICTPUN----
 
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# Plot myxozoan abundance against time 
-
-pimvig_abundance <-ggerrorplot(pimvig_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Pimephales vigilax")+
-  xlab("Year")+ylab("Abundance")
-
-pimvig_abundance
-
-# Plot myxozoan abundance against time - GAMAFF
-
-gamaff_abundance <-ggerrorplot(gamaff_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Gambusia affinis")+
-  xlab("Year")+ylab("Abundance")
-
-gamaff_abundance
 
 # Plot myxozoan abundance against time - ICTPUN
 
@@ -944,31 +918,6 @@ ictpun_abundance <-ggerrorplot(ictpun_count, x = "YearCollected", y = "psite_cou
 ictpun_abundance
 
 
-# NOTATH does not play a role here because it is only infected with myxidium and that can only be analyzed in terms of presence and absence
-
-# Plot myxozoan prevalence against time - CARVEL
-
-carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Carpiodes velifer")+
-  xlab("Year")+ylab("Abundance")
-
-carvel_abundance
-
-
-# Plot myxozoan prevalence against time - HYBNUC
-
-hybnuc_abundance <-ggerrorplot(hybnuc_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Hybognathus nuchalis")+
-  xlab("Year")+ylab("Abundance")
-
-
-hybnuc_abundance
 
 ## GLM for CARVEL
 
@@ -978,7 +927,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        scaled_TL_mm+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #four way interaction is too much
+                     data = ictpun_count,family=nbinom2()) #four way interaction is too much
 
 
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
@@ -987,73 +936,26 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #good convergence, good diagnostics, 
-
+                     data = ictpun_count,family=nbinom1()) #no convergence
 
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+
                        (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #good convergence, good diagnostics, 
+                     data = ictpun_count,family=nbinom2()) #no convergence
 
-glm_count <- glmer.nb(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
-                        (1|MonthCollected),
-                      data = carvel_count) #good convergence, bad diagnostics, 
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
+                       scale(meanTemp)+CI+scale(meanFlow)+
+                       before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+
+                       (1|MonthCollected),
+                     data = ictpun_count,family=nbinom1()) #no convergence
 
 summary(glm_count)
 
-
-#Evaluate residuals
-#Not suitable for GLM-quasipoisson but for the other models
-s=simulateResiduals(fittedModel=glm_count,n=250)
-s$scaledResiduals
-plot(s)
-
-
-#With the plot()function
-plot_model(glm_count,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
-
-# Flow with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("meanFlow[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-# Temperature with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("meanTemp[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
-# Temperature with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("YearCollected[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
-# Flow with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("before_after","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Clean water act', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
+# nothing is converging, with neither nbinom1 and nbinom2, but makes sense because only 1963 there was an observation of 25 cysts per fish and the rest was near zero, so there is no change to analyze
 
 ### Myxozoan abundace across time. GAMAFF----
 
@@ -1212,162 +1114,6 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 
 ### Myxozoan abundace across time. PIMVIG----
-
-#Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
-  theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
-        panel.border=element_blank(),
-        axis.line=element_line(),
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# Plot myxozoan abundance against time 
-
-pimvig_abundance <-ggerrorplot(pimvig_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Pimephales vigilax")+
-  xlab("Year")+ylab("Abundance")
-
-pimvig_abundance
-
-# Plot myxozoan abundance against time - GAMAFF
-
-gamaff_abundance <-ggerrorplot(gamaff_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Gambusia affinis")+
-  xlab("Year")+ylab("Abundance")
-
-gamaff_abundance
-
-# Plot myxozoan abundance against time - ICTPUN
-
-ictpun_abundance <-ggerrorplot(ictpun_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Ictalurus punctatus")+
-  xlab("Year")+ylab("Abundance")
-
-ictpun_abundance
-
-
-# NOTATH does not play a role here because it is only infected with myxidium and that can only be analyzed in terms of presence and absence
-
-# Plot myxozoan prevalence against time - CARVEL
-
-carvel_abundance <-ggerrorplot(carvel_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Carpiodes velifer")+
-  xlab("Year")+ylab("Abundance")
-
-carvel_abundance
-
-
-# Plot myxozoan prevalence against time - HYBNUC
-
-hybnuc_abundance <-ggerrorplot(hybnuc_count, x = "YearCollected", y = "psite_count",
-                               ggtheme = theme_bw(), color="CI",rawdata=TRUE,
-                               position=position_dodge(0.5),width=0.00, size=0.3)+
-  facet_wrap("Parasite_genus")+
-  apatheme+ggtitle("Hybognathus nuchalis")+
-  xlab("Year")+ylab("Abundance")
-
-
-hybnuc_abundance
-
-## GLM for CARVEL
-
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       scaled_TL_mm+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #four way interaction is too much
-
-
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #good convergence, good diagnostics, 
-
-
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #good convergence, good diagnostics, 
-
-glm_count <- glmer.nb(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
-                        (1|MonthCollected),
-                      data = carvel_count) #good convergence, bad diagnostics, 
-
-summary(glm_count)
-
-
-#Evaluate residuals
-#Not suitable for GLM-quasipoisson but for the other models
-s=simulateResiduals(fittedModel=glm_count,n=250)
-s$scaledResiduals
-plot(s)
-
-
-#With the plot()function
-plot_model(glm_count,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
-
-# Flow with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("meanFlow[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-# Temperature with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("meanTemp[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
-# Temperature with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("YearCollected[n=200]","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
-# Flow with CI and psite_genus
-
-mydf <- ggpredict(glm_count, c("before_after","CI")) 
-
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Clean water act', y = 'Abundance of myxozoans',title=NULL)+
-  apatheme
-
-
-
-### Myxozoan abundace across time. NOTATH----
 
 #Set a theme for all your plots
 apatheme= theme_bw(base_size = 11,base_family = "sans")+
