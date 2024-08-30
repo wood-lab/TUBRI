@@ -618,7 +618,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber/IndividualFishID)+ 
+                       (1|CatalogNumber)+ 
                        (1|MonthCollected),
                      data = carvel_count,family=nbinom2()) #NA for four way interaction. four way interaction is too much
 
@@ -627,7 +627,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                         scale(meanTemp)*CI*scale(meanFlow)+
                         CI*before_after+
                         offset(scaled_TL_mm)+
-                        (1|CatalogNumber/IndividualFishID)+
+                        (1|CatalogNumber)+
                         (1|MonthCollected),
                       data = carvel_count,family=nbinom2()) #this converged, but overdispersed
 
@@ -636,7 +636,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber/IndividualFishID)+
+                       (1|CatalogNumber)+
                        (1|MonthCollected),
                      ziformula=~1,
                      data = carvel_count,family=nbinom2()) #still bad diagnostics
@@ -646,7 +646,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber/IndividualFishID)+
+                       (1|CatalogNumber)+
                        (1|MonthCollected),
                      data = carvel_count,family=nbinom1()) #did not converge
 
@@ -656,7 +656,7 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
                        scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber/IndividualFishID)+
+                       (1|CatalogNumber)+
                        (1|MonthCollected),
                      data = carvel_count,family=nbinom1()) #did not converge
 
