@@ -621,6 +621,13 @@ ict_pun_processed_data$Weight_mg[ict_pun_processed_data$IndividualFishID=="15731
 stuff<-ict_pun_processed_data %>%
   filter(IndividualFishID=="157316_02")
 
+# Someone recorded month and day of collection wrong
+
+ict_pun_processed_data$MonthCollected[ict_pun_processed_data$IndividualFishID=="99517_02"]<-10
+ict_pun_processed_data$DayCollected[ict_pun_processed_data$IndividualFishID=="99517_02"]<-13
+ict_pun_processed_data$MonthCollected[ict_pun_processed_data$IndividualFishID=="99517_01"]<-10
+ict_pun_processed_data$DayCollected[ict_pun_processed_data$IndividualFishID=="99517_01"]<-13
+
 
 # Make the dataset analyzable
 
