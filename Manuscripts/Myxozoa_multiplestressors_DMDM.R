@@ -38,16 +38,18 @@ full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_in
 ## Merge with physical data
 
 # Stream flow
-# Create a yearflow column for later merging
+## NOT USING THIS ANYMORE - instead of creating an average per season per year, we are going to do an average per year so it reflects global warming and not seasonality.
 
-full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
+##Create a yearflow column for later merging
 
-full_dataset$season_flow <- ifelse(full_dataset$MonthCollected > 5 &
-                                     full_dataset$MonthCollected < 12,                # condition
-                                             'low',    # what if condition is TRUE
-                                             'high')       # what if condition is FALSE
+#full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
 
-full_dataset$yearflow <- paste(as.character(full_dataset$YearCollected),as.character(full_dataset$season_flow),sep="_")
+#full_dataset$season_flow <- ifelse(full_dataset$MonthCollected > 5 &
+                                   #  full_dataset$MonthCollected < 12,                # condition
+                                         #    'low',    # what if condition is TRUE
+                                          #   'high')       # what if condition is FALSE
+
+#full_dataset$yearflow <- paste(as.character(full_dataset$YearCollected),as.character(full_dataset$season_flow),sep="_")
 
 # Read physical data
 physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
@@ -58,32 +60,38 @@ streamflow_ms <- subset(streamflow, Unit=="m3/sec")
 
 # Create a yearflow column for later merging
 
-streamflow_ms$MonthCollected <- as.numeric(streamflow_ms$MonthCollected)
+#streamflow_ms$MonthCollected <- as.numeric(streamflow_ms$MonthCollected)
 
-streamflow_ms$season_flow <- ifelse(streamflow_ms$MonthCollected > 5 &
-                                      streamflow_ms$MonthCollected < 12,                # condition
-                                   'low',    # what if condition is TRUE
-                                   'high')       # what if condition is FALSE
+#streamflow_ms$season_flow <- ifelse(streamflow_ms$MonthCollected > 5 &
+                                      #streamflow_ms$MonthCollected < 12,                # condition
+                                  # 'low',    # what if condition is TRUE
+                                   #'high')       # what if condition is FALSE
 
-streamflow_ms$yearflow <- paste(as.character(streamflow_ms$YearCollected),as.character(streamflow_ms$season_flow),sep="_")
+#streamflow_ms$yearflow <- paste(as.character(streamflow_ms$YearCollected),as.character(streamflow_ms$season_flow),sep="_")
 
 # Get rid of columns we do not need
-streamflow_clean <- cbind.data.frame(streamflow_ms$yearflow,streamflow_ms$Result)
+# streamflow_clean <- cbind.data.frame(streamflow_ms$yearflow,streamflow_ms$Result)
 
 # Name the columns
 
-colnames(streamflow_clean)[1]<-"yearflow"
-colnames(streamflow_clean)[2]<-"Result"
+# colnames(streamflow_clean)[1]<-"yearflow"
+# colnames(streamflow_clean)[2]<-"Result"
 
 # Summarize by taking the mean stream flow per 'yearflow'
 
-streamflow_mean <- streamflow_clean %>% group_by(yearflow) %>% 
+# streamflow_mean <- streamflow_clean %>% group_by(yearflow) %>% 
+  # summarise(meanFlow=mean(Result),
+    #        .groups = 'drop')
+
+# Summarize by taking the mean stream flow per 'yearflow'
+
+streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
   summarise(meanFlow=mean(Result),
             .groups = 'drop')
 
 # Merge with parasite data
 
-Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "yearflow", by.y = "yearflow", all.x = TRUE)
+Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 # Adding water temperature data
 # Create a yearseason column in our data for later merging
@@ -104,19 +112,19 @@ Full_dataset_streamflow$MonthCollected <- as.numeric(Full_dataset_streamflow$Mon
   #))
 
 
-Full_dataset_streamflow$season_temp <- ifelse(Full_dataset_streamflow$MonthCollected > 4 &
-                                                Full_dataset_streamflow$MonthCollected < 10,                # condition
-                                   'summer',    # what if condition is TRUE
-                                   'winter')       # what if condition is FALSE
+## Full_dataset_streamflow$season_temp <- ifelse(Full_dataset_streamflow$MonthCollected > 4 &
+                                  #              Full_dataset_streamflow$MonthCollected < 10,                # condition
+                                   #'summer',    # what if condition is TRUE
+                                   #'winter')       # what if condition is FALSE
 
-Full_dataset_streamflow$yearseason <- paste(as.character(Full_dataset_streamflow$YearCollected),as.character(Full_dataset_streamflow$season_temp),sep="_")
+#Full_dataset_streamflow$yearseason <- paste(as.character(Full_dataset_streamflow$YearCollected),as.character(Full_dataset_streamflow$season_temp),sep="_")
 
 # Make a subset of only water temperature
 wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
 
 # Create a yearseason column in USGS data for later merging
 
-wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
+#wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
 
 
 #wtemp <- wtemp %>% 
@@ -132,30 +140,50 @@ wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
           #                 MonthCollected == 12 ~ "winter"
   #))
 
-wtemp$season_temp <- ifelse(wtemp$MonthCollected > 4 &
-                            wtemp$MonthCollected < 10,                # condition
-                                   'summer',    # what if condition is TRUE
-                                  'winter')       # what if condition is FALSE
+#wtemp$season_temp <- ifelse(wtemp$MonthCollected > 4 &
+                           # wtemp$MonthCollected < 10,                # condition
+                                #   'summer',    # what if condition is TRUE
+                                 # 'winter')       # what if condition is FALSE
 
-wtemp$yearseason <- paste(as.character(wtemp$YearCollected),as.character(wtemp$season_temp),sep="_")
+#wtemp$yearseason <- paste(as.character(wtemp$YearCollected),as.character(wtemp$season_temp),sep="_")
 
 # Get rid of columns we do not need
-wtemp_clean <- cbind.data.frame(wtemp$yearseason,wtemp$Result)
+#wtemp_clean <- cbind.data.frame(wtemp$yearseason,wtemp$Result)
 
 # Name the columns
 
-colnames(wtemp_clean)[1]<-"yearseason"
-colnames(wtemp_clean)[2]<-"Result"
+#colnames(wtemp_clean)[1]<-"yearseason"
+#colnames(wtemp_clean)[2]<-"Result"
 
 # Summarize by taking the mean temperature 'yearseason'
 
-wtemp_mean <- wtemp_clean %>% group_by(yearseason) %>% 
-  summarise(meanTemp=mean(Result),
+wtemp_summ <- wtemp %>% group_by(YearCollected) %>% 
+  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
             .groups = 'drop')
 
 # Merge with parasite data
 
-Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_mean, by.x = "yearseason", by.y = "yearseason", all.x = TRUE)
+Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_summ, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+
+## Create a season column
+
+Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
+
+Full_dataset_physical <- Full_dataset_physical %>% 
+mutate(season = case_when(  MonthCollected >= 1 &
+                            MonthCollected <= 2 
+                          ~ "winter",
+                          MonthCollected >= 3 &
+                            MonthCollected <= 5 ~ "spring",
+                          MonthCollected >= 6 &
+                          MonthCollected <= 8 ~ "summer",
+                        MonthCollected >= 9 &
+                         MonthCollected <= 11 ~ "fall",
+                        MonthCollected == 12 ~ "winter",
+))
+
+Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
+
 
 ## Make a subset for myxozoans
 
@@ -175,7 +203,6 @@ full_dataset_myxo$CI <- as.factor(full_dataset_myxo$CI)
 full_dataset_myxo$Fish_sp.x <- as.factor(full_dataset_myxo$Fish_sp.x)
 full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
 full_dataset_myxo$before_after <- as.factor(full_dataset_myxo$before_after)
-full_dataset_myxo$season_temp <- as.factor(full_dataset_myxo$season_temp)
 full_dataset_myxo$MonthCollected <- as.factor(full_dataset_myxo$MonthCollected)
 
 
@@ -613,105 +640,95 @@ carvel_abundance
 
 ## GLM for CARVEL
 
-# For the random effects: there are multiple entries for one fish individual which creates pseudoreplicates. Also, we still have to account for the dependency between fish sampled from the same lot (CatalogNumber). IndividualFishID is nested in CatalogNumber.
+# Both CatalogNumber and season as as random effects
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(meanTemp)*CI*scale(meanFlow)+
+                       scale(medianTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber)+ 
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #NA for four way interaction. four way interaction is too much
+                       (1|season),
+                     data = carvel_count,family=nbinom1()) #horrible fit
 
-# We try by letting YearCollected on its own to account changes throughout time, but the stressors we keep them interacting. Multicollinearity was checked and there was none.
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
-                        (1|MonthCollected),
-                      data = carvel_count,family=nbinom2()) #this converged, but overdispersed
 
-# We try the same but with zero-inflation
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
+                       scale(medianTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     ziformula=~1,
-                     data = carvel_count,family=nbinom2()) #still bad diagnostics
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom2()) #no convergence
 
-# Lets try with nbinom1
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
+# only CatalogNumber as random effect
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
+                       scale(medianTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #did not converge
+                       (1|CatalogNumber),
+                     data = carvel_count,family=nbinom2()) #no estimates possible, with neither nbinom1 or nbinom2
 
-
-# Nbinom1 with zi
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
+# only season as random effect
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
+                       scale(medianTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #did not converge
-
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     ziformula=~1,
-                     data = carvel_count,family=nbinom1()) #good convergence, good diagnostics, 
-
-
-
-## Let's simplify the random structure by accounting only for the lot (CatalogNumber)
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom2()) #this converged, but overdispersed
-
-# We try the same but with zero-inflation
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     ziformula=~1,
-                     data = carvel_count,family=nbinom2()) #still bad diagnostics
-
-# nbinom1 without zi
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     data = carvel_count,family=nbinom1()) #this converged, but bad diagnostics
-
-# We try the same but with zero-inflation
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)+
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+
-                       (1|MonthCollected),
-                     ziformula=~1,
-                     data = carvel_count,family=nbinom1()) #good convergence and diagnostics
-
+                       (1|season),
+                     data = carvel_count,family=nbinom1()) #no estimates possible, with neither nbinom1 or nbinom2
 
 summary(glm_count)
 
+## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with both REs performs better. 
+
+# Both CatalogNumber and season as as random effects
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
+                       scale(YearCollected)*scale(meanFlow)+
+                       scale(medianTemp)*scale(meanFlow)+
+                       CI*scale(medianTemp)+
+                       CI*scale(meanFlow)+
+                       CI*before_after+
+                       scaled_TL_mm+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom1()) # good convergence, residuals bad, 
+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
+                       scale(YearCollected)*scale(meanFlow)+
+                       scale(medianTemp)*scale(meanFlow)+
+                       CI*scale(medianTemp)+
+                       CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom2()) # overdispersed
+
+
+glm_count <- glmer.nb(psite_count ~ scale(YearCollected)*scale(medianTemp)+
+                       scale(YearCollected)*scale(meanFlow)+
+                       scale(medianTemp)*scale(meanFlow)+
+                       CI*scale(medianTemp)+
+                       CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count) # did not converge
+
+
+
+glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
+                       scale(YearCollected)*scale(meanFlow)+
+                       scale(medianTemp)*scale(meanFlow)+
+                       CI*scale(medianTemp)+
+                       CI*scale(meanFlow)+
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     ziformula=~1,
+                     data = carvel_count,family=nbinom2()) # nbinom2 very bad fit, nbinom1 no convergence
+
+
+summary(glm_count)
 
 #Evaluate residuals
 s=simulateResiduals(fittedModel=glm_count,n=250)
@@ -722,9 +739,11 @@ plot(s)
 #With the plot()function
 plot_model(glm_count,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
+plot_model(glm_count, type = "pred", terms = c("meanFlow", "medianTemp[15,32]"))
+
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("meanFlow[n=200]","CI")) 
+mydf <- ggpredict(glm_count, c("meanFlow[n=200]","medianTemp[15,32]")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
   labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
@@ -732,7 +751,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 # Temperature with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("meanTemp[n=200]","CI")) 
+mydf <- ggpredict(glm_count, c("medianTemp[n=200]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
   labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
@@ -1369,16 +1388,16 @@ ggplot(streamflow_ms, aes(x= as.factor(Month),
 
 # Plot stream flow as raw data per month
 
-ggplot(Full_dataset_physical, aes(x= meanFlow,
-                          y=psite_count))+
-  facet_wrap("before_after")+
+ggplot(Full_dataset_physical, aes(x= YearCollected,
+                          y=meanFlow))+
   geom_point()+apatheme+
-  ggtitle("Streamflow per month")+
-  xlab("Month")+ylab("Streamflow (m3/sec)")
+  ggtitle("Streamflow per year")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
 
 
 ### Water Temperature USGS visualization----
-# Plot stream flow as means throughout time 
+
+# Plot water temoerature as means throughout time 
 
 wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
                               ggtheme = theme_bw(),rawdata=TRUE,
@@ -1387,6 +1406,38 @@ wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
   xlab("Year")+ylab("Temperature (C)")
 
 wtemp_plot
+
+
+# Plot water temoerature mean across years 
+
+meanwtemp_plot <-ggerrorplot(wtemp_summ, x = "YearCollected", y = "meanTemp",
+                         ggtheme = theme_bw(),rawdata=TRUE,
+                         position=position_dodge(0.5),width=0.00, size=0.3)+
+  ggtitle("Water temperature")+
+  xlab("Year")+ylab("mean Temperature (C)")
+
+meanwtemp_plot
+
+# Plot water temoerature median across years 
+
+medianwtemp_plot <-ggerrorplot(wtemp_summ, x = "YearCollected", y = "medianTemp",
+                             ggtheme = theme_bw(),rawdata=TRUE,
+                             position=position_dodge(0.5),width=0.00, size=0.3)+
+  ggtitle("Water temperature")+
+  xlab("Year")+ylab("median Temperature (C)")
+
+medianwtemp_plot
+
+# Plot water temoerature max across years 
+
+maxwtemp_plot <-ggerrorplot(wtemp_summ, x = "YearCollected", y = "maxTemp",
+                               ggtheme = theme_bw(),rawdata=TRUE,
+                               position=position_dodge(0.5),width=0.00, size=0.3)+
+  ggtitle("Water temperature")+
+  xlab("Year")+ylab("max Temperature (C)")
+
+maxwtemp_plot
+
 
 # Water temperature per month
 
