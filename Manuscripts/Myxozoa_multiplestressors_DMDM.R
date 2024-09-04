@@ -37,20 +37,7 @@ full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_in
 
 ## Merge with physical data
 
-# Stream flow
-## NOT USING THIS ANYMORE - instead of creating an average per season per year, we are going to do an average per year so it reflects global warming and not seasonality.
-
-##Create a yearflow column for later merging
-
-#full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
-
-#full_dataset$season_flow <- ifelse(full_dataset$MonthCollected > 5 &
-                                   #  full_dataset$MonthCollected < 12,                # condition
-                                         #    'low',    # what if condition is TRUE
-                                          #   'high')       # what if condition is FALSE
-
-#full_dataset$yearflow <- paste(as.character(full_dataset$YearCollected),as.character(full_dataset$season_flow),sep="_")
-
+# Adding stream flow to data
 # Read physical data
 physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
 
@@ -58,32 +45,7 @@ physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
 streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
 streamflow_ms <- subset(streamflow, Unit=="m3/sec")
 
-# Create a yearflow column for later merging
-
-#streamflow_ms$MonthCollected <- as.numeric(streamflow_ms$MonthCollected)
-
-#streamflow_ms$season_flow <- ifelse(streamflow_ms$MonthCollected > 5 &
-                                      #streamflow_ms$MonthCollected < 12,                # condition
-                                  # 'low',    # what if condition is TRUE
-                                   #'high')       # what if condition is FALSE
-
-#streamflow_ms$yearflow <- paste(as.character(streamflow_ms$YearCollected),as.character(streamflow_ms$season_flow),sep="_")
-
-# Get rid of columns we do not need
-# streamflow_clean <- cbind.data.frame(streamflow_ms$yearflow,streamflow_ms$Result)
-
-# Name the columns
-
-# colnames(streamflow_clean)[1]<-"yearflow"
-# colnames(streamflow_clean)[2]<-"Result"
-
-# Summarize by taking the mean stream flow per 'yearflow'
-
-# streamflow_mean <- streamflow_clean %>% group_by(yearflow) %>% 
-  # summarise(meanFlow=mean(Result),
-    #        .groups = 'drop')
-
-# Summarize by taking the mean stream flow per 'yearflow'
+# Summarize by taking the mean stream flow per 'year'
 
 streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
   summarise(meanFlow=mean(Result),
@@ -94,66 +56,8 @@ streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>%
 Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 # Adding water temperature data
-# Create a yearseason column in our data for later merging
-
-Full_dataset_streamflow$MonthCollected <- as.numeric(Full_dataset_streamflow$MonthCollected)
-
-#Full_dataset_streamflow <- Full_dataset_streamflow %>% 
- # mutate(season_temp = case_when(MonthCollected >= 6 &
-  #                                 MonthCollected <= 8 ~ "summer", # both tests: group A
-   #                              MonthCollected >= 9 &
-    #                               MonthCollected <= 11 ~ "fall",
-     #                            MonthCollected >= 1 &
-      #                             MonthCollected <= 2 
-       #                          ~ "winter",
-        #                         MonthCollected >= 3 &
-         #                          MonthCollected <= 5 ~ "fall",
-          #                       MonthCollected == 12 ~ "winter"
-  #))
-
-
-## Full_dataset_streamflow$season_temp <- ifelse(Full_dataset_streamflow$MonthCollected > 4 &
-                                  #              Full_dataset_streamflow$MonthCollected < 10,                # condition
-                                   #'summer',    # what if condition is TRUE
-                                   #'winter')       # what if condition is FALSE
-
-#Full_dataset_streamflow$yearseason <- paste(as.character(Full_dataset_streamflow$YearCollected),as.character(Full_dataset_streamflow$season_temp),sep="_")
-
 # Make a subset of only water temperature
 wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
-
-# Create a yearseason column in USGS data for later merging
-
-#wtemp$MonthCollected <- as.numeric(wtemp$MonthCollected)
-
-
-#wtemp <- wtemp %>% 
- # mutate(season_temp = case_when(MonthCollected >= 6 &
-  #                           MonthCollected <= 8 ~ "summer", # both tests: group A
-   #                        MonthCollected >= 9 &
-    #                         MonthCollected <= 11 ~ "fall",
-     #                      MonthCollected >= 1 &
-      #                       MonthCollected <= 2 
-       #                       ~ "winter",
-        #                   MonthCollected >= 3 &
-         #                    MonthCollected <= 5 ~ "fall",
-          #                 MonthCollected == 12 ~ "winter"
-  #))
-
-#wtemp$season_temp <- ifelse(wtemp$MonthCollected > 4 &
-                           # wtemp$MonthCollected < 10,                # condition
-                                #   'summer',    # what if condition is TRUE
-                                 # 'winter')       # what if condition is FALSE
-
-#wtemp$yearseason <- paste(as.character(wtemp$YearCollected),as.character(wtemp$season_temp),sep="_")
-
-# Get rid of columns we do not need
-#wtemp_clean <- cbind.data.frame(wtemp$yearseason,wtemp$Result)
-
-# Name the columns
-
-#colnames(wtemp_clean)[1]<-"yearseason"
-#colnames(wtemp_clean)[2]<-"Result"
 
 # Summarize by taking the mean temperature 'yearseason'
 
@@ -205,6 +109,10 @@ full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
 full_dataset_myxo$before_after <- as.factor(full_dataset_myxo$before_after)
 full_dataset_myxo$MonthCollected <- as.factor(full_dataset_myxo$MonthCollected)
 
+## Revise reference levels
+
+full_dataset_myxo$before_after <- relevel(full_dataset_myxo$before_after, ref = "before")
+
 
 ## Create subset per fish species
 
@@ -237,27 +145,9 @@ notath_count <- subset(myxo_count, Fish_sp.x == "Notropis atherinoides")
 carvel_count <- subset(myxo_count, Fish_sp.x == "Carpiodes velifer")
 hybnuc_count <- subset(myxo_count, Fish_sp.x == "Hybognathus nuchalis")
 
-## Do a quick check for collinearity
-# Get only columns for which we want to check collinearity -scaled
-colfull_dataset_myxo <- cbind.data.frame(scale(full_dataset_myxo$meanFlow),
-                                         scale(full_dataset_myxo$meanTemp),
-                                         scale(full_dataset_myxo$YearCollected),
-                                         full_dataset_myxo$scaled_TL_mm)
-
-
-cor(colfull_dataset_myxo) 
-
-# Get only columns for which we want to check collinearity - unscaled
-colfull_dataset_myxo <- cbind.data.frame(full_dataset_myxo$meanFlow,
-                                         full_dataset_myxo$meanTemp,
-                                         full_dataset_myxo$YearCollected,
-                                         full_dataset_myxo$scaled_TL_mm)
-
-
-cor(colfull_dataset_myxo) 
 
 # Set a theme for all your plots
-apatheme= theme_bw(base_size = 11,base_family = "sans")+
+apatheme= theme_bw(base_size = 14,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         panel.border=element_blank(),
@@ -658,6 +548,45 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        (1|season),
                      data = carvel_count,family=nbinom2()) #no convergence
 
+# Both CatalogNumber and season as as random effects
+glm_count1 <- glmmTMB(psite_count ~ 
+                       scale(meanTemp)*scale(meanFlow)*
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom1()) #horrible fit
+
+glm_count2 <- glmmTMB(psite_count ~ 
+                       scale(meanTemp)*scale(meanFlow)*
+                       CI*before_after+
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom2()) #horrible fit
+
+glm_count3 <- glmmTMB(psite_count ~ 
+                        scale(meanTemp)*scale(meanFlow)*
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+ 
+                        (1|season),
+                      ziformula=~1,
+                      data = carvel_count,family=nbinom1()) #horrible fit
+
+glm_count4 <- glmmTMB(psite_count ~ 
+                        scale(meanTemp)*scale(meanFlow)*
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+ 
+                        (1|season),
+                      ziformula=~1,
+                      data = carvel_count,family=nbinom2()) #horrible fit
+
+
+
+AIC(glm_count1,glm_count2,glm_count3)
+
 # only CatalogNumber as random effect
 glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
                        scale(medianTemp)*CI*scale(meanFlow)+
@@ -731,30 +660,30 @@ glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
 summary(glm_count)
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=glm_count,n=250)
+s=simulateResiduals(fittedModel=glm_count1,n=250)
 s$scaledResiduals
 plot(s)
 
 
 #With the plot()function
-plot_model(glm_count,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+plot_model(glm_count1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
-plot_model(glm_count, type = "pred", terms = c("meanFlow", "medianTemp[15,32]"))
+plot_model(glm_count, type = "pred")
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("meanFlow[n=200]","medianTemp[15,32]")) 
+mydf <- ggpredict(glm_count, c("meanFlow[n=200]","CI")) 
 
-plot(mydf,rawdata=TRUE,jitter=0.05)+
+plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
   apatheme
 
 # Temperature with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("medianTemp[n=200]","CI")) 
+mydf <- ggpredict(glm_count, c("meanTemp[n=200]","CI")) 
 
-plot(mydf,rawdata=TRUE,jitter=0.05)+
-  labs(x = 'Temperature', y = 'Abundance of myxozoans',title=NULL)+
+plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  labs(x = 'Temperature (°C)', y = 'Abundance of myxozoans',title=NULL)+
   apatheme
 
 
@@ -1360,16 +1289,6 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 ### Streamflow visualization----
 
-# Plot stream flow as means throught time
-
-streamflow_plot <-ggerrorplot(streamflow_ms, x = "Year", y = "Result",
-                                ggtheme = theme_bw(),rawdata=TRUE,
-                                position=position_dodge(0.5),width=0.00, size=0.3)+
-  ggtitle("Streamflow")+
-  xlab("Year")+ylab("Streamflow (m3/sec)")
-
-streamflow_plot
-
 # Plot stream flow as raw data per year
 
 ggplot(streamflow_ms, aes(x= as.factor(YearCollected),
@@ -1388,16 +1307,48 @@ ggplot(streamflow_ms, aes(x= as.factor(Month),
 
 # Plot stream flow as raw data per month
 
-ggplot(Full_dataset_physical, aes(x= YearCollected,
+ggplot(streamflow_mean, aes(x= as.factor(YearCollected),
                           y=meanFlow))+
-  geom_point()+apatheme+
+  geom_bar(stat = "identity",color="#9ecae1",fill="#9ecae1")+apatheme+
   ggtitle("Streamflow per year")+
-  xlab("Year")+ylab("Streamflow (m3/sec)")
+  xlab("Year")+ylab("Streamflow (m3/sec)")+
+  geom_hline(yintercept=214, linetype="dashed", color = "black", size=0.5)
 
+# what is the mean flow of the river throughout the years?
+mean(streamflow_mean$meanFlow)
 
 ### Water Temperature USGS visualization----
 
-# Plot water temoerature as means throughout time 
+# wtemp change throughout time
+
+m1 <- lm(meanTemp~YearCollected, data=wtemp_summ)
+m2 <- lm(medianTemp~YearCollected, data=wtemp_summ)
+
+#Evaluate residuals
+#Not suitable for GLM-quasipoisson but for the other models
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+summary(m1)
+summary(m2)
+
+#With the plot()function
+plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+plot_model(m2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+tab_model(m1)
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(m1, c("YearCollected[n=100]")) 
+
+plot(mydf,rawdata=TRUE,color="red")+
+  labs(x = 'Year', y = 'Mean Annual Temperature (C)',title=NULL)+
+  apatheme
+
+
+# Plot water temperature as means throughout time 
 
 wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
                               ggtheme = theme_bw(),rawdata=TRUE,
@@ -1408,7 +1359,7 @@ wtemp_plot <-ggerrorplot(wtemp, x = "YearCollected", y = "Result",
 wtemp_plot
 
 
-# Plot water temoerature mean across years 
+# Plot water temperature calculated mean against years 
 
 meanwtemp_plot <-ggerrorplot(wtemp_summ, x = "YearCollected", y = "meanTemp",
                          ggtheme = theme_bw(),rawdata=TRUE,
@@ -1449,39 +1400,3 @@ ggplot(wtemp, aes(x= as.factor(MonthCollected),
   geom_hline(yintercept=15, linetype="dashed", color = "black", size=0.5)+
   geom_hline(yintercept=25, linetype="dashed", color = "black", size=0.5)+
   geom_hline(yintercept=35, linetype="dashed", color = "black", size=0.5)
-
-hist(wtemp$Result)
-# USGS data merged with our data, to double check
-# Water temperature per month
-
-ggplot(Full_dataset_physical, aes(x= as.factor(season_temp),
-                  y=meanTemp))+
-  geom_point()+apatheme+
-  ggtitle("Water temperature per month")+
-  xlab("Month")+ylab("Temperature (degC)")+
-  geom_hline(yintercept=20, linetype="dashed", color = "black", size=0.5)
-
-
-# Plot Temperature against flow
-
-ggplot(Full_dataset_physical, aes(x= meanTemp,
-                                  y=meanFlow))+
-  geom_point()+apatheme+
-  ggtitle("Streamflow as as function of temperature")+
-  xlab("Temperature")+ylab("Streamflow")
-
-
-ggplot(carvel_myxo, aes(x= YearCollected,
-                                  y=meanTemp,color=season_temp))+
-  geom_point()+apatheme+
-  facet_wrap("Parasite_genus")+
-  ggtitle("Streamflow as as function of temperature")+
-  xlab("Temperature")+ylab("Streamflow")
-
-# Plot Temperature against year
-
-ggplot(Full_dataset_physical, aes(x= YearCollected,
-                                  y=meanTemp))+
-  geom_point()+apatheme+
-  ggtitle("Streamflow as as function of temperature")+
-  xlab("Temperature")+ylab("Streamflow")
