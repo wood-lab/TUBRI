@@ -175,6 +175,8 @@ lat_myxo <-ggerrorplot(full_dataset_myxo_bca, x = "Latitude", y = "psite_presenc
   ylim(0,1)+
   geom_vline(xintercept=30.76222, linetype="dashed", color = "black", size=0.5)
 
+lat_myxo
+
 ## Test the effect of distance from the pulp mill (with latitude as proxy for distance) on the prevalence of myxozoanss
 
 # GLM for the probability of finding myxozoans along the river
@@ -182,14 +184,14 @@ lat_myxo <-ggerrorplot(full_dataset_myxo_bca, x = "Latitude", y = "psite_presenc
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         Latitude*CI*Fish_sp.x+
                         scaled_TL_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = full_dataset_myxo_bca,
                       family=binomial()) # This model failed to converge. Let's make it a bit simpler by running the model per fish species
 
 # GLM for the probability of finding myxozoans in CARVEL along the river
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         StandardLength_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = carvel_myxo,
                       family=binomial())
 
@@ -200,7 +202,7 @@ summary(glm_presence) # Model converged, diagnostics are great, no significances
 # GLM for the probability of finding myxozoans in PIMVIG along the river
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         StandardLength_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = pimvig_myxo,
                       family=binomial())
 
@@ -210,7 +212,7 @@ summary(glm_presence) # Model converged, diagnostics are great, only fish size w
 # GLM for the probability of finding myxozoans in GAMAFF along the river
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         StandardLength_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = gamaff_myxo,
                       family=binomial())
 
@@ -221,7 +223,7 @@ summary(glm_presence) # Model did not converge, however not much to see here sin
 # GLM for the probability of finding myxozoans in ICTPUN along the river, in this case no interaction with parasite genus because there is only one genus for this fish
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI+
                         StandardLength_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = ictpun_myxo,
                       family=binomial())
 
@@ -242,7 +244,7 @@ summary(glm_presence) # Model converged, diagnostics are great, no significances
 # GLM for the probability of finding myxozoans in HYBNUC along the river, in this case no interaction with parasite genus because there is only one genus for this fish
 glm_presence<-glmmTMB(psite_presence ~ Latitude*CI*Parasite_genus+
                         StandardLength_mm+
-                        (1|MonthCollected),
+                        (1|season),
                       data = hybnuc_myxo,
                       family=binomial())
 
@@ -531,148 +533,152 @@ carvel_abundance
 ## GLM for CARVEL
 
 # Both CatalogNumber and season as as random effects
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(medianTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom1()) #horrible fit
-
-
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(medianTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom2()) #no convergence
-
-# Both CatalogNumber and season as as random effects
-glm_count1 <- glmmTMB(psite_count ~ 
-                       scale(meanTemp)*scale(meanFlow)*
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom1()) #horrible fit
-
-glm_count2 <- glmmTMB(psite_count ~ 
-                       scale(meanTemp)*scale(meanFlow)*
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom2()) #horrible fit
-
-glm_count3 <- glmmTMB(psite_count ~ 
-                        scale(meanTemp)*scale(meanFlow)*
+glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)*
+                        scale(meanTemp)*CI*scale(meanFlow)+
                         CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+ 
-                        (1|season),
-                      ziformula=~1,
-                      data = carvel_count,family=nbinom1()) #horrible fit
-
-glm_count4 <- glmmTMB(psite_count ~ 
-                        scale(meanTemp)*scale(meanFlow)*
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+ 
-                        (1|season),
-                      ziformula=~1,
-                      data = carvel_count,family=nbinom2()) #horrible fit
-
-
-
-AIC(glm_count1,glm_count2,glm_count3)
+                       offset(scaled_TL_mm)+
+                       (1|CatalogNumber)+ 
+                       (1|season),
+                     data = carvel_count,family=nbinom2()) 
 
 # only CatalogNumber as random effect
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(medianTemp)*CI*scale(meanFlow)+
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)*
+                       scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
                        (1|CatalogNumber),
-                     data = carvel_count,family=nbinom2()) #no estimates possible, with neither nbinom1 or nbinom2
+                     data = carvel_count,family=nbinom2()) 
 
 # only season as random effect
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(medianTemp)*CI*scale(meanFlow)+
+glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)*
+                       scale(meanTemp)*CI*scale(meanFlow)+
                        CI*before_after+
                        offset(scaled_TL_mm)+
                        (1|season),
-                     data = carvel_count,family=nbinom1()) #no estimates possible, with neither nbinom1 or nbinom2
+                     data = carvel_count,family=nbinom2())
 
 summary(glm_count)
 
-## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with both REs performs better. 
+AIC(glm_count1,glm_count2,glm_count3)
+
+## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with nbinom2 and either catalog number or season as RE performs better. 
+## Nevertheless the estimates of all these models is horrible. 
+# I will simplify the model by leaving year collected alone
 
 # Both CatalogNumber and season as as random effects
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
-                       scale(YearCollected)*scale(meanFlow)+
-                       scale(medianTemp)*scale(meanFlow)+
-                       CI*scale(medianTemp)+
-                       CI*scale(meanFlow)+
-                       CI*before_after+
-                       scaled_TL_mm+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom1()) # good convergence, residuals bad, 
+glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI*scale(meanFlow)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+ 
+                        (1|season),
+                      data = carvel_count,family=nbinom2()) #convergence problem w. nbinom2
 
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
-                       scale(YearCollected)*scale(meanFlow)+
-                       scale(medianTemp)*scale(meanFlow)+
-                       CI*scale(medianTemp)+
-                       CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count,family=nbinom2()) # overdispersed
+# only CatalogNumber as random effect
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI*scale(meanFlow)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber),
+                      data = carvel_count,family=nbinom2()) 
 
+# only season as random effect
+glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI*scale(meanFlow)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|season),
+                      data = carvel_count,family=nbinom2())
 
-glm_count <- glmer.nb(psite_count ~ scale(YearCollected)*scale(medianTemp)+
-                       scale(YearCollected)*scale(meanFlow)+
-                       scale(medianTemp)*scale(meanFlow)+
-                       CI*scale(medianTemp)+
-                       CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     data = carvel_count) # did not converge
+summary(glm_count2)
+
+AIC(glm_count1,glm_count2,glm_count3)
 
 
+## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with nbinom2 and either catalog number or season as RE performs better. 
+## Nevertheless the estimates of all these models is horrible. 
+# I will simplify the model by leaving year collected alone
 
-glm_count <- glmmTMB(psite_count ~ scale(YearCollected)*scale(medianTemp)+
-                       scale(YearCollected)*scale(meanFlow)+
-                       scale(medianTemp)*scale(meanFlow)+
-                       CI*scale(medianTemp)+
-                       CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
-                       (1|season),
-                     ziformula=~1,
-                     data = carvel_count,family=nbinom2()) # nbinom2 very bad fit, nbinom1 no convergence
+# Both CatalogNumber and season as as random effects
+glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI+
+                        scale(meanFlow)*CI+
+                        scale(meanFlow)*scale(meanTemp)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+ 
+                        (1|season),
+                      data = carvel_count,family=nbinom1()) #convergence problem w. nbinom2
 
+# only CatalogNumber as random effect
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI+
+                        scale(meanFlow)*CI+
+                        scale(meanFlow)*scale(meanTemp)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber),
+                      data = carvel_count,family=nbinom1()) 
 
-summary(glm_count)
+# only season as random effect
+glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI+
+                        scale(meanFlow)*CI+
+                        scale(meanFlow)*scale(meanTemp)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|season),
+                      data = carvel_count,family=nbinom1())
+
+summary(glm_count2)
+
+AIC(glm_count1,glm_count2,glm_count3)
+
+# the fit of these models under nbinom1 and nbinom2 is terrible
+
+# we simplify by removing the least significant: yearcollected
+glm_count2 <- glmmTMB(psite_count ~ 
+                        scale(meanTemp)*CI+
+                        scale(meanFlow)*CI+
+                        scale(meanFlow)*scale(meanTemp)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+
+                        (1|season)
+                        ,
+                      data = carvel_count,family=nbinom2()) 
+
+glm_count2 <- glmmTMB(psite_count ~ 
+                        scale(meanTemp)*CI*
+                        scale(meanFlow)*before_after+
+                        offset(scaled_TL_mm)+
+                        (1|CatalogNumber)+
+                        (1|season),
+                      data = carvel_count,family=nbinom1()) 
+
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)*
+                        scale(meanTemp)*CI*
+                        scale(meanFlow)*before_after+
+                        scaled_TL_mm+
+                        (1|CatalogNumber)+
+                        (1|season),
+                      data = carvel_count,family=nbinom2()) 
+
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=glm_count1,n=250)
+s=simulateResiduals(fittedModel=glm_count2,n=250)
 s$scaledResiduals
 plot(s)
 
 
 #With the plot()function
-plot_model(glm_count1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+plot_model(glm_count2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
-plot_model(glm_count, type = "pred")
+plot_model(glm_count2, type = "pred")
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("meanFlow[n=200]","CI")) 
+mydf <- ggpredict(glm_count2, c("meanFlow[all]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
@@ -680,7 +686,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
 
 # Temperature with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("meanTemp[n=200]","CI")) 
+mydf <- ggpredict(glm_count2, c("meanTemp[n=200]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   labs(x = 'Temperature (°C)', y = 'Abundance of myxozoans',title=NULL)+
