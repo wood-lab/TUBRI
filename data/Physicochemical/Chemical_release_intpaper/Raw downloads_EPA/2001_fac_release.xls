@@ -1,0 +1,1067 @@
+<table><tr>
+</table><table><tr><td>TRI On-site and Off-site Reported Disposed of or Otherwise Released (in pounds), for all 2  facilities, for  facilities in All Industries, for  All chemicals,   ZIP code 70427, 2001
+</tr><tr>
+<hr/>
+<th id="Header1" scope="col"><B>Row #</B></th>
+<th id="Header2" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.showgroup?p_showtype=facility" target="tri_doc_view"><B>Facility</B></A></th>
+<th id="Header3" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=TRI+Facility+ID+Number" target="tri_doc_view"><B>TRIF ID</B></A></th>
+<th id="Header6" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Latitude" target="tri_doc_view"><B>Latitude</B></A></th>
+<th id="Header7" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Longitude" target="tri_doc_view"><B>Longitude</B></A></th>
+<th id="Header2001d" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Water+Discharge" TARGET="tri_doc_view"><B>Surface Water Discharges</B></A> </th>
+<th id="Header40" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Total+On-+and+Off-site+Releases" TARGET="tri_doc_view"><B>Total On- and Off-site Disposal or Other Releases</B></A></th></tr><tr>
+
+
+
+
+
+
+</tr><tr>
+
+
+
+
+
+
+</tr><tr>
+
+
+
+
+
+
+</tr><tr>
+<!-- MAIN QUERY:  Select * from (  select FACILITY_NAME , FACILITY_ADDRESS,
+      TE.TRI_FACILITY_ID FACILITY_ID,
+      nvl(R_FORM.NUM_R_FORMS,0) NUM_R, nvl(A_FORM.NUM_A_FORMS,0) NUM_A,   TRI_CENTROID_LAT AS tri_centroid_lat,
+      TRI_CENTROID_LONG AS tri_centroid_long,
+          SUM(TE.UNINJ_I * vci.MFACTOR ) AS UNINJ_I,
+    SUM(TE.RCRA_C * vci.MFACTOR ) AS RCRA_C,
+    CASE WHEN SUM(TE.OTH_LANDF) IS NULL and SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0))+ SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) END AS OTH_LANDF,
+    CASE WHEN SUM(TE.UNINJ_I) IS NULL and SUM(TE.RCRA_C) IS NULL AND SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0))
+           + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0)) + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0))  END AS SUBTOT_LAND_ONSITE,
+    SUM(TE.AIR_FUG * vci.MFACTOR ) AS AIR_FUG,
+    SUM(TE.AIR_STACK * vci.MFACTOR ) AS AIR_STACK,
+    SUM(TE.TOTAL_AIR_RELEASE * vci.MFACTOR) AS AIRLBY,
+    SUM(TE.WATER * vci.MFACTOR ) AS WATER,
+    CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR,0))+ SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR,0)) END AS UNINJ_IIV,
+        CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_I) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0))
+           + SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR ,0)) END AS E4,
+        SUM(TE.OTH_LANDF * vci.MFACTOR ) AS E51B,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS E52,
+    CASE WHEN SUM(SI_5_5_3A) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3A * vci.MFACTOR ,0)) + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E53,
+        SUM(TE.OTH_DISP * vci.MFACTOR ) AS E54,
+    CASE WHEN SUM(TE.LANDF8795) IS NULL and SUM(TE.OTH_LANDF) IS NULL  and SUM(TE.RCRA_C) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR,0)) END AS E51,
+    CASE WHEN SUM(TE.RCRA_C) IS NULL and SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LAND_TREA) IS NULL
+        AND SUM(TE.LANDF8795) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(TE.OTH_DISP) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LAND_TREA * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_DISP * vci.MFACTOR ,0))
+           + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E5,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS LAND_TREA,
+    SUM(TE.SI_5_5_3A * vci.MFACTOR ) AS SI_5_5_3A,
+    CASE WHEN SUM(TE.SI_5_5_3B) IS NULL and SUM(TE.SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0))+ SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS SI_5_5_3B,
+    SUM(TE.OTH_DISP * vci.MFACTOR ) AS OTH_DISP,
+    SUM(TE.SUBTOT_OTHER_ONSITE * vci.MFACTOR) AS SUBTOT_OTHER_ONSITE,
+    SUM(TE.TOTAL_ONSITE_RELEASE * vci.MFACTOR) AS TOTAL_ONSITE,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M71) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M81) IS NULL THEN NULL
+        ELSE SUM(TE.M81 * vci.MFACTOR ) END END AS M81,
+    SUM(TE.M65 * vci.MFACTOR ) AS M65,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M64) IS NULL and SUM(TE.M72) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M64) IS NULL THEN NULL
+        ELSE SUM(TE.M64 * vci.MFACTOR ) END END AS M64,
+    CASE WHEN '2001' = '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M71) IS NULL
+                 AND SUM(TE.M82) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          WHEN '2001' >= '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          ELSE
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) END END AS SUBTOT_LAND_OFFSITE,
+    SUM(TE.M10 * vci.MFACTOR ) AS M10,
+        CASE WHEN SUM(TE.M40M) IS NULL and SUM(TE.M41) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M40M * vci.MFACTOR ,0)) + SUM(NVL(TE.M41 * vci.MFACTOR ,0)) END AS M41,
+        CASE WHEN SUM(TE.M61M) IS NULL and SUM(TE.M62) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M61M * vci.MFACTOR ,0)) + SUM(NVL(TE.M62 * vci.MFACTOR ,0)) END AS M62,
+    SUM(TE.P81D * vci.MFACTOR ) AS P81D,
+    SUM(TE.P81C * vci.MFACTOR ) AS P81C,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M82) IS NULL AND SUM(TE.M71) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M82) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END END AS M82,
+    SUM(TE.M66 * vci.MFACTOR ) AS M66,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M67) IS NULL AND SUM(TE.M63) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M67) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END END AS M67,
+    SUM(TE.M73 * vci.MFACTOR ) AS M73,
+    SUM(TE.M79 * vci.MFACTOR ) AS M79,
+    SUM(TE.M90 * vci.MFACTOR ) AS M90,
+    SUM(TE.M91 * vci.MFACTOR ) AS M91,
+  CASE WHEN SUM(TE.M94) IS NULL and SUM(TE.M91) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M94 * vci.MFACTOR ,0)) + SUM(NVL(TE.M91 * vci.MFACTOR ,0)) END AS M94,
+    SUM(TE.M99 * vci.MFACTOR ) AS M99,
+    CASE WHEN SUM(TE.M71) IS NULL and SUM(TE.M81) IS NULL AND SUM(TE.M82) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M71 * vci.MFACTOR ,0)) + SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END AS M81_M82,
+    CASE WHEN SUM(TE.M72) IS NULL AND SUM(TE.M63) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M65) IS NULL
+                and SUM(TE.M66) IS NULL AND SUM(TE.M67) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0))
+              + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65,0))
+              + SUM(NVL(TE.M66 * vci.MFACTOR ,0)) + SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END  END AS M66_M67,
+   CASE WHEN SUM(M10) IS NULL AND SUM(M40M) IS NULL AND SUM(M41) IS NULL AND SUM(M61M) IS NULL
+        AND SUM(M62) IS NULL and SUM(P81D) IS NULL AND SUM(M66) IS NULL
+        AND SUM(M67) IS NULL and SUM(M73) IS NULL AND SUM(M63) IS NULL
+        AND SUM(M79) IS NULL and SUM(M90) IS NULL AND SUM(M72) IS NULL and SUM(M82) IS NULL
+        AND SUM(M91) IS NULL AND SUM(M94) IS NULL and SUM(M99) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+              WHEN '2001' >= '2003' THEN
+              SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+            + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+            + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+            + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M71 * vci.MFACTOR ,0))
+            + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+            + SUM(NVL(M63 * vci.MFACTOR ,0))
+            + SUM(NVL(M73 * vci.MFACTOR ,0)) + SUM(NVL(M79 * vci.MFACTOR ,0))
+            + SUM(NVL(M90 * vci.MFACTOR ,0))  + SUM(NVL(M91 * vci.MFACTOR ,0))
+            + SUM(NVL(M94 * vci.MFACTOR ,0)) + SUM(NVL(M99 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+       END END AS SUBTOT_OTHER_OFFSITE,
+   SUM(TE.TOTAL_OFFSITE_RELEASE * vci.MFACTOR) AS TOTAL_OFFSITE,
+   SUM(TE.TOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ONOFFSITE,
+   SUM(TE.OTOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ADJ_ONOFFSITE
+      from TRI_EX_RELEASE_REPORT_INFO TE
+      inner join vw_mat_chem_info vci
+      on TE.tri_chem_id = vci.tri_chem_id
+      inner join NAICS_LOOKUP NL
+      on TE.TRI_NAICS_GROUP_CODE = NL.NAICS_CODE
+      left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_R_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'L'  and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427' group by TF.TRI_FACILITY_ID) R_FORM on TE.TRI_FACILITY_ID = R_FORM.TRI_FACILITY_ID
+      left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_A_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'S' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427'  group by TF.TRI_FACILITY_ID) A_FORM on TE.TRI_FACILITY_ID = A_FORM.TRI_FACILITY_ID
+         where  REPORTING_YEAR = '2001' and TE.ZIP_CODE = '70427'        group by FACILITY_NAME , FACILITY_ADDRESS,
+      TE.TRI_FACILITY_ID ,
+      R_FORM.NUM_R_FORMS, A_FORM.NUM_A_FORMS, TRI_CENTROID_LAT, TRI_CENTROID_LONG    order by  1  asc,num_r  asc, facility_name  asc ) a  where ROWNUM < 101  -->
+<td headers="header1" align="CENTER">1</td>
+<td headers="header2" align="LEFT"><a href=https://enviro.epa.gov/triexplorer/release_fac_profile?TRI=70427GYLRD4THST&TRILIB=TRIQ1&V_NA_INDICATOR=.&FLD=&FLD=&FLD=TRIID&FLD=LNGLAT&FLD=E3&FLD=RE_TOLBY&OFFDISPD=&OTHDISPD=&ONDISPD=&OTHOFFD=&YEAR=2001 target="_blank">INTERNATIONAL PAPER BOGALUSA MILL</a>.898 W 4TH ST, BOGALUSA LOUISIANA 70427 (WASHINGTON PARISH) </td>
+<td headers="header3" align="RIGHT">70427GYLRD4THST</td>
+<td headers="header6" align="RIGHT">              30.777</td>
+<td headers="header7" align="RIGHT">             -89.858</td>
+<td headers="header2001d" align="RIGHT">          72,724.3000000</td>
+<td headers="header40" align="RIGHT">       1,855,790.4730870</td></tr><tr>
+<!--  select TE.tri_chem_id AS tri_chem_id,  TE.doc_ctrl_num AS doc_id,
+      HTML_ENCODING(TE.CHEM_NAME) AS chem_name ,
+      replace(NL.NAICS_DESCRIPTION,'NAICS ','') AS TRI_NAICS_CODE,
+      nvl(R_FORM.NUM_R_FORMS,0) NUM_R, nvl(A_FORM.NUM_A_FORMS,0) NUM_A,   TRI_CENTROID_LAT AS tri_centroid_lat,
+      TRI_CENTROID_LONG AS tri_centroid_long,
+          SUM(TE.UNINJ_I * vci.MFACTOR ) AS UNINJ_I,
+    SUM(TE.RCRA_C * vci.MFACTOR ) AS RCRA_C,
+    CASE WHEN SUM(TE.OTH_LANDF) IS NULL and SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0))+ SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) END AS OTH_LANDF,
+    CASE WHEN SUM(TE.UNINJ_I) IS NULL and SUM(TE.RCRA_C) IS NULL AND SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0))
+           + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0)) + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0))  END AS SUBTOT_LAND_ONSITE,
+    SUM(TE.AIR_FUG * vci.MFACTOR ) AS AIR_FUG,
+    SUM(TE.AIR_STACK * vci.MFACTOR ) AS AIR_STACK,
+    SUM(TE.TOTAL_AIR_RELEASE * vci.MFACTOR) AS AIRLBY,
+    SUM(TE.WATER * vci.MFACTOR ) AS WATER,
+    CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR,0))+ SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR,0)) END AS UNINJ_IIV,
+        CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_I) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0))
+           + SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR ,0)) END AS E4,
+        SUM(TE.OTH_LANDF * vci.MFACTOR ) AS E51B,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS E52,
+    CASE WHEN SUM(SI_5_5_3A) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3A * vci.MFACTOR ,0)) + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E53,
+        SUM(TE.OTH_DISP * vci.MFACTOR ) AS E54,
+    CASE WHEN SUM(TE.LANDF8795) IS NULL and SUM(TE.OTH_LANDF) IS NULL  and SUM(TE.RCRA_C) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR,0)) END AS E51,
+    CASE WHEN SUM(TE.RCRA_C) IS NULL and SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LAND_TREA) IS NULL
+        AND SUM(TE.LANDF8795) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(TE.OTH_DISP) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LAND_TREA * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_DISP * vci.MFACTOR ,0))
+           + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E5,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS LAND_TREA,
+    SUM(TE.SI_5_5_3A * vci.MFACTOR ) AS SI_5_5_3A,
+    CASE WHEN SUM(TE.SI_5_5_3B) IS NULL and SUM(TE.SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0))+ SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS SI_5_5_3B,
+    SUM(TE.OTH_DISP * vci.MFACTOR ) AS OTH_DISP,
+    SUM(TE.SUBTOT_OTHER_ONSITE * vci.MFACTOR) AS SUBTOT_OTHER_ONSITE,
+    SUM(TE.TOTAL_ONSITE_RELEASE * vci.MFACTOR) AS TOTAL_ONSITE,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M71) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M81) IS NULL THEN NULL
+        ELSE SUM(TE.M81 * vci.MFACTOR ) END END AS M81,
+    SUM(TE.M65 * vci.MFACTOR ) AS M65,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M64) IS NULL and SUM(TE.M72) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M64) IS NULL THEN NULL
+        ELSE SUM(TE.M64 * vci.MFACTOR ) END END AS M64,
+    CASE WHEN '2001' = '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M71) IS NULL
+                 AND SUM(TE.M82) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          WHEN '2001' >= '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          ELSE
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) END END AS SUBTOT_LAND_OFFSITE,
+    SUM(TE.M10 * vci.MFACTOR ) AS M10,
+        CASE WHEN SUM(TE.M40M) IS NULL and SUM(TE.M41) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M40M * vci.MFACTOR ,0)) + SUM(NVL(TE.M41 * vci.MFACTOR ,0)) END AS M41,
+        CASE WHEN SUM(TE.M61M) IS NULL and SUM(TE.M62) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M61M * vci.MFACTOR ,0)) + SUM(NVL(TE.M62 * vci.MFACTOR ,0)) END AS M62,
+    SUM(TE.P81D * vci.MFACTOR ) AS P81D,
+    SUM(TE.P81C * vci.MFACTOR ) AS P81C,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M82) IS NULL AND SUM(TE.M71) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M82) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END END AS M82,
+    SUM(TE.M66 * vci.MFACTOR ) AS M66,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M67) IS NULL AND SUM(TE.M63) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M67) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END END AS M67,
+    SUM(TE.M73 * vci.MFACTOR ) AS M73,
+    SUM(TE.M79 * vci.MFACTOR ) AS M79,
+    SUM(TE.M90 * vci.MFACTOR ) AS M90,
+    SUM(TE.M91 * vci.MFACTOR ) AS M91,
+  CASE WHEN SUM(TE.M94) IS NULL and SUM(TE.M91) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M94 * vci.MFACTOR ,0)) + SUM(NVL(TE.M91 * vci.MFACTOR ,0)) END AS M94,
+    SUM(TE.M99 * vci.MFACTOR ) AS M99,
+    CASE WHEN SUM(TE.M71) IS NULL and SUM(TE.M81) IS NULL AND SUM(TE.M82) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M71 * vci.MFACTOR ,0)) + SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END AS M81_M82,
+    CASE WHEN SUM(TE.M72) IS NULL AND SUM(TE.M63) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M65) IS NULL
+                and SUM(TE.M66) IS NULL AND SUM(TE.M67) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0))
+              + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65,0))
+              + SUM(NVL(TE.M66 * vci.MFACTOR ,0)) + SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END  END AS M66_M67,
+   CASE WHEN SUM(M10) IS NULL AND SUM(M40M) IS NULL AND SUM(M41) IS NULL AND SUM(M61M) IS NULL
+        AND SUM(M62) IS NULL and SUM(P81D) IS NULL AND SUM(M66) IS NULL
+        AND SUM(M67) IS NULL and SUM(M73) IS NULL AND SUM(M63) IS NULL
+        AND SUM(M79) IS NULL and SUM(M90) IS NULL AND SUM(M72) IS NULL and SUM(M82) IS NULL
+        AND SUM(M91) IS NULL AND SUM(M94) IS NULL and SUM(M99) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+              WHEN '2001' >= '2003' THEN
+              SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+            + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+            + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+            + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M71 * vci.MFACTOR ,0))
+            + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+            + SUM(NVL(M63 * vci.MFACTOR ,0))
+            + SUM(NVL(M73 * vci.MFACTOR ,0)) + SUM(NVL(M79 * vci.MFACTOR ,0))
+            + SUM(NVL(M90 * vci.MFACTOR ,0))  + SUM(NVL(M91 * vci.MFACTOR ,0))
+            + SUM(NVL(M94 * vci.MFACTOR ,0)) + SUM(NVL(M99 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+       END END AS SUBTOT_OTHER_OFFSITE,
+   SUM(TE.TOTAL_OFFSITE_RELEASE * vci.MFACTOR) AS TOTAL_OFFSITE,
+   SUM(TE.TOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ONOFFSITE,
+   SUM(TE.OTOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ADJ_ONOFFSITE
+      from TRI_EX_RELEASE_REPORT_INFO TE
+      inner join vw_mat_chem_info vci
+      on TE.tri_chem_id = vci.tri_chem_id
+      inner join NAICS_LOOKUP NL
+      on TE.TRI_NAICS_GROUP_CODE = NL.NAICS_CODE
+      left outer join (select TF.TRI_FACILITY_ID, TF.TRI_CHEM_ID, count(distinct doc_ctrl_num) NUM_R_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'L'  and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427' group by TF.TRI_FACILITY_ID,TF.TRI_CHEM_ID) R_FORM on TE.TRI_FACILITY_ID = R_FORM.TRI_FACILITY_ID AND TE.TRI_CHEM_ID = R_FORM.TRI_CHEM_ID
+      left outer join (select TF.TRI_FACILITY_ID, TF.TRI_CHEM_ID, count(distinct doc_ctrl_num) NUM_A_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'S' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427'  group by TF.TRI_FACILITY_ID,TF.TRI_CHEM_ID) A_FORM on TE.TRI_FACILITY_ID = A_FORM.TRI_FACILITY_ID AND TE.TRI_CHEM_ID = A_FORM.TRI_CHEM_ID
+         where  REPORTING_YEAR = '2001' and TE.ZIP_CODE = '70427'   and TE.TRI_FACILITY_ID = '70427GYLRD4THST'     group by TE.tri_chem_id, TE.doc_ctrl_num, TE.chem_name, NL.NAICS_DESCRIPTION, R_FORM.NUM_R_FORMS, A_FORM.NUM_A_FORMS, TRI_CENTROID_LAT, TRI_CENTROID_LONG    order by TE.chem_name asc  -->
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822524&rpt_year=2001&ban_flag=Y" target="envirofacts">Acetaldehyde</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">             620.0000000</td>
+<td headers="header40" align="RIGHT">         110,620.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715908&rpt_year=2001&ban_flag=Y" target="envirofacts">Ammonia</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">          12,000.0000000</td>
+<td headers="header40" align="RIGHT">         123,800.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715910&rpt_year=2001&ban_flag=Y" target="envirofacts">Barium compounds (except for barium sulfate (CAS No. 7727-43-7))</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">           6,000.0000000</td>
+<td headers="header40" align="RIGHT">          22,600.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822536&rpt_year=2001&ban_flag=Y" target="envirofacts">Catechol</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">             250.0000000</td>
+<td headers="header40" align="RIGHT">             250.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715934&rpt_year=2001&ban_flag=Y" target="envirofacts">Dioxin and dioxin-like compounds</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">**</td>
+<td headers="header40" align="RIGHT">**</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161255&rpt_year=2001&ban_flag=Y" target="envirofacts">Ethylbenzene</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">                .0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822548&rpt_year=2001&ban_flag=Y" target="envirofacts">Formaldehyde</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">           2,400.0000000</td>
+<td headers="header40" align="RIGHT">          33,655.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715959&rpt_year=2001&ban_flag=Y" target="envirofacts">Hydrochloric acid (acid aerosols including mists, vapors, gas, fog, and other airborne forms of any particle size)</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">          59,000.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715961&rpt_year=2001&ban_flag=Y" target="envirofacts">Lead compounds</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">             590.0000000</td>
+<td headers="header40" align="RIGHT">           2,005.5000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715973&rpt_year=2001&ban_flag=Y" target="envirofacts">Manganese compounds</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">          42,000.0000000</td>
+<td headers="header40" align="RIGHT">          61,900.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150715997&rpt_year=2001&ban_flag=Y" target="envirofacts">Mercury</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">               2.3000000</td>
+<td headers="header40" align="RIGHT">              99.9700000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161230&rpt_year=2001&ban_flag=Y" target="envirofacts">Methanol</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">               1.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822563&rpt_year=2001&ban_flag=Y" target="envirofacts">Methanol</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">           4,400.0000000</td>
+<td headers="header40" align="RIGHT">       1,350,405.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161228&rpt_year=2001&ban_flag=Y" target="envirofacts">Methyl ethyl ketone</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">               1.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822551&rpt_year=2001&ban_flag=Y" target="envirofacts">Methyl ethyl ketone</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">             250.0000000</td>
+<td headers="header40" align="RIGHT">          13,250.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161281&rpt_year=2001&ban_flag=Y" target="envirofacts">Nitrate compounds (water dissociable; reportable only when in aqueous solution)</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">                .0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161242&rpt_year=2001&ban_flag=Y" target="envirofacts">Nitric acid</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">                .0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301200822575&rpt_year=2001&ban_flag=Y" target="envirofacts">Phenol</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">           2,400.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150716013&rpt_year=2001&ban_flag=Y" target="envirofacts">Polycyclic aromatic compounds</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">              12.0000000</td>
+<td headers="header40" align="RIGHT">             302.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161279&rpt_year=2001&ban_flag=Y" target="envirofacts">Sodium nitrite</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">                .0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150716037&rpt_year=2001&ban_flag=Y" target="envirofacts">Sulfuric acid (acid aerosols including mists, vapors, gas, fog, and other airborne forms of any particle size)</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">          58,000.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150161267&rpt_year=2001&ban_flag=Y" target="envirofacts">Toluene</a> (325 - Chemicals)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">               1.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150716049&rpt_year=2001&ban_flag=Y" target="envirofacts">Zinc compounds</a> (322 - Paper)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">           4,200.0000000</td>
+<td headers="header40" align="RIGHT">          17,500.0000000</td></tr><tr>
+<td headers="header1" align="CENTER">2</td>
+<td headers="header2" align="LEFT"><a href=https://enviro.epa.gov/triexplorer/release_fac_profile?TRI=70427LSNFB511IN&TRILIB=TRIQ1&V_NA_INDICATOR=.&FLD=&FLD=&FLD=TRIID&FLD=LNGLAT&FLD=E3&FLD=RE_TOLBY&OFFDISPD=&OTHDISPD=&ONDISPD=&OTHOFFD=&YEAR=2001 target="_blank">LOUISIANA FIBERGLASS L.L.C.</a>.511 INDUSTRIAL PKY. DR., BOGALUSA LOUISIANA 70427 (WASHINGTON PARISH) </td>
+<td headers="header3" align="RIGHT">70427LSNFB511IN</td>
+<td headers="header6" align="RIGHT">              30.812</td>
+<td headers="header7" align="RIGHT">             -89.860</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">           7,412.0000000</td></tr><tr>
+<!--  select TE.tri_chem_id AS tri_chem_id,  TE.doc_ctrl_num AS doc_id,
+      HTML_ENCODING(TE.CHEM_NAME) AS chem_name ,
+      replace(NL.NAICS_DESCRIPTION,'NAICS ','') AS TRI_NAICS_CODE,
+      nvl(R_FORM.NUM_R_FORMS,0) NUM_R, nvl(A_FORM.NUM_A_FORMS,0) NUM_A,   TRI_CENTROID_LAT AS tri_centroid_lat,
+      TRI_CENTROID_LONG AS tri_centroid_long,
+          SUM(TE.UNINJ_I * vci.MFACTOR ) AS UNINJ_I,
+    SUM(TE.RCRA_C * vci.MFACTOR ) AS RCRA_C,
+    CASE WHEN SUM(TE.OTH_LANDF) IS NULL and SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0))+ SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) END AS OTH_LANDF,
+    CASE WHEN SUM(TE.UNINJ_I) IS NULL and SUM(TE.RCRA_C) IS NULL AND SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0))
+           + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0)) + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0))  END AS SUBTOT_LAND_ONSITE,
+    SUM(TE.AIR_FUG * vci.MFACTOR ) AS AIR_FUG,
+    SUM(TE.AIR_STACK * vci.MFACTOR ) AS AIR_STACK,
+    SUM(TE.TOTAL_AIR_RELEASE * vci.MFACTOR) AS AIRLBY,
+    SUM(TE.WATER * vci.MFACTOR ) AS WATER,
+    CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR,0))+ SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR,0)) END AS UNINJ_IIV,
+        CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_I) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.UNINJ_I * vci.MFACTOR ,0))
+           + SUM(NVL(TE.UNINJ_IIV * vci.MFACTOR ,0)) END AS E4,
+        SUM(TE.OTH_LANDF * vci.MFACTOR ) AS E51B,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS E52,
+    CASE WHEN SUM(SI_5_5_3A) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3A * vci.MFACTOR ,0)) + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E53,
+        SUM(TE.OTH_DISP * vci.MFACTOR ) AS E54,
+    CASE WHEN SUM(TE.LANDF8795) IS NULL and SUM(TE.OTH_LANDF) IS NULL  and SUM(TE.RCRA_C) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.LANDF8795 * vci.MFACTOR,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR,0)) + SUM(NVL(TE.RCRA_C * vci.MFACTOR,0)) END AS E51,
+    CASE WHEN SUM(TE.RCRA_C) IS NULL and SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LAND_TREA) IS NULL
+        AND SUM(TE.LANDF8795) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(TE.OTH_DISP) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.RCRA_C * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_LANDF * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LAND_TREA * vci.MFACTOR ,0))
+           + SUM(NVL(TE.LANDF8795 * vci.MFACTOR ,0)) + SUM(NVL(TE.OTH_DISP * vci.MFACTOR ,0))
+           + SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0)) + SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS E5,
+        SUM(TE.LAND_TREA * vci.MFACTOR ) AS LAND_TREA,
+    SUM(TE.SI_5_5_3A * vci.MFACTOR ) AS SI_5_5_3A,
+    CASE WHEN SUM(TE.SI_5_5_3B) IS NULL and SUM(TE.SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3B * vci.MFACTOR ,0))+ SUM(NVL(TE.SURF_IMP * vci.MFACTOR ,0)) END AS SI_5_5_3B,
+    SUM(TE.OTH_DISP * vci.MFACTOR ) AS OTH_DISP,
+    SUM(TE.SUBTOT_OTHER_ONSITE * vci.MFACTOR) AS SUBTOT_OTHER_ONSITE,
+    SUM(TE.TOTAL_ONSITE_RELEASE * vci.MFACTOR) AS TOTAL_ONSITE,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M71) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M81) IS NULL THEN NULL
+        ELSE SUM(TE.M81 * vci.MFACTOR ) END END AS M81,
+    SUM(TE.M65 * vci.MFACTOR ) AS M65,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M64) IS NULL and SUM(TE.M72) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M64) IS NULL THEN NULL
+        ELSE SUM(TE.M64 * vci.MFACTOR ) END END AS M64,
+    CASE WHEN '2001' = '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M71) IS NULL
+                 AND SUM(TE.M82) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          WHEN '2001' >= '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M72) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0)) END
+          ELSE
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65 * vci.MFACTOR ,0)) + SUM(NVL(TE.P81C * vci.MFACTOR ,0))
+               + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) END END AS SUBTOT_LAND_OFFSITE,
+    SUM(TE.M10 * vci.MFACTOR ) AS M10,
+        CASE WHEN SUM(TE.M40M) IS NULL and SUM(TE.M41) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M40M * vci.MFACTOR ,0)) + SUM(NVL(TE.M41 * vci.MFACTOR ,0)) END AS M41,
+        CASE WHEN SUM(TE.M61M) IS NULL and SUM(TE.M62) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M61M * vci.MFACTOR ,0)) + SUM(NVL(TE.M62 * vci.MFACTOR ,0)) END AS M62,
+    SUM(TE.P81D * vci.MFACTOR ) AS P81D,
+    SUM(TE.P81C * vci.MFACTOR ) AS P81C,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M82) IS NULL AND SUM(TE.M71) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) + SUM(NVL(TE.M71 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M82) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END END AS M82,
+    SUM(TE.M66 * vci.MFACTOR ) AS M66,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M67) IS NULL AND SUM(TE.M63) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M67) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END END AS M67,
+    SUM(TE.M73 * vci.MFACTOR ) AS M73,
+    SUM(TE.M79 * vci.MFACTOR ) AS M79,
+    SUM(TE.M90 * vci.MFACTOR ) AS M90,
+    SUM(TE.M91 * vci.MFACTOR ) AS M91,
+  CASE WHEN SUM(TE.M94) IS NULL and SUM(TE.M91) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M94 * vci.MFACTOR ,0)) + SUM(NVL(TE.M91 * vci.MFACTOR ,0)) END AS M94,
+    SUM(TE.M99 * vci.MFACTOR ) AS M99,
+    CASE WHEN SUM(TE.M71) IS NULL and SUM(TE.M81) IS NULL AND SUM(TE.M82) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M71 * vci.MFACTOR ,0)) + SUM(NVL(TE.M81 * vci.MFACTOR ,0)) + SUM(NVL(TE.M82 * vci.MFACTOR ,0)) END AS M81_M82,
+    CASE WHEN SUM(TE.M72) IS NULL AND SUM(TE.M63) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M65) IS NULL
+                and SUM(TE.M66) IS NULL AND SUM(TE.M67) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(TE.M72 * vci.MFACTOR ,0)) + SUM(NVL(TE.M63 * vci.MFACTOR ,0))
+              + SUM(NVL(TE.M64 * vci.MFACTOR ,0)) + SUM(NVL(TE.M65,0))
+              + SUM(NVL(TE.M66 * vci.MFACTOR ,0)) + SUM(NVL(TE.M67 * vci.MFACTOR ,0)) END  END AS M66_M67,
+   CASE WHEN SUM(M10) IS NULL AND SUM(M40M) IS NULL AND SUM(M41) IS NULL AND SUM(M61M) IS NULL
+        AND SUM(M62) IS NULL and SUM(P81D) IS NULL AND SUM(M66) IS NULL
+        AND SUM(M67) IS NULL and SUM(M73) IS NULL AND SUM(M63) IS NULL
+        AND SUM(M79) IS NULL and SUM(M90) IS NULL AND SUM(M72) IS NULL and SUM(M82) IS NULL
+        AND SUM(M91) IS NULL AND SUM(M94) IS NULL and SUM(M99) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M63 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+              WHEN '2001' >= '2003' THEN
+              SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+            + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+            + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+            + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M71 * vci.MFACTOR ,0))
+            + SUM(NVL(M66 * vci.MFACTOR ,0)) + SUM(NVL(M67 * vci.MFACTOR ,0))
+            + SUM(NVL(M63 * vci.MFACTOR ,0))
+            + SUM(NVL(M73 * vci.MFACTOR ,0)) + SUM(NVL(M79 * vci.MFACTOR ,0))
+            + SUM(NVL(M90 * vci.MFACTOR ,0))  + SUM(NVL(M91 * vci.MFACTOR ,0))
+            + SUM(NVL(M94 * vci.MFACTOR ,0)) + SUM(NVL(M99 * vci.MFACTOR ,0))
+              ELSE
+                SUM(NVL(M10 * vci.MFACTOR ,0)) + SUM(NVL(M40M * vci.MFACTOR ,0))
+              + SUM(NVL(M41 * vci.MFACTOR ,0)) + SUM(NVL(M61M * vci.MFACTOR ,0))
+              + SUM(NVL(M62 * vci.MFACTOR ,0)) + SUM(NVL(P81D * vci.MFACTOR ,0))
+              + SUM(NVL(M82 * vci.MFACTOR ,0)) + SUM(NVL(M66 * vci.MFACTOR ,0))
+              + SUM(NVL(M67 * vci.MFACTOR ,0)) + SUM(NVL(M73 * vci.MFACTOR ,0))
+              + SUM(NVL(M79 * vci.MFACTOR ,0)) + SUM(NVL(M90 * vci.MFACTOR ,0))
+              + SUM(NVL(M91 * vci.MFACTOR ,0)) + SUM(NVL(M94 * vci.MFACTOR ,0))
+              + SUM(NVL(M99 * vci.MFACTOR ,0))
+       END END AS SUBTOT_OTHER_OFFSITE,
+   SUM(TE.TOTAL_OFFSITE_RELEASE * vci.MFACTOR) AS TOTAL_OFFSITE,
+   SUM(TE.TOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ONOFFSITE,
+   SUM(TE.OTOTAL_ONOFFSITE * vci.MFACTOR) AS TOTAL_ADJ_ONOFFSITE
+      from TRI_EX_RELEASE_REPORT_INFO TE
+      inner join vw_mat_chem_info vci
+      on TE.tri_chem_id = vci.tri_chem_id
+      inner join NAICS_LOOKUP NL
+      on TE.TRI_NAICS_GROUP_CODE = NL.NAICS_CODE
+      left outer join (select TF.TRI_FACILITY_ID, TF.TRI_CHEM_ID, count(distinct doc_ctrl_num) NUM_R_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'L'  and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427' group by TF.TRI_FACILITY_ID,TF.TRI_CHEM_ID) R_FORM on TE.TRI_FACILITY_ID = R_FORM.TRI_FACILITY_ID AND TE.TRI_CHEM_ID = R_FORM.TRI_CHEM_ID
+      left outer join (select TF.TRI_FACILITY_ID, TF.TRI_CHEM_ID, count(distinct doc_ctrl_num) NUM_A_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'S' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427'  group by TF.TRI_FACILITY_ID,TF.TRI_CHEM_ID) A_FORM on TE.TRI_FACILITY_ID = A_FORM.TRI_FACILITY_ID AND TE.TRI_CHEM_ID = A_FORM.TRI_CHEM_ID
+         where  REPORTING_YEAR = '2001' and TE.ZIP_CODE = '70427'   and TE.TRI_FACILITY_ID = '70427LSNFB511IN'     group by TE.tri_chem_id, TE.doc_ctrl_num, TE.chem_name, NL.NAICS_DESCRIPTION, R_FORM.NUM_R_FORMS, A_FORM.NUM_A_FORMS, TRI_CENTROID_LAT, TRI_CENTROID_LONG    order by TE.chem_name asc  -->
+<td headers="header1" align="CENTER">&nbsp;</td>
+<td headers="header2" align="LEFT" WIDTH="300"><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://enviro.epa.gov/enviro/tri_formr_partone_v2.get_thisone?dcn_num=1301150400974&rpt_year=2001&ban_flag=Y" target="envirofacts">Styrene</a> (336 - Transportation Equipment)</div></td>
+<td headers="header3" align="RIGHT">&nbsp;</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">           7,412.0000000</td></tr><tr>
+<td scope="col">&nbsp;</td>
+<td Header="2" scope="col" align="CENTER">Total</td>
+<td Header="3" scope="col" align="RIGHT">2</td>
+<td Header="6" scope="col" align="RIGHT">&nbsp;</td>
+<td Header="7" scope="col" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">          72,724.3000000</td>
+<td header="40" scope="col" align="RIGHT">       1,863,202.4730870</td></tr><tr>
+<td scope="col" colspan="2" align="left">Total disposal or other releases omitting double counted amounts</td>
+<td header="40" scope="col" align="RIGHT">       1,863,202.4730870</td></tr><tr>
+</table><table><tr><td>TRI On-site and Off-site Reported Disposed of or Otherwise Released (in grams), for all 1 facilities, for  facilities in All Industries, for  Dioxin and Dioxin-like compounds, ZIP code 70427, 2001
+</tr><tr>
+<hr/>
+<th id="Header1" scope="col"><B>Row #</B></th>
+<th id="Header2" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.showgroup?p_showtype=facility" target="tri_doc_view"><B>Facility</B></A></th>
+<th id="Header3" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=TRI+Facility+ID+Number" target="tri_doc_view"><B>TRIF ID</B></A></th>
+<th id="Header6" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Latitude" target="tri_doc_view"><B>Latitude</B></A></th>
+<th id="Header7" scope="col"><A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Longitude" target="tri_doc_view"><B>Longitude</B></A></th>
+<th id="Header2001d" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Water+Discharge" TARGET="tri_doc_view"><B>Surface Water Discharges</B></A> </th>
+<th id="Header40" scope="col"> <A HREF="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Total+On-+and+Off-site+Releases" TARGET="tri_doc_view"><B>Total On- and Off-site Disposal or Other Releases</B></A></th></tr><tr>
+
+
+
+
+
+
+</tr><tr>
+
+
+
+
+
+
+</tr><tr>
+
+
+
+
+
+
+</tr><tr>
+<!-- DIOXIN query:  Select * from (  select FACILITY_NAME , FACILITY_ADDRESS,
+      TE.TRI_FACILITY_ID FACILITY_ID,
+      nvl(R_FORM.NUM_R_FORMS,0) NUM_R, nvl(A_FORM.NUM_A_FORMS,0) NUM_A,  
+      TRI_CENTROID_LAT AS tri_centroid_lat,
+      TRI_CENTROID_LONG AS tri_centroid_long,
+      SUM(TE.UNINJ_I) AS UNINJ_I,
+    SUM(TE.RCRA_C) AS RCRA_C,
+    CASE WHEN SUM(TE.OTH_LANDF) IS NULL and SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.OTH_LANDF,0))+ SUM(NVL(TE.LANDF8795,0)) END AS OTH_LANDF,
+    CASE WHEN SUM(TE.UNINJ_I) IS NULL and SUM(TE.RCRA_C) IS NULL AND SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LANDF8795) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ_I,0)) + SUM(NVL(TE.RCRA_C,0))
+           + SUM(NVL(TE.OTH_LANDF,0)) + SUM(NVL(TE.LANDF8795,0)) END AS SUBTOT_LAND_ONSITE,
+    SUM(TE.AIR_FUG) AS AIR_FUG,
+    SUM(TE.AIR_STACK) AS AIR_STACK,
+    SUM(TE.TOTAL_AIR_RELEASE) AS AIRLBY,
+    SUM(TE.WATER) AS WATER,
+        CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795,0))+ SUM(NVL(TE.UNINJ_IIV,0)) END AS UNINJ_IIV,
+        CASE WHEN SUM(TE.UNINJ8795) IS NULL and SUM(TE.UNINJ_I) IS NULL and SUM(TE.UNINJ_IIV) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.UNINJ8795,0)) + SUM(NVL(TE.UNINJ_I,0))
+           + SUM(NVL(TE.UNINJ_IIV,0)) END AS E4,
+        SUM(TE.OTH_LANDF) AS E51B,
+        SUM(TE.LAND_TREA) AS E52,
+    CASE WHEN SUM(SI_5_5_3A) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3A,0)) + SUM(NVL(TE.SI_5_5_3B,0)) + SUM(NVL(TE.SURF_IMP,0)) END AS E53,
+        SUM(TE.OTH_DISP) AS E54,
+    CASE WHEN SUM(LANDF8795) IS NULL and SUM(OTH_LANDF) IS NULL  and SUM(RCRA_C) IS NULL THEN NULL
+        ELSE SUM(NVL(LANDF8795,0)) + SUM(NVL(OTH_LANDF,0)) + SUM(NVL(RCRA_C,0)) END AS E51,
+    CASE WHEN SUM(TE.RCRA_C) IS NULL and SUM(TE.OTH_LANDF) IS NULL AND SUM(TE.LAND_TREA) IS NULL
+        AND SUM(TE.LANDF8795) IS NULL AND SUM(SI_5_5_3B) IS NULL AND SUM(TE.OTH_DISP) IS NULL AND SUM(SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.RCRA_C,0)) + SUM(NVL(TE.OTH_LANDF,0))
+           + SUM(NVL(TE.LAND_TREA,0))
+           + SUM(NVL(TE.LANDF8795,0)) + SUM(NVL(TE.OTH_DISP,0))
+           + SUM(NVL(TE.SI_5_5_3B,0)) + SUM(NVL(TE.SURF_IMP,0)) END AS E5,
+        SUM(TE.LAND_TREA) AS LAND_TREA,
+    SUM(TE.SI_5_5_3A) AS SI_5_5_3A,
+    CASE WHEN SUM(TE.SI_5_5_3B) IS NULL and SUM(TE.SURF_IMP) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.SI_5_5_3B,0))+ SUM(NVL(TE.SURF_IMP,0)) END AS SI_5_5_3B,
+    SUM(TE.OTH_DISP) AS OTH_DISP,
+    SUM(TE.SUBTOT_OTHER_ONSITE) AS SUBTOT_OTHER_ONSITE,
+    SUM(TE.TOTAL_ONSITE_RELEASE) AS TOTAL_ONSITE,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M71) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M81,0)) + SUM(NVL(TE.M71,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M81) IS NULL THEN NULL
+        ELSE SUM(TE.M81) END END AS M81,
+    SUM(TE.M65) AS M65,
+     CASE WHEN '2001' >= '1996' THEN
+        CASE WHEN SUM(TE.M64) IS NULL and SUM(TE.M72) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M64,0)) + SUM(NVL(TE.M72,0)) END
+     ELSE
+        CASE WHEN SUM(TE.M64) IS NULL THEN NULL
+        ELSE SUM(TE.M64) END END AS M64,
+    CASE WHEN '2001' = '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M71) IS NULL
+                 AND SUM(TE.P81C) IS NULL AND SUM(TE.M82) IS NULL AND SUM(TE.M72) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81,0)) + SUM(NVL(TE.M65,0))
+               + SUM(NVL(TE.M64,0)) + SUM(NVL(TE.M71,0))
+               + SUM(NVL(TE.M82,0)) + SUM(NVL(TE.M72,0)) END
+          WHEN '2001' >= '2002' THEN
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M72) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81,0)) + SUM(NVL(TE.M65,0)) + SUM(NVL(TE.P81C,0))
+               + SUM(NVL(TE.M64,0)) + SUM(NVL(TE.M72,0)) END
+          ELSE
+            CASE WHEN SUM(TE.M81) IS NULL and SUM(TE.M65) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.P81C) IS NULL THEN NULL
+            ELSE SUM(NVL(TE.M81,0)) + SUM(NVL(TE.M65,0)) + SUM(NVL(TE.P81C,0))
+               + SUM(NVL(TE.M64,0)) END END AS SUBTOT_LAND_OFFSITE,
+    SUM(TE.M10) AS M10,
+        CASE WHEN SUM(TE.M40M) IS NULL and SUM(TE.M41) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M40M,0)) + SUM(NVL(TE.M41,0)) END AS M41,
+        CASE WHEN SUM(TE.M61M) IS NULL and SUM(TE.M62) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M61M,0)) + SUM(NVL(TE.M62,0)) END AS M62,
+    SUM(TE.P81D) AS P81D,
+    SUM(TE.P81C) AS P81C,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M82) IS NULL AND SUM(TE.M71) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82,0)) + SUM(NVL(TE.M71,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M82) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M82,0)) END END AS M82,
+    SUM(TE.M66) AS M66,
+    CASE WHEN '2001' >= '2003' THEN
+      CASE WHEN SUM(TE.M67) IS NULL AND SUM(TE.M63) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67,0)) + SUM(NVL(TE.M63,0)) END
+    ELSE
+      CASE WHEN SUM(TE.M67) IS NULL THEN NULL
+      ELSE SUM(NVL(TE.M67,0)) END END AS M67,
+    SUM(TE.M73) AS M73,
+    SUM(TE.M79) AS M79,
+    SUM(TE.M90) AS M90,
+    SUM(TE.M91) AS M91,
+  CASE WHEN SUM(TE.M94) IS NULL and SUM(TE.M91) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M94,0)) + SUM(NVL(TE.M91,0)) END AS M94,
+    SUM(TE.M99) AS M99,
+    CASE WHEN SUM(TE.M71) IS NULL and SUM(TE.M81) IS NULL AND SUM(TE.M82) IS NULL THEN NULL
+        ELSE SUM(NVL(TE.M71,0)) + SUM(NVL(TE.M81,0)) + SUM(NVL(TE.M82,0)) END AS M81_M82,
+    CASE WHEN SUM(TE.M72) IS NULL AND SUM(TE.M63) IS NULL AND SUM(TE.M64) IS NULL AND SUM(TE.M65) IS NULL
+                and SUM(TE.M66) IS NULL AND SUM(TE.M67) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M63,0)) + SUM(NVL(M66,0)) + SUM(NVL(M67,0))
+              ELSE
+                SUM(NVL(TE.M72,0)) + SUM(NVL(TE.M63,0))
+              + SUM(NVL(TE.M64,0)) + SUM(NVL(TE.M65,0))
+              + SUM(NVL(TE.M66,0)) + SUM(NVL(TE.M67,0)) END  END AS M66_M67,
+   CASE WHEN SUM(M10) IS NULL AND SUM(M40M) IS NULL AND SUM(M41) IS NULL AND SUM(M61M) IS NULL
+        AND SUM(M62) IS NULL and SUM(P81D) IS NULL AND SUM(M66) IS NULL
+        AND SUM(M67) IS NULL and SUM(M73) IS NULL AND SUM(M63) IS NULL
+        AND SUM(M79) IS NULL and SUM(M90) IS NULL AND SUM(M72) IS NULL
+        AND SUM(M91) IS NULL AND SUM(M94) IS NULL and SUM(M99) IS NULL THEN NULL
+        ELSE CASE WHEN '2001' = '2002' THEN
+                SUM(NVL(M10,0)) + SUM(NVL(M40M,0))
+              + SUM(NVL(M41,0)) + SUM(NVL(M61M,0))
+              + SUM(NVL(M62,0)) + SUM(NVL(P81D,0))
+              + SUM(NVL(M63,0)) + SUM(NVL(M66,0))
+              + SUM(NVL(M67,0)) + SUM(NVL(M73,0))
+              + SUM(NVL(M79,0)) + SUM(NVL(M90,0))
+              + SUM(NVL(M91,0)) + SUM(NVL(M94,0))
+              + SUM(NVL(M99,0))
+              WHEN '2001' >= '2003' THEN
+              SUM(NVL(M10,0)) + SUM(NVL(M40M,0))
+            + SUM(NVL(M41,0)) + SUM(NVL(M61M,0))
+            + SUM(NVL(M62,0)) + SUM(NVL(P81D,0))
+            + SUM(NVL(M82,0)) + SUM(NVL(M71,0))
+            + SUM(NVL(M66,0)) + SUM(NVL(M67,0))
+            + SUM(NVL(M63,0))
+            + SUM(NVL(M73,0)) + SUM(NVL(M79,0))
+            + SUM(NVL(M90,0))  + SUM(NVL(M91,0))
+            + SUM(NVL(M94,0)) + SUM(NVL(M99,0))
+              ELSE
+                SUM(NVL(M10,0)) + SUM(NVL(M40M,0))
+              + SUM(NVL(M41,0)) + SUM(NVL(M61M,0))
+              + SUM(NVL(M62,0)) + SUM(NVL(P81D,0))
+              + SUM(NVL(M82,0)) + SUM(NVL(M66,0))
+              + SUM(NVL(M67,0)) + SUM(NVL(M73,0))
+              + SUM(NVL(M79,0)) + SUM(NVL(M90,0))
+              + SUM(NVL(M91,0)) + SUM(NVL(M94,0))
+              + SUM(NVL(M99,0))
+       END END AS SUBTOT_OTHER_OFFSITE,
+   SUM(TE.TOTAL_OFFSITE_RELEASE) AS TOTAL_OFFSITE,
+   SUM(TE.TOTAL_ONOFFSITE) AS TOTAL_ONOFFSITE,
+   SUM(TE.OTOTAL_ONOFFSITE) AS TOTAL_ADJ_ONOFFSITE
+      from TRI_EX_RELEASE_REPORT_INFO TE
+      left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_R_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'L' and TF.tri_chem_id = 'N150' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427' group by TF.TRI_FACILITY_ID ) R_FORM on TE.TRI_FACILITY_ID = R_FORM.TRI_FACILITY_ID
+      left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_A_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'S' and TF.tri_chem_id = 'N150' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427'  group by TF.TRI_FACILITY_ID ) A_FORM on TE.TRI_FACILITY_ID = A_FORM.TRI_FACILITY_ID
+         where  REPORTING_YEAR = '2001' and TE.ZIP_CODE = '70427'   and TRI_CHEM_ID =  'N150'   group by FACILITY_NAME , FACILITY_ADDRESS,
+      TE.TRI_FACILITY_ID ,
+      R_FORM.NUM_R_FORMS, A_FORM.NUM_A_FORMS, TRI_CENTROID_LAT, TRI_CENTROID_LONG    order by  1  asc ) a  where ROWNUM < 101  -->
+<td headers="header1" align="CENTER">1</td>
+<td headers="header2" align="LEFT"><a href=https://enviro.epa.gov/triexplorer/release_fac_profile?tri=70427GYLRD4THST&TRILIB=TRIQ1&V_NA_INDICATOR=.&FLD=&FLD=&FLD=TRIID&FLD=LNGLAT&FLD=E3&FLD=RE_TOLBY&OFFDISPD=&OTHDISPD=&ONDISPD=&OTHOFFD=&year=2001 target="_blank">INTERNATIONAL PAPER BOGALUSA MILL</a>.898 W 4TH ST, BOGALUSA LOUISIANA 70427 (WASHINGTON PARISH) </td>
+<td headers="header3" align="RIGHT">70427GYLRD4THST</td>
+<td headers="header6" align="RIGHT">              30.777</td>
+<td headers="header7" align="RIGHT">             -89.858</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td headers="header40" align="RIGHT">               1.4000000</td></tr><tr>
+<td scope="col">&nbsp;</td>
+<td Header="2" scope="col" align="CENTER">Total</td>
+<td headers="header3" align="RIGHT">1</td>
+<td headers="header6" align="RIGHT">&nbsp;</td>
+<td headers="header7" align="RIGHT">&nbsp;</td>
+<td headers="header2001d" align="RIGHT">                .0000000</td>
+<td header="40" scope="col" align="RIGHT">               1.4000000</td></tr><tr>
+</table><table><tr><td/><td><div align="center">Distribution of Each member of the Dioxin and Dioxin-like Compounds Category (as a percentage), , 2001
+</tr><tr>
+<hr/>
+<th style=" background-color: #D0E0FF;" scope="col">Row #</th>
+<th style=" background-color: #D0E0FF;" scope="col">Facility</th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_NA" target= 'tri_doc_view'">NA</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_1" target= 'tri_doc_view'">1</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_2" target= 'tri_doc_view'">2</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_3" target= 'tri_doc_view'">3</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_4" target= 'tri_doc_view'">4</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_5" target= 'tri_doc_view'">5</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_6" target= 'tri_doc_view'">6</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_7" target= 'tri_doc_view'">7</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_8" target= 'tri_doc_view'">8</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_9" target= 'tri_doc_view'">9</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_10" target= 'tri_doc_view'">10</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_11" target= 'tri_doc_view'">11</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_12" target= 'tri_doc_view'">12</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_13" target= 'tri_doc_view'">13</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_14" target= 'tri_doc_view'">14</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_15" target= 'tri_doc_view'">15</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_16" target= 'tri_doc_view'">16</a></th>
+<th style=" background-color: #D0E0FF;" scope="col"><a href="https://enviro.epa.gov/triexplorer/trimetadata.show?p_title=Dioxin_17" target= 'tri_doc_view'">17</a></th></tr><tr>
+<!-- DISTR QUERY:  Select * from ( select TE.FACILITY_NAME , TE.FACILITY_ADDRESS ,
+TE.TRI_FACILITY_ID,
+nvl(R_FORM.NUM_R_FORMS,0) NUM_R,
+nvl(A_FORM.NUM_A_FORMS,0) NUM_A,
+TE.TRI_CENTROID_LAT,
+TE.TRI_CENTROID_LONG,
+DIOXIN_DISTRIBUTION_NA AS dioxin_distna,
+ROUND(PER_DIOXIN_DISTRIBUTION_1,2) AS dioxin_dist1,
+PER_DIOXIN_DISTRIBUTION_2 AS dioxin_dist2,
+PER_DIOXIN_DISTRIBUTION_3 AS dioxin_dist3,
+PER_DIOXIN_DISTRIBUTION_4 AS dioxin_dist4,
+PER_DIOXIN_DISTRIBUTION_5 AS dioxin_dist5,
+PER_DIOXIN_DISTRIBUTION_6 AS dioxin_dist6,
+PER_DIOXIN_DISTRIBUTION_7 AS dioxin_dist7,
+PER_DIOXIN_DISTRIBUTION_8 AS dioxin_dist8,
+PER_DIOXIN_DISTRIBUTION_9 AS dioxin_dist9,
+PER_DIOXIN_DISTRIBUTION_10 AS dioxin_dist10,
+PER_DIOXIN_DISTRIBUTION_11 AS dioxin_dist11,
+PER_DIOXIN_DISTRIBUTION_12 AS dioxin_dist12,
+PER_DIOXIN_DISTRIBUTION_13 AS dioxin_dist13,
+PER_DIOXIN_DISTRIBUTION_14 AS dioxin_dist14,
+PER_DIOXIN_DISTRIBUTION_15 AS dioxin_dist15,
+PER_DIOXIN_DISTRIBUTION_16 AS dioxin_dist16,
+PER_DIOXIN_DISTRIBUTION_17 AS dioxin_dist17,
+nvl(DIOXIN_DISTRIBUTION_NA,0) + nvl(PER_DIOXIN_DISTRIBUTION_1,0) + nvl(PER_DIOXIN_DISTRIBUTION_2,0) +
+nvl(PER_DIOXIN_DISTRIBUTION_3,0) + nvl(PER_DIOXIN_DISTRIBUTION_4,0) + nvl(PER_DIOXIN_DISTRIBUTION_5,0) +
+nvl(PER_DIOXIN_DISTRIBUTION_6,0) + nvl(PER_DIOXIN_DISTRIBUTION_7,0) + nvl(PER_DIOXIN_DISTRIBUTION_8,0) +
+nvl(PER_DIOXIN_DISTRIBUTION_9,0) + nvl(PER_DIOXIN_DISTRIBUTION_10,0) + nvl(PER_DIOXIN_DISTRIBUTION_11,0) +
+nvl(PER_DIOXIN_DISTRIBUTION_12,0) + nvl(PER_DIOXIN_DISTRIBUTION_13,0) + nvl(PER_DIOXIN_DISTRIBUTION_14,0) +
+nvl(PER_DIOXIN_DISTRIBUTION_15,0) + nvl(PER_DIOXIN_DISTRIBUTION_16,0) + nvl(PER_DIOXIN_DISTRIBUTION_17,0)  total_distribution,
+CASE WHEN  R_TE.UNINJ_I IS NULL and R_TE.RCRA_C IS NULL AND R_TE.OTH_LANDF IS NULL AND R_TE.AIR_FUG IS NULL AND R_TE.AIR_STACK IS NULL
+             AND R_TE.WATER IS NULL AND R_TE.UNINJ_IIV IS NULL AND R_TE.LAND_TREA IS NULL AND R_TE.SI_5_5_3A IS NULL AND R_TE.SI_5_5_3B IS NULL
+             AND R_TE.OTH_DISP IS NULL AND R_TE.M81 IS NULL and R_TE.M65 IS NULL AND R_TE.M64 IS NULL AND R_TE.M10 IS NULL AND R_TE.M41 IS NULL AND R_TE.M62 IS NULL
+             AND R_TE.M82 IS NULL AND R_TE.M66 IS NULL and R_TE.M67 IS NULL AND R_TE.M73 IS NULL AND R_TE.M79 IS NULL and R_TE.M90 IS NULL AND R_TE.M91 IS NULL
+             AND R_TE.M94 IS NULL and R_TE.M99 IS NULL AND R_TE.M71 IS NULL THEN NULL
+      ELSE ROUND(NVL(R_TE.UNINJ_I,0) + NVL(R_TE.RCRA_C,0) + NVL(R_TE.OTH_LANDF,0) + NVL(R_TE.AIR_FUG,0) + NVL(R_TE.AIR_STACK,0) + NVL(R_TE.WATER,0)
+               + NVL(R_TE.UNINJ_IIV,0) + NVL(R_TE.LAND_TREA,0) + NVL(R_TE.SI_5_5_3A,0) + NVL(R_TE.SI_5_5_3B,0) + NVL(R_TE.OTH_DISP,0)  + NVL(R_TE.M81,0)
+               + NVL(R_TE.M65,0) + NVL(R_TE.M64,0) + NVL(R_TE.M10,0)  + NVL(R_TE.M41,0) + NVL(R_TE.M62,0) + NVL(R_TE.M82,0) + NVL(R_TE.M66,0)
+               + NVL(R_TE.M67,0) + NVL(R_TE.M73,0) + NVL(R_TE.M79,0) + NVL(R_TE.M90,0) + NVL(R_TE.M91,0) + NVL(R_TE.M94,0) + NVL(R_TE.M99,0) + NVL(R_TE.M71,0),7) END TOTAL_ONOFFSITE
+from TRI_EX_RELEASE_TOX_REPORT_INFO TE
+inner join TRI_EX_RELEASE_REPORT_INFO R_TE
+on TE.DOC_CTRL_NUM = R_TE.DOC_CTRL_NUM
+and R_TE.TRI_CHEM_ID = 'N150'
+left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_R_FORMS
+from TRI_EX_RELEASE_TOX_REPORT_INFO TF
+where TF.FORM_TYPE_IND = 'L'
+and TF.TRI_CHEM_ID = 'N150' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427' group by TF.TRI_FACILITY_ID) R_FORM
+      on TE.TRI_FACILITY_ID = R_FORM.TRI_FACILITY_ID
+      left outer join (select TF.TRI_FACILITY_ID, count(distinct doc_ctrl_num) NUM_A_FORMS
+      from TRI_EX_RELEASE_REPORT_INFO TF
+      where TF.FORM_TYPE_IND = 'S'
+      and TF.TRI_CHEM_ID = 'N150' and  REPORTING_YEAR = '2001' and TF.ZIP_CODE = '70427'  group by TF.TRI_FACILITY_ID) A_FORM
+      on TE.TRI_FACILITY_ID = A_FORM.TRI_FACILITY_ID
+     where  TE.REPORTING_YEAR = '2001' and TE.ZIP_CODE = '70427'  ORDER BY total_onoffsite DESC  ) a  where ROWNUM < 101  -->
+<td align="CENTER">1</td>
+<td align="LEFT"><a href=https://enviro.epa.gov/triexplorer/release_fac_profile?TRI=70427GYLRD4THST&TRILIB=TRIQ1&V_NA_INDICATOR=.&FLD=&FLD=&FLD=TRIID&FLD=LNGLAT&FLD=E3&FLD=RE_TOLBY&OFFDISPD=&OTHDISPD=&ONDISPD=&OTHOFFD=&YEAR=2001 target="_blank">INTERNATIONAL PAPER BOGALUSA MILL</a>.898 W 4TH ST, BOGALUSA LOUISIANA 70427 (WASHINGTON PARISH) </td>
+<td align="RIGHT">0</td>
+<td align="RIGHT">   2.88</td>
+<td align="RIGHT">    .79</td>
+<td align="RIGHT">   1.37</td>
+<td align="RIGHT">    .81</td>
+<td align="RIGHT">   1.51</td>
+<td align="RIGHT">   1.13</td>
+<td align="RIGHT">    .07</td>
+<td align="RIGHT">    .61</td>
+<td align="RIGHT">   1.02</td>
+<td align="RIGHT">  14.24</td>
+<td align="RIGHT">   4.47</td>
+<td align="RIGHT">  64.66</td>
+<td align="RIGHT">   1.42</td>
+<td align="RIGHT">   1.11</td>
+<td align="RIGHT">    .03</td>
+<td align="RIGHT">   3.88</td>
+<td align="RIGHT">    .00</td></tr><tr>
+</table><table><tr><td/><td><div align="center">Distribution of Each member of the Dioxin and Dioxin-like Compounds Category (as a percentage), , 2001
+</tr><tr>
+<hr/>
+<th header="1" style=" background-color: #D0E0FF;" scope="col">Number</th>
+<th header="2" style=" background-color: #D0E0FF;" scope="col">CAS No.</th>
+<th header="3" style=" background-color: #D0E0FF;" scope="col">Chemical</th></tr><tr>
+<td>NA</td>
+<td>&nbsp;</td>
+<td>There is no specification data available</td></tr><tr>
+<td>1</td>
+<td>67562-39-4</td>
+<td>1,2,3,4,6,7,8-Heptachlorodibenzofuran</td></tr><tr>
+<td>2</td>
+<td>55673-89-7</td>
+<td>1,2,3,4,7,8,9-Heptachlorodibenzofuran</td></tr><tr>
+<td>3</td>
+<td>70648-26-9</td>
+<td>1,2,3,4,7,8-Hexachlorodibenzofuran</td></tr><tr>
+<td>4</td>
+<td>57117-44-9</td>
+<td>1,2,3,6,7,8-Hexachlorodibenzofuran</td></tr><tr>
+<td>5</td>
+<td>72918-21-9</td>
+<td>1,2,3,7,8,9-Hexachlorodibenzofuran</td></tr><tr>
+<td>6</td>
+<td>60851-34-5</td>
+<td>2,3,4,6,7,8-Hexachlorodibenzofuran</td></tr><tr>
+<td>7</td>
+<td>39227-28-6</td>
+<td>1,2,3,4,7,8-Hexachlorodibenzo-p-dioxin</td></tr><tr>
+<td>8</td>
+<td>57653-85-7</td>
+<td>1,2,3,6,7,8-Hexachlorodibenzo-p-dioxin</td></tr><tr>
+<td>9</td>
+<td>19408-74-3</td>
+<td>1,2,3,7,8,9-Hexachlorodibenzo-p-dioxin</td></tr><tr>
+<td>10</td>
+<td>35822-46-9</td>
+<td>1,2,3,4,6,7,8-Heptachlorodibenzo-p-dioxin</td></tr><tr>
+<td>11</td>
+<td>39001-02-0</td>
+<td>1,2,3,4,6,7,8,9-Octachlorodibenzofuran</td></tr><tr>
+<td>12</td>
+<td>3268-87-9</td>
+<td>1,2,3,4,6,7,8,9-Octachlorodibenzo-p-dioxin</td></tr><tr>
+<td>13</td>
+<td>57117-41-6</td>
+<td>1,2,3,7,8-Pentachlorodibenzofuran</td></tr><tr>
+<td>14</td>
+<td>57117-31-4</td>
+<td>2,3,4,7,8-Pentachlorodibenzofuran</td></tr><tr>
+<td>15</td>
+<td>40321-76-4</td>
+<td>1,2,3,7,8-Pentachlorodibenzo-p-dioxin</td></tr><tr>
+<td>16</td>
+<td>51207-31-9</td>
+<td>2,3,7,8-Tetrachlorodibenzofuran</td></tr><tr>
+<td>17</td>
+<td>1746-01-6</td>
+<td>2,3,7,8-Tetrachlorodibenzo-p-dioxin</td></tr><tr>
+<TABLE BORDER="0" CELLPADDING="6" CELLSPACING="0" WIDTH="%"><TR>
+          <TD VALIGN="TOP" BGCOLOR="#E0E0E0">
+<P><A NAME="note"></A><b>Note:</b>
+Reporting year (RY) 2022 is the most recent TRI data available. Facilities reporting to TRI were required to submit their data to EPA by July 1 for the previous calendar year's activities.  TRI Explorer is using the 2022 Dataset (released October 2023). This dataset includes revisions for the years 1988 to 2022 processed by EPA. Revisions submitted to EPA after this time are not reflected in TRI Explorer reports.<BR>
+TRI data may also be obtained through <a href="https://www.epa.gov/enviro/envirofacts-overview" target="tri_doc_view">EPA Envirofacts</a>.</P>
+<P>
+Users of TRI information should be aware that TRI data reflect releases and other waste management activities of chemicals, not whether (or to what degree) the public has been exposed to those chemicals. Release estimates alone are not sufficient to determine exposure or to calculate potential adverse effects on human health and the environment. TRI data, in conjunction with other information, can be used as a starting point in evaluating exposures that may result from releases and other waste management activities which involve toxic chemicals. The determination of potential risk depends upon many factors, including the toxicity of the chemical, the fate of the chemical, and the amount and duration of human or other exposure to the chemical after it is released. <BR>
+</P>
+<P>
+Off-site disposal or other releases include transfers sent to other TRI Facilities that reported the amount as on-site disposal or other release because not all states and/or not all industry sectors are included in this report.<BR>
+</P>
+<P>
+On-site Disposal or Other Releases include Underground Injection to Class I Wells (Section 5.4.1), RCRA Subtitle C Landfills (5.5.1A), Other Landfills (5.5.1B), Fugitive or Non-point Air Emissions (5.1), Stack or Point Air Emissions (5.2), Surface Water Discharges (5.3), Underground Injection to Class II-V Wells (5.4.2), Land Treatment/Application Farming (5.5.2), Surface Impoundments (5.5.3) and Other Land Disposal (5.5.4). Off-site Disposal or Other Releases include from Section 6.2 Underground Injection (M71), RCRA Subtitle C Landfills (M65), Other Landfills (M64, M72), Storage Only (M10), Solidification/Stabilization - Metals and Metal Compounds only (M41 or M40), Wastewater Treatment (excluding POTWs) - Metals and Metal Compounds only (M62 or M61), Surface Impoundments (M63), Land Treatment (M73), Other Land Disposal (M79), Other Off-site Management (M90), Transfers to Waste Broker - Disposal (M94, M91), and Unknown (M99) and, from Section 6.1 Transfers to POTWs (metals and metal compounds only).<BR>
+</P>
+<P>
+For purposes of analysis, data reported as Range Code A is calculated using a value of 5 pounds, Range Code B is calculated using a value of 250 pounds and Range Code C is calculated using a value of 750 pounds.<BR>
+</P>
+<P>
+The facility may have reported multiple NAICS codes to TRI in the current reporting year. See the facility profile report by clicking on the facility name to see a list of all NAICS codes submitted to TRI for the current reporting year.<BR>
+</P>
+<P>
+A decimal point, or "." denotes that 
+the facility left that particular cell blank in its Form R submission (a zero in a cell denotes either that the facility reported "0" or "NA" in its Form R submission). 
+"NA" in a cell denotes that the facility has submitted only Form A and thus the data for release, waste transfers or quantities of TRI chemicals in waste are not applicable. By submitting a Form A the facility has certified that its total annual reportable amount is less than 500 pounds, and that the facility does not manufacture, process, or otherwise use more than 1 million pounds of the toxic chemical.<BR>
+</P>
+<u>How to cite TRI Explorer.</u>    Following APA Style, 6th edition, an appropriate citation to TRI Explorer is:<br/>United States Environmental Protection Agency. (2024). <i>TRI Explorer</i> (2022 Dataset (released October 2023)) [Internet database]. Retrieved from <a href="https://enviro.epa.gov/triexplorer/tri_release.chemical">https://enviro.epa.gov/triexplorer/</a>, (September04, 2024).<BR>
+</TD></TR></TABLE>
