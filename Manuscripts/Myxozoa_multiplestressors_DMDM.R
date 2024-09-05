@@ -39,15 +39,23 @@ full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_in
 
 # Adding stream flow to data
 # Read physical data
-physicalUSGS <- read_excel("data/geospatial/Physicaldata_USGS.xlsx")
+physicalUSGS <- read_excel("data/Physicochemical/Physicaldata_USGS.xlsx")
+physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
+
+# Read site info
+siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+
+physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
 
 # Make a subset only for stream flow in m3/sec
-streamflow <- subset(physicalUSGS, Result_Characteristic=="Stream flow")
+streamflow <- subset(physicalUSGS_withmetadata, Measure=="Stream flow")
 streamflow_ms <- subset(streamflow, Unit=="m3/sec")
 
 # Summarize by taking the mean stream flow per 'year'
 
-streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
+streamflow_mean <- streamflow_ms %>% group_by(YearCollected,CI) %>% 
   summarise(meanFlow=mean(Result),
             .groups = 'drop')
 
@@ -57,11 +65,11 @@ Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearColl
 
 # Adding water temperature data
 # Make a subset of only water temperature
-wtemp <- subset(physicalUSGS, Result_Characteristic=="Temperature, water")
+wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
 
 # Summarize by taking the mean temperature 'yearseason'
 
-wtemp_summ <- wtemp %>% group_by(YearCollected) %>% 
+wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
   summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
             .groups = 'drop')
 
@@ -656,10 +664,11 @@ glm_count2 <- glmmTMB(psite_count ~
                         (1|season),
                       data = carvel_count,family=nbinom1()) 
 
-glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)*
-                        scale(meanTemp)*CI*
-                        scale(meanFlow)*before_after+
-                        scaled_TL_mm+
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(medianTemp)*CI*
+                        scale(meanFlow)+
+                        CI*before_after+
+                        offset(scaled_TL_mm)+
                         (1|CatalogNumber)+
                         (1|season),
                       data = carvel_count,family=nbinom2()) 
@@ -1327,7 +1336,9 @@ mean(streamflow_mean$meanFlow)
 
 # wtemp change throughout time
 
-m1 <- lm(meanTemp~YearCollected, data=wtemp_summ)
+wtemp_summ$CI <- as.factor(wtemp_summ$CI)
+
+m1 <- lm(meanTemp~YearCollected*CI, data=wtemp_summ)
 m2 <- lm(medianTemp~YearCollected, data=wtemp_summ)
 
 #Evaluate residuals
@@ -1347,7 +1358,7 @@ tab_model(m1)
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m1, c("YearCollected[n=100]")) 
+mydf <- ggpredict(m1, c("YearCollected[n=100]","CI")) 
 
 plot(mydf,rawdata=TRUE,color="red")+
   labs(x = 'Year', y = 'Mean Annual Temperature (C)',title=NULL)+
@@ -1369,8 +1380,8 @@ wtemp_plot
 
 meanwtemp_plot <-ggerrorplot(wtemp_summ, x = "YearCollected", y = "meanTemp",
                          ggtheme = theme_bw(),rawdata=TRUE,
-                         position=position_dodge(0.5),width=0.00, size=0.3)+
-  ggtitle("Water temperature")+
+                         position=position_dodge(0.5),width=0.00, size=0.3,color="CI")+
+  ggtitle("Water temperature")+apatheme+
   xlab("Year")+ylab("mean Temperature (C)")
 
 meanwtemp_plot
