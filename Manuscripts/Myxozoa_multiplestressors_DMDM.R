@@ -31,7 +31,7 @@ library(dplyr)
 library(MuMIn)
 
 ###Prepare data frames-----
-## Import data
+## Import data for temperature and stream flow
 
 full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
 
@@ -95,6 +95,34 @@ mutate(season = case_when(  MonthCollected >= 1 &
 ))
 
 Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
+
+
+
+## Import data for metals
+
+inorganics <- read_csv("data/Physicochemical/inorganics_resultphyschem.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+
+inorganics_withmetadata <- merge(inorganics, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+# Summarize by taking the mean stream flow per 'year'
+
+inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,CI,Unit,Measure) %>% 
+  summarise(Result=mean(Result),
+            .groups = 'drop')
+
+
+# Make a subset only for each inorganic element
+ug_L <- subset(inorganics_means, Unit=="ug/l")
+mg_L <- subset(inorganics_means, Unit=="mg/l")
+mg_kg <- subset(inorganics_means, Unit=="mg/kg")
+percent <- subset(inorganics_means, Unit=="%")
+
+
+# Merge with parasite data
+
+Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 
 ## Make a subset for myxozoans
@@ -1417,3 +1445,153 @@ ggplot(wtemp, aes(x= as.factor(MonthCollected),
   geom_hline(yintercept=15, linetype="dashed", color = "black", size=0.5)+
   geom_hline(yintercept=25, linetype="dashed", color = "black", size=0.5)+
   geom_hline(yintercept=35, linetype="dashed", color = "black", size=0.5)
+
+### Inorganics, elements----
+
+# Summarize by taking the mean stream flow per 'year'
+
+ug_L_means <- ug_L %>% group_by(Measure) %>% 
+  summarise(Means=mean(Result),
+            .groups = 'drop')
+
+# Plot stream flow as raw data per month
+
+ggplot(ug_L_means, aes(x= Measure,
+                 y=Means,color="black",fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Streamflow per year")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
+
+
+# make subset per concentrations
+
+ug_L_HC <- subset(ug_L, Measure==c("Aluminum","Barium","Iron","Manganese","Molybdenum","Strotium","Zinc"))
+ug_L_LC <- subset(ug_L, Measure==c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Cobalt","Copper","Lead","Lithium","Mercury","Nickel","Selenium","Silver"))
+ug_L_high <- subset(ug_L, Result > 0)
+
+# Plot stream flow as raw data per month
+
+ggplot(subset(ug_L, Measure %in% c("Iron","Aluminum","Arsenic")), aes(x= YearCollected,
+                            y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Streamflow per year")+
+  facet_wrap("CI")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
+
+# Essentials
+
+ggplot(subset(ug_L, Measure %in% c("Cobalt","Selenium","Copper","Zinc","Molybdenum","Nickel")), aes(x= as.factor(YearCollected),
+                                                                      y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+ggplot(subset(ug_L, Measure %in% c("Iron","Manganese")), aes(x= as.factor(YearCollected),
+                                                        y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+# Non-Essentials
+
+ggplot(subset(ug_L, Measure %in% c("Aluminum","Barium","Strontium")), aes(x= as.factor(YearCollected),
+                                                                                           y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+ggplot(subset(ug_L, Measure %in% c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Lead","Lithium","Mercury","Silver")), aes(x= as.factor(YearCollected),
+                                                             y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+# Oxygen looks good all across, higher than 7.5 mg/L
+
+ggplot(subset(mg_L, Measure %in% c("Oxygen")), aes(x= as.factor(YearCollected),
+                                                                                                                                       y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+
+### Organics----
+
+# Summarize by taking the mean stream flow per 'year'
+
+ug_L_means <- ug_L %>% group_by(Measure) %>% 
+  summarise(Means=mean(Result),
+            .groups = 'drop')
+
+# Plot stream flow as raw data per month
+
+ggplot(ug_L_means, aes(x= Measure,
+                       y=Means,color="black",fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Streamflow per year")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
+
+
+# make subset per concentrations
+
+ug_L_HC <- subset(ug_L, Measure==c("Aluminum","Barium","Iron","Manganese","Molybdenum","Strotium","Zinc"))
+ug_L_LC <- subset(ug_L, Measure==c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Cobalt","Copper","Lead","Lithium","Mercury","Nickel","Selenium","Silver"))
+ug_L_high <- subset(ug_L, Result > 0)
+
+# Plot stream flow as raw data per month
+
+ggplot(subset(ug_L, Measure %in% c("Iron","Aluminum","Arsenic")), aes(x= YearCollected,
+                                                                      y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Streamflow per year")+
+  facet_wrap("CI")+
+  xlab("Year")+ylab("Streamflow (m3/sec)")
+
+# Essentials
+
+ggplot(subset(ug_L, Measure %in% c("Cobalt","Selenium","Copper","Zinc","Molybdenum","Nickel")), aes(x= as.factor(YearCollected),
+                                                                                                    y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+ggplot(subset(ug_L, Measure %in% c("Iron","Manganese")), aes(x= as.factor(YearCollected),
+                                                             y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+# Non-Essentials
+
+ggplot(subset(ug_L, Measure %in% c("Aluminum","Barium","Strontium")), aes(x= as.factor(YearCollected),
+                                                                          y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+ggplot(subset(ug_L, Measure %in% c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Lead","Lithium","Mercury","Silver")), aes(x= as.factor(YearCollected),
+                                                                                                                                       y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
+# Oxygen looks good all across, higher than 7.5 mg/L
+
+oxygen_mgL <- subset(inorganics_means,Unit=="mg/l")
+
+ggplot(subset(oxygen_mgL, Measure %in% c("Oxygen")), aes(x= as.factor(YearCollected),
+                                                         y=Result,fill=Measure))+
+  geom_bar(stat = "identity")+apatheme+
+  ggtitle("Non-essential elements")+
+  facet_grid("CI")+
+  xlab("Year")+ylab("[Element] (µg/L)")
+
