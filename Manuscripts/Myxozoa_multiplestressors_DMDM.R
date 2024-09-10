@@ -106,24 +106,88 @@ inorganics <- read_csv("data/Physicochemical/inorganics_resultphyschem.csv")
 
 inorganics_withmetadata <- merge(inorganics, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
 
-# Summarize by taking the mean stream flow per 'year'
+# Summarize by taking the mean year
 
 inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,CI,Unit,Measure) %>% 
   summarise(Result=mean(Result),
             .groups = 'drop')
 
 
-# Make a subset only for each inorganic element
+# Make a subset for each unit type
 ug_L <- subset(inorganics_means, Unit=="ug/l")
 mg_L <- subset(inorganics_means, Unit=="mg/l")
 mg_kg <- subset(inorganics_means, Unit=="mg/kg")
 percent <- subset(inorganics_means, Unit=="%")
 
+## Import data for organic pollutants
 
-# Merge with parasite data
+organics <- read_csv("data/Physicochemical/organics_resultphyschem.csv")
 
-Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+# Add info on sampling sites (latitude, longitude, CI, etc.)
 
+organics_withmetadata <- merge(organics, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+# Summarize by taking the mean per year
+
+organics_means <- organics_withmetadata %>% group_by(YearCollected,CI,Unit,Measure) %>% 
+  summarise(Result=mean(Result),
+            .groups = 'drop')
+
+
+# Make a subset only for those pollutants that were detected
+
+organics_na <- subset(organics_means, !is.na(Result)) # remove NAs
+
+organics_sum <- organics_na %>% group_by(Measure) %>% # check which ones have a sum higher than 0
+  summarise(Result_sum = sum(Result),
+            .groups = 'drop')
+
+organics_means$Measure <- as.factor(organics_means$Measure) # Set Measure as factor
+
+organics_means_high <- subset(organics_means,Measure==c("Chlordane, technical")|
+                                             Measure==c("p,p'-DDD")|
+                                Measure==c("p,p'-DDE")|
+                                Measure==c("p,p'-DDT")|
+                                Measure==c("Polychlorinated biphenyls")|
+                                Measure==c("Diazinon")|
+                                Measure==c("Dieldrin")|
+                                Measure==c("Heptachlor")|
+                                Measure==c("2,4-D"))
+
+
+
+# Make a subset only for each inorganic element
+ug_L_org <- subset(organics_means_high, Unit=="ug/l")
+ug_kg_org <- subset(organics_means_high, Unit=="ug/kg")
+
+
+## Import data for nutrients
+
+nutrients <- read_csv("data/Physicochemical/nutrients_resultphyschem.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+
+nutrients_withmetadata <- merge(nutrients, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+nutrients_withmetadata$Measure_type <- ifelse(nutrients_withmetadata$Measure == "Inorganic nitrogen (nitrate and nitrite)"|
+                                            nutrients_withmetadata$Measure == "Nitrate"|
+                                            nutrients_withmetadata$Measure == "Nitrite"|
+                                            nutrients_withmetadata$Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)"|
+                                              nutrients_withmetadata$Measure == "Organic Nitrogen",                # condition
+                                                                             "Nitrogen (mixed forms)",    # what if condition is TRUE
+                                          nutrients_withmetadata$Measure)       # what if condition is FALSE
+
+
+# Summarize by taking the mean per year
+
+nutrients_sums <- nutrients_withmetadata %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure_type) %>% 
+  summarise(Result=sum(Result),
+            .groups = 'drop')
+
+
+nutrients_means <- nutrients_sums %>% group_by(YearCollected,CI,Unit,Measure_type) %>% 
+  summarise(Result=mean(Result),
+            .groups = 'drop')
 
 ## Make a subset for myxozoans
 
@@ -1522,76 +1586,36 @@ ggplot(subset(mg_L, Measure %in% c("Oxygen")), aes(x= as.factor(YearCollected),
 
 ### Organics----
 
-# Summarize by taking the mean stream flow per 'year'
-
-ug_L_means <- ug_L %>% group_by(Measure) %>% 
-  summarise(Means=mean(Result),
-            .groups = 'drop')
 
 # Plot stream flow as raw data per month
 
-ggplot(ug_L_means, aes(x= Measure,
-                       y=Means,color="black",fill=Measure))+
+ggplot(ug_L_org, aes(x= as.factor(YearCollected),
+                       y=Result,fill=Measure))+
   geom_bar(stat = "identity")+apatheme+
-  ggtitle("Streamflow per year")+
-  xlab("Year")+ylab("Streamflow (m3/sec)")
-
-
-# make subset per concentrations
-
-ug_L_HC <- subset(ug_L, Measure==c("Aluminum","Barium","Iron","Manganese","Molybdenum","Strotium","Zinc"))
-ug_L_LC <- subset(ug_L, Measure==c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Cobalt","Copper","Lead","Lithium","Mercury","Nickel","Selenium","Silver"))
-ug_L_high <- subset(ug_L, Result > 0)
-
-# Plot stream flow as raw data per month
-
-ggplot(subset(ug_L, Measure %in% c("Iron","Aluminum","Arsenic")), aes(x= YearCollected,
-                                                                      y=Result,fill=Measure))+
-  geom_bar(stat = "identity")+apatheme+
-  ggtitle("Streamflow per year")+
-  facet_wrap("CI")+
-  xlab("Year")+ylab("Streamflow (m3/sec)")
-
-# Essentials
-
-ggplot(subset(ug_L, Measure %in% c("Cobalt","Selenium","Copper","Zinc","Molybdenum","Nickel")), aes(x= as.factor(YearCollected),
-                                                                                                    y=Result,fill=Measure))+
-  geom_bar(stat = "identity")+apatheme+
-  ggtitle("Essential elements")+
+  ggtitle("Organic pollutants in water")+
+  xlab("Year")+ylab("[pollutant] (µg/L)")+
   facet_grid("CI")+
-  xlab("Year")+ylab("[Element] (µg/L)")
+  geom_vline(xintercept=1975, linetype="dashed", color = "black", size=0.5)
 
-ggplot(subset(ug_L, Measure %in% c("Iron","Manganese")), aes(x= as.factor(YearCollected),
-                                                             y=Result,fill=Measure))+
+
+
+# Plot organic pollutants in bed sediment
+
+ggplot(ug_kg_org, aes(x= as.factor(YearCollected),
+                     y=Result,fill=Measure))+
   geom_bar(stat = "identity")+apatheme+
-  ggtitle("Essential elements")+
-  facet_grid("CI")+
-  xlab("Year")+ylab("[Element] (µg/L)")
+  ggtitle("Organic pollutants in bed sediment")+
+  xlab("Year")+ylab("[pollutant] (µg/kg)")+
+  facet_grid("CI")
 
-# Non-Essentials
 
-ggplot(subset(ug_L, Measure %in% c("Aluminum","Barium","Strontium")), aes(x= as.factor(YearCollected),
-                                                                          y=Result,fill=Measure))+
+# Plot nutrients
+
+ggplot(nutrients_means, aes(x= as.factor(YearCollected),
+                      y=Result,fill=Measure_type))+
   geom_bar(stat = "identity")+apatheme+
-  ggtitle("Non-essential elements")+
-  facet_grid("CI")+
-  xlab("Year")+ylab("[Element] (µg/L)")
+  ggtitle("Nutrients in water")+
+  xlab("Year")+ylab("[nutrient] (mg/L)")+
+  facet_grid("CI")
 
-ggplot(subset(ug_L, Measure %in% c("Arsenic","Beryllium","Cadmium","Chromium","Chromium_VI","Lead","Lithium","Mercury","Silver")), aes(x= as.factor(YearCollected),
-                                                                                                                                       y=Result,fill=Measure))+
-  geom_bar(stat = "identity")+apatheme+
-  ggtitle("Non-essential elements")+
-  facet_grid("CI")+
-  xlab("Year")+ylab("[Element] (µg/L)")
-
-# Oxygen looks good all across, higher than 7.5 mg/L
-
-oxygen_mgL <- subset(inorganics_means,Unit=="mg/l")
-
-ggplot(subset(oxygen_mgL, Measure %in% c("Oxygen")), aes(x= as.factor(YearCollected),
-                                                         y=Result,fill=Measure))+
-  geom_bar(stat = "identity")+apatheme+
-  ggtitle("Non-essential elements")+
-  facet_grid("CI")+
-  xlab("Year")+ylab("[Element] (µg/L)")
 
