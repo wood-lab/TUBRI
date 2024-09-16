@@ -33,70 +33,7 @@ library(MuMIn)
 ###Prepare data frames-----
 ## Import data for temperature and stream flow
 
-full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
-
-## Merge with physical data
-
-# Adding stream flow to data
-# Read physical data
-physicalUSGS <- read_excel("data/Physicochemical/Physicaldata_USGS.xlsx")
-physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
-
-# Read site info
-siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
-
-# Add info on sampling sites (latitude, longitude, CI, etc.)
-
-physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
-
-# Make a subset only for stream flow in m3/sec
-streamflow <- subset(physicalUSGS_withmetadata, Measure=="Stream flow")
-streamflow_ms <- subset(streamflow, Unit=="m3/sec")
-
-# Summarize by taking the mean stream flow per 'year'
-
-streamflow_mean <- streamflow_ms %>% group_by(YearCollected,CI) %>% 
-  summarise(meanFlow=mean(Result),
-            .groups = 'drop')
-
-# Merge with parasite data
-
-Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
-
-# Adding water temperature data
-# Make a subset of only water temperature
-wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
-
-# Summarize by taking the mean temperature 'yearseason'
-
-wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
-  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
-            .groups = 'drop')
-
-# Merge with parasite data
-
-Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_summ, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
-
-## Create a season column
-
-Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
-
-Full_dataset_physical <- Full_dataset_physical %>% 
-mutate(season = case_when(  MonthCollected >= 1 &
-                            MonthCollected <= 2 
-                          ~ "winter",
-                          MonthCollected >= 3 &
-                            MonthCollected <= 5 ~ "spring",
-                          MonthCollected >= 6 &
-                          MonthCollected <= 8 ~ "summer",
-                        MonthCollected >= 9 &
-                         MonthCollected <= 11 ~ "fall",
-                        MonthCollected == 12 ~ "winter",
-))
-
-Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
-
-
+full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.16.csv")
 
 ## Import data for metals
 
@@ -191,7 +128,7 @@ nutrients_means <- nutrients_sums %>% group_by(YearCollected,CI,Unit,Measure_typ
 
 ## Make a subset for myxozoans
 
-full_dataset_myxo <- subset(Full_dataset_physical, Parasite_taxonomic_group == "Myxozoa")
+full_dataset_myxo <- subset(full_dataset, Parasite_taxonomic_group == "Myxozoa")
 
 ## Create column for presence and absence of myxozoans
 full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,                # condition
@@ -1433,13 +1370,7 @@ wtemp_summ$CI <- as.factor(wtemp_summ$CI)
 m1 <- lm(meanTemp~YearCollected*CI, data=wtemp_summ)
 m2 <- lm(medianTemp~YearCollected, data=wtemp_summ)
 
-#Evaluate residuals
-#Not suitable for GLM-quasipoisson but for the other models
-s=simulateResiduals(fittedModel=m1,n=250)
-s$scaledResiduals
-plot(s)
-
-summary(m1)
+summary(m1) 
 summary(m2)
 
 #With the plot()function
@@ -1619,3 +1550,64 @@ ggplot(nutrients_means, aes(x= as.factor(YearCollected),
   facet_grid("CI")
 
 
+
+### Old code----
+## Merge with physical data
+
+# Adding stream flow to data
+# Read physical data
+physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
+
+# Read site info
+siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+
+physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+# Make a subset only for stream flow in m3/sec
+streamflow <- subset(physicalUSGS_withmetadata, Measure=="Stream flow")
+streamflow_ms <- subset(streamflow, Unit=="m3/sec")
+
+# Summarize by taking the mean stream flow per 'year'
+
+streamflow_mean <- streamflow_ms %>% group_by(YearCollected,CI) %>% 
+  summarise(meanFlow=mean(Result),
+            .groups = 'drop')
+
+# Merge with parasite data
+
+Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+
+# Adding water temperature data
+# Make a subset of only water temperature
+wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
+
+# Summarize by taking the mean temperature 'yearseason'
+
+wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
+  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
+            .groups = 'drop')
+
+# Merge with parasite data
+
+Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_summ, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+
+## Create a season column
+
+Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
+
+Full_dataset_physical <- Full_dataset_physical %>% 
+  mutate(season = case_when(  MonthCollected >= 1 &
+                                MonthCollected <= 2 
+                              ~ "winter",
+                              MonthCollected >= 3 &
+                                MonthCollected <= 5 ~ "spring",
+                              MonthCollected >= 6 &
+                                MonthCollected <= 8 ~ "summer",
+                              MonthCollected >= 9 &
+                                MonthCollected <= 11 ~ "fall",
+                              MonthCollected == 12 ~ "winter",
+  ))
+
+Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
