@@ -100,6 +100,5 @@ Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
 # Export the sheet
 
 write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
-write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
 
 
