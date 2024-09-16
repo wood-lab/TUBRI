@@ -3,7 +3,7 @@
 
 ## Physicaldata_USGS.xlsx
 
-This data set includes a lot of physical parameters measured by USGS at the Pearl River near Bogalusa. The sampling station is located at latitude 30.7932614161365, longitude -89.8209117246503 (just north of highway 10). Parameters include water temperature, streamflow, suspended solids etc. DMDM deleted those columns which were totally empty. Measurements are available monthly from 1963-1995 but there are several gaps, especially for the months.
+This data set includes a lot of physical parameters measured by USGS at the Pearl River near Bogalusa. The sampling stations are located at latitude 30.7932614161365, longitude -89.8209117246503 (just north of highway 10) falling in the category of control and at 30.70583333	-89.8463889 which falls in the category of impact. Parameters include water temperature, streamflow, suspended solids etc. DMDM deleted those columns which were totally empty. Measurements are available monthly from 1963-1995 but there are several gaps, especially for the months.
 
 Data accessed: August 26, 2024
 Data source: https://waterdata.usgs.gov/download-samples/#monitoringLocationIdentifier=USGS-02489500&dataProfile=basicphyschem&sampleMedia=Water&characteristicGroup=Physical&startDate=1963-01-01&endDate=2005-08-31
