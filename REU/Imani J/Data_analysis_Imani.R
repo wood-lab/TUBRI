@@ -14,7 +14,7 @@ setwd("C:/Users/imani/OneDrive - Tuskegee University/Desktop/TUBRI_Monogenea_Pro
 ## Stats with Jolee----
 library(readr)
 
-ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
 
 
 monogenes.ict<-ICTPUNCT[, c ("MONO.IP","MONO.UNK","YearCollected")]
@@ -62,7 +62,7 @@ ggplot(Monogenes.ict_table, aes(x= Year,
 
 library(readr)
 
-ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.07.10.csv")
+ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
@@ -101,10 +101,10 @@ ggplot(ICTPUNCT_MONOIP, aes(x= YearCollected,
 #labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
 #y=label for y axis. color= represents the legend or key of labels.
 
-install.packages("stats")
-install.packages("lme4")
-install.packages("DHARMa")
-install.packages("glmmTMB")
+#install.packages("stats")
+#install.packages("lme4")
+#install.packages("DHARMa")
+#install.packages("glmmTMB")
 
 library(stats)
 library(lme4)
@@ -120,6 +120,11 @@ glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNu
 glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
 glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
 
+# generalized linear model for count data with poisson or negative binomial distribution
+# generalized linear mixed model for countr data with varying slopes
+
+# YearCollected*Pollution = Year + Pollution + Year:Pollution
+
 #Model selection. The lower the AIC, the better the model is.
 AIC(glmmonoip1,glmmonoip2)
 
@@ -128,6 +133,7 @@ glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|C
 
 
 summary(glmmonoip1)
+tab_model(glmmonoip1)
 
 #Evaluate diagnostics
 library(DHARMa)
@@ -171,7 +177,7 @@ ggsave(file="REU/Imani J/Model plots/ICTPUNCT_Ligictaluridus pricei _modelplot.p
 
 library(readr)
 
-PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.07.10.csv")
+PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.16.csv")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
