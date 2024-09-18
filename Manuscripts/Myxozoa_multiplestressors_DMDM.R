@@ -29,6 +29,7 @@ library(mgcv)
 library(readr)
 library(dplyr)
 library(MuMIn)
+library(tidyverse)
 
 ###Prepare data frames-----
 ## Import data for temperature and stream flow
@@ -43,18 +44,87 @@ inorganics <- read_csv("data/Physicochemical/inorganics_resultphyschem.csv")
 
 inorganics_withmetadata <- merge(inorganics, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
 
-# Summarize by taking the mean year
+# Summarize by taking the mean per year
 
 inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,CI,Unit,Measure) %>% 
   summarise(Result=mean(Result),
-            .groups = 'drop')
-
+            .groups = 'drop') # We do this prior to the PCA because we are interested to see what happens with the metals year by year
 
 # Make a subset for each unit type
 ug_L <- subset(inorganics_means, Unit=="ug/l")
 mg_L <- subset(inorganics_means, Unit=="mg/l")
 mg_kg <- subset(inorganics_means, Unit=="mg/kg")
 percent <- subset(inorganics_means, Unit=="%")
+
+
+### Analyse with PCA
+
+## Remove NAs
+inorganics_ugL_na <- subset(ug_L, !is.na(Result)) # remove NAs
+
+## Make data in wide format
+inorganics_pca_wide_ugL <- spread(inorganics_ugL_na, Measure,Result)
+
+## Remove non-numeric variables and elements which almost do not have data or have mostly zeroes (Beryllium, Chromium VI, Cobalt, Lithium, Molybdenum, Silver, Selenium )
+
+inorganics_pca_wide_ugL_num <- inorganics_pca_wide_ugL[-c(1:3,7,10,11,15,18,20,21)] #19, 22
+                                                       
+CI <- inorganics_pca_wide_ugL$CI
+
+
+library(missMDA)
+
+# Estimate the number of dimensions for the Principal Component Anal- ysis by cross-validation
+# The number of components which leads to the smallest mean square error of prediction (MSEP) is retained. 
+# For the Kfold cross-validation, pNA percentage of missing values is inserted and predicted with a PCA model using ncp.min to ncp.max dimensions.
+
+nb <- estim_ncpPCA(inorganics_pca_wide_ugL_num,method.cv = "Kfold", verbose = FALSE)
+nb$ncp #2
+
+plot(0:5, nb$criterion, xlab = "nb dim", ylab = "MSEP")
+
+# Because we have a lot of NAs and PCAs can't handle that, we have to imput values based on our data
+# The (regularized) iterative PCA algorithm (by default) first consists imputing missing values with initial values such as the mean of the variable.
+# We advice to use the regularized version of the algorithm to avoid the overfitting problems which are very frequent when there are many missing values. 
+
+res.comp <- imputePCA(inorganics_pca_wide_ugL_num, ncp = nb$ncp) # iterativePCA algorithm
+res.comp$completeObs[1:3,] # the imputed data set
+
+imp <- cbind.data.frame(res.comp$completeObs,CI)
+
+# Build PCA
+library(FactoMineR)
+
+imp <- cbind.data.frame(res.comp$completeObs)
+
+res.pca <- PCA(imp, quanti.sup = 1, quali.sup = 12, ncp = nb$ncp, graph=FALSE)
+
+plot(res.pca, hab=12, lab="quali")
+
+res.pca$var
+
+
+imp <- cbind.data.frame(res.comp$completeObs)
+
+plot(res.pca, choix="var")
+
+head(res.pca$ind$coord)
+
+res.pca <- PCA(imp, quanti.sup = 1, quali.sup = 12, ncp = nb$ncp, graph=FALSE)
+plot(res.pca, hab=12, lab="quali")
+
+
+# Make a subset for inorganics in water
+inorganics_pca_wide <- subset(inorganics_pca_wide, Unit=="ug/l"|Unit=="mg/l")
+
+# load packages required for PCA
+library('corrr')
+library(ggcorrplot)
+library("FactoMineR")
+
+
+colSums(is.na(inorganics_pca_wide))
+
 
 ## Import data for organic pollutants
 
@@ -114,17 +184,48 @@ nutrients_withmetadata$Measure_type <- ifelse(nutrients_withmetadata$Measure == 
                                                                              "Nitrogen (mixed forms)",    # what if condition is TRUE
                                           nutrients_withmetadata$Measure)       # what if condition is FALSE
 
-
 # Summarize by taking the mean per year
 
-nutrients_sums <- nutrients_withmetadata %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure_type) %>% 
+nutrients_sums <- nutrients_withmetadata %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure) %>% 
   summarise(Result=sum(Result),
             .groups = 'drop')
 
 
-nutrients_means <- nutrients_sums %>% group_by(YearCollected,CI,Unit,Measure_type) %>% 
+nutrients_means <- nutrients_sums %>% group_by(YearCollected,CI,Unit,Measure) %>% 
   summarise(Result=mean(Result),
             .groups = 'drop')
+
+nutrients_yearCI <- subset(nutrients_means, YearCollected > 1974 | YearCollected < 1986)
+
+
+nitrogen <- subset(nutrients_withmetadata, Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)")
+
+
+# Summarize by taking the mean per year
+
+nitrogen_means <- nitrogen %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure) %>% 
+  summarise(Result=sum(Result),
+            .groups = 'drop')
+
+
+#correlation
+
+mydf <- cbind.data.frame(nitrogen_means$YearCollected,nitrogen_means$CI,nitrogen_means$Result)
+
+# Name the columns
+
+colnames(mydf)[1]<-"YearCollected"
+colnames(mydf)[2]<-"CI"
+colnames(mydf)[3]<-"Result"
+
+## Make data in wide format
+nitrogen_wideCI <- spread(mydf, CI,Result)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=glm_count1,n=250)
+s$scaledResiduals
+plot(s)
+
 
 ## Make a subset for myxozoans
 
@@ -137,6 +238,7 @@ full_dataset_myxo$psite_presence <- ifelse(full_dataset_myxo$psite_count > 0,   
 
 ## Remove columns with myxozoans that aren't confirmed to be myxozoans and therefore are not identified
 full_dataset_myxo <- subset(full_dataset_myxo, !is.na(Parasite_genus))
+full_dataset_myxo <- subset(full_dataset_myxo, psite_spp.x!="MYX.GM") # According to Stephen, this is likely a contamination and also it is in the gall bladder so does not count for abundace
 
 #Revise variable types
 full_dataset_myxo$IndividualFishID <- as.factor(full_dataset_myxo$IndividualFishID)
@@ -569,154 +671,87 @@ carvel_abundance
 
 ## GLM for CARVEL
 
+# Transform total length
+
+carvel_count$logTL_mm <- log(carvel_count$TotalLength_mm)
+
 # Both CatalogNumber and season as as random effects
-glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)*
+glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
                         scale(meanTemp)*CI*scale(meanFlow)+
                         CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber)+ 
+                       offset(logTL_mm)+
+                       (1|IndividualFishID)+ 
                        (1|season),
                      data = carvel_count,family=nbinom2()) 
 
-# only CatalogNumber as random effect
-glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|CatalogNumber),
-                     data = carvel_count,family=nbinom2()) 
 
-# only season as random effect
-glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)*
-                       scale(meanTemp)*CI*scale(meanFlow)+
-                       CI*before_after+
-                       offset(scaled_TL_mm)+
-                       (1|season),
-                     data = carvel_count,family=nbinom2())
-
-summary(glm_count)
-
-AIC(glm_count1,glm_count2,glm_count3)
-
-## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with nbinom2 and either catalog number or season as RE performs better. 
-## Nevertheless the estimates of all these models is horrible. 
-# I will simplify the model by leaving year collected alone
-
-# Both CatalogNumber and season as as random effects
 glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)+
                         scale(meanTemp)*CI*scale(meanFlow)+
                         CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+ 
+                        offset(logTL_mm)+
+                        (1|IndividualFishID)+ 
                         (1|season),
-                      data = carvel_count,family=nbinom2()) #convergence problem w. nbinom2
+                      data = carvel_count,family=nbinom1()) 
 
-# only CatalogNumber as random effect
-glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber),
-                      data = carvel_count,family=nbinom2()) 
 
-# only season as random effect
-glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI*scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|season),
-                      data = carvel_count,family=nbinom2())
 
+summary(glm_count1)
 summary(glm_count2)
 
-AIC(glm_count1,glm_count2,glm_count3)
+AIC(glm_count1,glm_count2) # According to AIC nbinom1 performs better
 
-
-## For the random structure, I tried with season and catalognumber as REs and also without one or the other, with both nbinom1 and nibinom2 and the one with nbinom2 and either catalog number or season as RE performs better. 
-## Nevertheless the estimates of all these models is horrible. 
-# I will simplify the model by leaving year collected alone
-
-# Both CatalogNumber and season as as random effects
 glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)+
                         scale(meanTemp)*CI+
-                        scale(meanFlow)*CI+
-                        scale(meanFlow)*scale(meanTemp)+
+                        CI*scale(meanFlow)+
+                        scale(meanTemp)*scale(meanFlow)+
                         CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+ 
-                        (1|season),
-                      data = carvel_count,family=nbinom1()) #convergence problem w. nbinom2
-
-# only CatalogNumber as random effect
-glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI+
-                        scale(meanFlow)*CI+
-                        scale(meanFlow)*scale(meanTemp)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber),
-                      data = carvel_count,family=nbinom1()) 
-
-# only season as random effect
-glm_count3 <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(meanTemp)*CI+
-                        scale(meanFlow)*CI+
-                        scale(meanFlow)*scale(meanTemp)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|season),
-                      data = carvel_count,family=nbinom1())
-
-summary(glm_count2)
-
-AIC(glm_count1,glm_count2,glm_count3)
-
-# the fit of these models under nbinom1 and nbinom2 is terrible
-
-# we simplify by removing the least significant: yearcollected
-glm_count2 <- glmmTMB(psite_count ~ 
-                        scale(meanTemp)*CI+
-                        scale(meanFlow)*CI+
-                        scale(meanFlow)*scale(meanTemp)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
-                        (1|season)
-                        ,
-                      data = carvel_count,family=nbinom2()) 
-
-glm_count2 <- glmmTMB(psite_count ~ 
-                        scale(meanTemp)*CI*
-                        scale(meanFlow)*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
+                        offset(logTL_mm)+
+                        (1|IndividualFishID)+ 
                         (1|season),
                       data = carvel_count,family=nbinom1()) 
 
-glm_count2 <- glmmTMB(psite_count ~ scale(YearCollected)+
-                        scale(medianTemp)*CI*
-                        scale(meanFlow)+
-                        CI*before_after+
-                        offset(scaled_TL_mm)+
-                        (1|CatalogNumber)+
+
+glm_count1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                        scale(meanTemp)*CI+
+                        CI*scale(meanFlow)+
+                        scale(meanTemp)*scale(meanFlow)+
+                        offset(logTL_mm)+
+                        (1|IndividualFishID)+ 
                         (1|season),
-                      data = carvel_count,family=nbinom2()) 
+                      data = carvel_count,family=nbinom1()) 
 
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=glm_count2,n=250)
+s=simulateResiduals(fittedModel=glm_count1,n=250)
 s$scaledResiduals
 plot(s)
 
+# Plot interactions
+
+library(interactions)
+
+interact_plot(glm_count1, pred = meanFlow, modx = meanTemp,modx.values = c(18,19,20,21,22),
+              allow.new.levels=TRUE,interval = TRUE,
+              int.width = 0.95)+
+  apatheme+  ggtitle("Full")
+
+interact_plot(glm_count1, pred = meanFlow, modx = meanTemp,modx.values = c(18,19,20,21,22),
+              allow.new.levels=TRUE,interval = TRUE,
+              int.width = 0.95)+
+  apatheme+  ggtitle("With before_after")
+
+interact_plot(glm_count1, pred = meanFlow, modx = meanTemp,modx.values = c(18,19,20,21,22),
+              allow.new.levels=TRUE,interval = TRUE,
+              int.width = 0.95)+
+  apatheme+  ggtitle("Without before_after")
 
 #With the plot()function
-plot_model(glm_count2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
-
+plot_model(glm_count1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 plot_model(glm_count2, type = "pred")
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count2, c("meanFlow[all]","CI")) 
+mydf <- ggpredict(glm_count1, c("meanFlow[all]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
@@ -724,7 +759,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
 
 # Temperature with CI and psite_genus
 
-mydf <- ggpredict(glm_count2, c("meanTemp[n=200]","CI")) 
+mydf <- ggpredict(glm_count1, c("meanTemp[n=200]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   labs(x = 'Temperature (°C)', y = 'Abundance of myxozoans',title=NULL)+
@@ -733,7 +768,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
 
 # Temperature with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("YearCollected[n=200]","CI")) 
+mydf <- ggpredict(glm_count1, c("YearCollected[n=200]","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
   labs(x = 'Year', y = 'Abundance of myxozoans',title=NULL)+
@@ -742,7 +777,7 @@ plot(mydf,rawdata=TRUE,jitter=0.05)+
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(glm_count, c("before_after","CI")) 
+mydf <- ggpredict(glm_count1, c("before_after","CI")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05)+
   labs(x = 'Clean water act', y = 'Abundance of myxozoans',title=NULL)+
@@ -1441,6 +1476,7 @@ ggplot(wtemp, aes(x= as.factor(MonthCollected),
   geom_hline(yintercept=25, linetype="dashed", color = "black", size=0.5)+
   geom_hline(yintercept=35, linetype="dashed", color = "black", size=0.5)
 
+
 ### Inorganics, elements----
 
 # Summarize by taking the mean stream flow per 'year'
@@ -1611,3 +1647,12 @@ Full_dataset_physical <- Full_dataset_physical %>%
   ))
 
 Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
+
+# Nutrients
+
+ggplot(nutrients_yearCI, aes(x= as.factor(YearCollected),
+                  y=Result, color=CI))+
+  geom_point()+apatheme+
+  ggtitle("Water temperature per month")+
+  facet_wrap("Measure")
+  
