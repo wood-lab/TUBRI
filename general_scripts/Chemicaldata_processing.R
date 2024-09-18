@@ -198,6 +198,8 @@ plot(0:5, nb$criterion, xlab = "nb dim", ylab = "MSEP")
 # The (regularized) iterative PCA algorithm (by default) first consists imputing missing values with initial values such as the mean of the variable.
 # It is adviced to use the regularized version of the algorithm to avoid the overfitting problems which are very frequent when there are many missing values. 
 
+library(FactoMineR)
+
 res.comp <- imputePCA(elements_na_wide_scaled, ncp = nb$ncp) # iterativePCA algorithm
 res.comp$completeObs[1:3,] # the imputed data set
 
@@ -232,6 +234,7 @@ full_dataset_yearscontrol <- subset(full_dataset_years,
 
 # Merge with parasite data
 
+Full_dataset_elements <- merge(full_dataset, mod, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 Full_dataset_elements <- merge(full_dataset_yearscontrol, mod, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 
@@ -306,5 +309,52 @@ apatheme= theme_bw(base_size = 14,base_family = "sans")+
         axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
-### Impact of multiple stressors on the abundance of myxoblous----
+### Impact of multiple stressors on the abundance of myxobolus----
+
+## GLM for CARVEL
+
+# Transform total length
+
+carvel_count$logTL_mm <- log(carvel_count$TotalLength_mm)
+
+carvel_count$scaledmeanFlow <- scale(carvel_count$meanFlow )
+
+carvel_count$scaledmeanN <- scale(carvel_count$meanN)
+
+carvel_count$scaledmeanTemp <- scale(carvel_count$meanTemp)
+
+carvel_count$scaledYear <- scale(carvel_count$YearCollected)
+
+
+# Both CatalogNumber and season as as random effects
+glm_count2 <- glmmTMB(psite_count ~ 
+                        scaledmeanTemp*scaledmeanFlow*scaledmeanN+
+                        offset(logTL_mm)+
+                        (1|IndividualFishID)+ 
+                        (1|season),
+                      data = carvel_count,family=nbinom1()) # This model is working good, good dianostic and fit.
+
+glm_count2 <- glmmTMB(psite_count ~ scaledYear+
+                        scaledmeanTemp*scaledmeanFlow*scaledmeanN+
+                        offset(logTL_mm)+
+                        (1|IndividualFishID)+ 
+                        (1|season),
+                      data = carvel_count,family=nbinom2()) # rank deficient
+
+summary(glm_count2)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=glm_count2,n=250)
+s$scaledResiduals
+plot(s)
+
+tab_model(glm_count2)
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(glm_count2, c("scaledmeanN[all]")) 
+
+plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  labs(x = 'Stream flow (m3/sec)', y = 'Abundance of myxozoans',title=NULL)+
+  apatheme
 
