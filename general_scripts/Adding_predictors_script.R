@@ -77,7 +77,6 @@ print(full_dataset)
 
 #### The script below assigns to each fish individual the mean streamflow per year regardless of when during that year the fish was collected
 
-
 # Summarize by taking the mean streamflow per 'year'
 
 streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
@@ -180,7 +179,7 @@ nutrients_withmetadata <- merge(nutrients, siteinfo, by.x = "MonitoringLocationI
 # downstram impact sites are going to be represented by this data.
 
 
-# Take only nitrate, nitrite, and their sum (inorganic nitrogen (nitrate and nitrite))
+# Take only mixed forms of nitrogen in mg-N/L
 
 mixN_unitall <- subset(nutrients_withmetadata, Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)")
 mixN <- subset(mixN_unitall, Unit_full == "mg/l")
@@ -234,15 +233,9 @@ ggplot(nutrients_means, aes(x= as.factor(YearCollected),
   ggtitle("Nutrients per year")+
   facet_wrap("Measure")
 
-
-
-
-
-
 ### Season----
 ## Create a season column to be later used as a random factor in the models
 
-#Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
 full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
 
 full_dataset <- full_dataset %>% 
@@ -262,7 +255,7 @@ full_dataset$season <- as.factor(full_dataset$season)
 
 #### Export the final sheet----
 
-write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
+#write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
 write.csv(full_dataset, file="data/processed/Full_dataset_physical_2024.09.23.csv")
 
 
