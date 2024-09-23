@@ -36,6 +36,48 @@ physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLoc
 streamflow <- subset(physicalUSGS_withmetadata, Measure=="Stream flow")
 streamflow_ms <- subset(streamflow, Unit=="m3/sec")
 
+#### The script below assigns to each fish individual the mean streamflow (mean_streamflow) that the fish experienced over one year before its collection
+
+# Add a new column to store the mean temperatures
+full_dataset$mean_streamflow <- NA
+
+library(lubridate)
+
+# Combine year, month, and day columns into a date column
+full_dataset$collection_date <- make_date(full_dataset$YearCollected, full_dataset$MonthCollected, 
+                                          full_dataset$DayCollected)
+
+
+streamflow_ms$measurement_date <- make_date(streamflow_ms$YearCollected, streamflow_ms$MonthCollected, 
+                                            streamflow_ms$DayCollected)
+
+
+# Loop through each row of 'full_dataset'
+for (i in 1:nrow(full_dataset)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(full_dataset$collection_date[i])
+  
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter 'streamflow_ms' to get the streamflow data within that one-year range
+  streamflow_data <- streamflow_ms[streamflow_ms$measurement_date >= start_date & streamflow_ms$measurement_date < end_date, "Result"]
+  
+  # Calculate the mean streamflow and store it in 'full_dataset'
+  if (length(streamflow_data) > 0) {
+    full_dataset$mean_streamflow[i] <- mean(streamflow_data, na.rm = TRUE)
+  } else {
+    full_dataset$mean_streamflow[i] <- NA  # If no data is found, store NA
+  }
+}
+
+# View updated 'full_dataset'
+print(full_dataset)
+
+#### The script below assigns to each fish individual the mean streamflow per year regardless of when during that year the fish was collected
+
+
 # Summarize by taking the mean streamflow per 'year'
 
 streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
@@ -66,6 +108,46 @@ summary(m2)
 tab_model(m1)
 tab_model(m2)# The estimate of YearCollected is the same/consistent for both models (an increase of 0.09 degC/year). No difference between control and impact.
 
+#### The script below assigns to each fish individual the mean temperature (mean_temperature) that the fish experienced over one year before its collection
+
+# Add a new column to store the mean temperatures
+full_dataset$mean_temperature <- NA
+
+library(lubridate)
+
+# Combine year, month, and day columns into a date column
+full_dataset$collection_date <- make_date(full_dataset$YearCollected, full_dataset$MonthCollected, 
+                                          full_dataset$DayCollected)
+
+
+wtemp$measurement_date <- make_date(wtemp$YearCollected, wtemp$MonthCollected, 
+                                    wtemp$DayCollected)
+
+
+# Loop through each row of 'full_dataset'
+for (i in 1:nrow(full_dataset)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(full_dataset$collection_date[i])
+  
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter 'wtemp' to get the temperature data within that one-year range
+  temp_data <- wtemp[wtemp$measurement_date >= start_date & wtemp$measurement_date < end_date, "Result"]
+  
+  # Calculate the mean temperature and store it in 'full_dataset'
+  if (length(temp_data) > 0) {
+    full_dataset$mean_temperature[i] <- mean(temp_data, na.rm = TRUE)
+  } else {
+    full_dataset$mean_temperature[i] <- NA  # If no data is found, store NA
+  }
+}
+
+# View updated 'full_dataset'
+print(full_dataset)
+
+#### The script below assigns to each fish individual the mean temperature per year regardless of when during that year the fish was collected
 
 # Summarize by taking the mean, max, and median temperature per 'year'
 
@@ -77,11 +159,93 @@ wtemp_summ <- wtemp %>% group_by(YearCollected) %>%
 
 Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_summ, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
+### Nutrients----
+## Import data for nutrients
+
+nutrients <- read_csv("data/Physicochemical/nutrients_resultphyschem.csv")
+
+# Read USGS-gauge site metadata
+
+siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+
+nutrients_withmetadata <- merge(nutrients, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+# Nitrogen species: nitrogen available to plants occurs in the form of 
+# ammonia (NH3), ammonium (NH4+), nitrate (NO3−), nitrite (NO2-), and 
+# organic nitrogen. Therefore, we used the mixed nitrogen measurement for our analyses.
+# However it only spans between 1973 and 1994. So we will perform the analyses 
+# only for that time period and for the control because I cannot assume that the 
+# downstram impact sites are going to be represented by this data.
+
+
+# Take only nitrate, nitrite, and their sum (inorganic nitrogen (nitrate and nitrite))
+
+mixN_unitall <- subset(nutrients_withmetadata, Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)")
+mixN <- subset(mixN_unitall, Unit_full == "mg/l")
+
+
+#### The script below assigns to each fish individual the mean nutrients (mean_nitrogen) that the fish experienced over one year before its collection
+
+# Add a new column to store the mean nutrient in the form of mixed nitrogen forms
+full_dataset$mean_nitrogen <- NA
+
+library(lubridate)
+
+# Combine year, month, and day columns into a date column
+full_dataset$collection_date <- make_date(full_dataset$YearCollected, full_dataset$MonthCollected, 
+                                          full_dataset$DayCollected)
+
+
+mixN$measurement_date <- make_date(mixN$YearCollected, mixN$MonthCollected, 
+                                   mixN$DayCollected)
+
+
+# Loop through each row of 'full_dataset'
+for (i in 1:nrow(full_dataset)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(full_dataset$collection_date[i])
+  
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter 'mixN' to get the nitrogen data within that one-year range
+  nutrient_data <- mixN[mixN$measurement_date >= start_date & mixN$measurement_date < end_date, "Result"]
+  
+  # Calculate the mean nitrogen and store it in 'full_dataset'
+  if (length(nutrient_data) > 0) {
+    full_dataset$mean_nitrogen[i] <- mean(nutrient_data, na.rm = TRUE)
+  } else {
+    full_dataset$mean_nitrogen[i] <- NA  # If no data is found, store NA
+  }
+}
+
+# View updated 'full_dataset'
+print(full_dataset)
+
+
+# Evaluate dynamic of nutrients across years
+
+ggplot(nutrients_means, aes(x= as.factor(YearCollected),
+                            y=Result, color=CI))+
+  geom_point()+apatheme+
+  ggtitle("Nutrients per year")+
+  facet_wrap("Measure")
+
+
+
+
+
+
+### Season----
 ## Create a season column to be later used as a random factor in the models
 
-Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
+#Full_dataset_physical$MonthCollected <- as.numeric(Full_dataset_physical$MonthCollected)
+full_dataset$MonthCollected <- as.numeric(full_dataset$MonthCollected)
 
-Full_dataset_physical <- Full_dataset_physical %>% 
+full_dataset <- full_dataset %>% 
   mutate(season = case_when(  MonthCollected >= 1 &
                                 MonthCollected <= 2 
                               ~ "winter",
@@ -94,11 +258,11 @@ Full_dataset_physical <- Full_dataset_physical %>%
                               MonthCollected == 12 ~ "winter",
   ))
 
-Full_dataset_physical$season <- as.factor(Full_dataset_physical$season)
+full_dataset$season <- as.factor(full_dataset$season)
 
-
-# Export the sheet
+#### Export the final sheet----
 
 write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
+write.csv(full_dataset, file="data/processed/Full_dataset_physical_2024.09.23.csv")
 
 
