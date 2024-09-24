@@ -94,6 +94,12 @@ wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
 
 # Check if there is a significant difference between control and impact 
 
+# Summarize by taking the mean, max, and median temperature per 'year'
+
+wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
+  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
+            .groups = 'drop') # For water temperature there is also data for the impact category (although for less years). However, there is no significant difference between control and impact so we take the mean per year ignoring CI. See analysis (LM) relevant to this data above We have to keep in mind that the gage at the impact category is way downstream. So there might be some warming frmo the pulp mill that is probably not captured by the gage.
+
 # wtemp change throughout time
 
 wtemp_summ$CI <- as.factor(wtemp_summ$CI)
@@ -182,7 +188,8 @@ nutrients_withmetadata <- merge(nutrients, siteinfo, by.x = "MonitoringLocationI
 # Take only mixed forms of nitrogen in mg-N/L
 
 mixN_unitall <- subset(nutrients_withmetadata, Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)")
-mixN <- subset(mixN_unitall, Unit_full == "mg/l")
+mixN_control <- subset(mixN_unitall, CI == "control")
+mixN <- subset(mixN_control, Unit_full == "mg/l")
 
 
 #### The script below assigns to each fish individual the mean nutrients (mean_nitrogen) that the fish experienced over one year before its collection
