@@ -144,9 +144,9 @@ inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,CI,Unit,M
             .groups = 'drop') # We do this prior to the PCA because we are interested to see what happens with the metals year by year
 
 
-inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure) %>% 
-  summarise(Result=mean(Result),
-            .groups = 'drop') # new, summarizing by month to have more data
+#inorganics_means <- inorganics_withmetadata %>% group_by(YearCollected,MonthCollected,CI,Unit,Measure) %>% 
+ # summarise(Result=mean(Result),
+  #          .groups = 'drop') # new, summarizing by month to have more data
 
 # Make a subset for element concentration in water
 
@@ -162,24 +162,24 @@ elements_water_years <- subset(elements_water,
 elements_water_yearscontrol <- subset(elements_water_years, 
                                CI == "control" )
 
-elements_water_control <- subset(elements_water, 
-                                      CI == "control" )#new
+#elements_water_control <- subset(elements_water, 
+                                    #  CI == "control" )#new
 
 ## Analyse with PCA
 
 # Remove NAs
 elements_na <- subset(elements_water_yearscontrol, !is.na(Result)) # remove NAs
-elements_na <- subset(elements_water_control, !is.na(Result)) # new
-elements_na <- subset(elements_water, !is.na(Result)) # new
+#elements_na <- subset(elements_water_control, !is.na(Result)) # new
+#elements_na <- subset(elements_water, !is.na(Result)) # new
 
 # Keep those elements that we are interested on and that have enough data to be analyze
 
-elements_sub <- subset(elements_na, Measure %in% c("Aluminum","Arsenic","Barium",
-                                   "Cadmium","Chloride","Chromium",
-                                   "Copper","Lead","Iron","Magnesium",
-                                   "Manganese","Mercury",
-                                   "Nickel","Potassium","Sodium","Silica",
-                                   "Zinc"))
+#elements_sub <- subset(elements_na, Measure %in% c("Aluminum","Arsenic","Barium",
+#                                   "Cadmium","Chloride","Chromium",
+#                                   "Copper","Lead","Iron","Magnesium",
+#                                   "Manganese","Mercury",
+#                                   "Nickel","Potassium","Sodium","Silica",
+#                                   "Zinc"))
 
 elements_sub <- subset(elements_na, Measure %in% c("Arsenic","Barium",
                                                    "Cadmium","Chromium",
@@ -195,7 +195,7 @@ elements_na_wide <- spread(elements_sub, Measure,Result)
 ## Remove non-numeric variables and elements which almost do not have data or have mostly zeroes (Beryllium, Chromium VI, Cobalt, Lithium, Molybdenum, Silver, Selenium )
 
 elements_na_wide_num <- elements_na_wide[-c(1:3)]
-elements_na_wide_num <- elements_na_wide[-c(1:4)] #new
+#elements_na_wide_num <- elements_na_wide[-c(1:4)] #new
 
 elements_na_wide_scaled <- scale(elements_na_wide_num)
 
@@ -220,12 +220,6 @@ library(FactoMineR)
 res.comp <- imputePCA(elements_na_wide_scaled, ncp = nb$ncp) # iterativePCA algorithm
 res.comp$completeObs[1:3,] # the imputed data set
 
-mydata.cor = cor(res.comp$completeObs[1:3,])
-
-library(corrplot)
-corrplot(mydata.cor)
-
-
 imp <- cbind.data.frame(res.comp$completeObs)
 
 res.pca <- PCA(imp, quanti.sup = 1, quali.sup = 12, ncp = 2, graph=FALSE) # generate PCA
@@ -242,7 +236,7 @@ mod
 
 ## Import parasite dataset
 
-full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.16.csv")
+#full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.16.csv")
 full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.23.csv")
 
 ## Restrict to year and control
@@ -258,17 +252,12 @@ full_dataset_yearscontrol <- subset(full_dataset_years,
 
 # Merge with parasite data
 
-Full_dataset_elements <- merge(full_dataset, mod, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+#Full_dataset_elements <- merge(full_dataset, mod, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 Full_dataset_elements <- merge(full_dataset_yearscontrol, mod, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
-
-
-# Merge with nitrogen data
-
-Full_dataset_elemN <- merge(Full_dataset_elements, mixN_control, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 ## Make a subset for myxozoans
 
-full_dataset_myxo <- subset(Full_dataset_elemN, Parasite_taxonomic_group == "Myxozoa")
+#full_dataset_myxo <- subset(Full_dataset_elemN, Parasite_taxonomic_group == "Myxozoa")
 full_dataset_myxo <- subset(Full_dataset_elements, Parasite_taxonomic_group == "Myxozoa")
 
 ## Create column for presence and absence of myxozoans
@@ -395,12 +384,21 @@ ggplot(myxo_count, aes(x= mean_nitrogen,
   geom_point()+apatheme+
   facet_wrap("Fish_sp.x")
 
+# Evaluate dynamic of nutrients across years
+
+ggplot(myxo_count, aes(x= Latitude,
+                       y=Longitude))+
+  geom_point()+apatheme
+
+ggplot(myxo_count, aes(x= Longitude,
+                       y=Latitude))+
+  geom_point()+apatheme
+
 
 
 ## GLM for all fish
 
 # Both CatalogNumber and season as as random effects
-library(splines)
 
 m1 <- glmmTMB(psite_count ~ scaledYear+
                 scaledmean_streamflow*scaledmean_nitrogen+
@@ -443,65 +441,174 @@ m3 <- glmmTMB(psite_count ~ scaledYear+
               data = myxo_count,
               family = nbinom1(link = "sqrt"))
 
-myxo_count$times <- as.factor(myxo_count$YearCollected)
+## Add a covariance term, temporal autocorrelation corARMA structure
+
+myxo_count$times <- as.factor(myxo_count$YearCollected)#Set time as factor
+
+
+myxo_count$Longitude <- as.numeric(myxo_count$Longitude)
+
+myxo_count <- myxo_count %>% 
+  mutate(site = case_when(  Longitude == -89.83083 ~ "CA",
+                              Longitude == -89.83195 ~ "CA",
+                              Longitude == -89.83028 ~ "CA",
+                              Longitude == -89.83222
+                              ~ "CA",
+                            Longitude == -89.82972~ "CB",
+                              Longitude == -89.82722 ~ "CB",
+                            Longitude == -89.82806 ~ "CC",
+                            Longitude == -89.82027 ~ "CD",
+  ))
+
+myxo_count$site <- as.factor(myxo_count$site)
+
+
+top.xy <- unique(myxo_count[c("Latitude","Longitude")])
+top.xy
+
+
 
 m3 <- glmmTMB(psite_count ~ scaledYear+
                 scaledmean_streamflow*scaledmean_nitrogen+
                 scaledmean_temperature*scaledmean_nitrogen+
                 scaledmean_temperature*scaledmean_streamflow+
-                (1|Fish_sp.x/CatalogNumber/IndividualFishID)+
+                (1|Fish_sp.x/IndividualFishID)+
                 (1|season)+
-                ar1(times + 0 | group),
+                ar1(times + 0 | site),
               data = myxo_count,
               family = nbinom1(link = "sqrt"))
 
+m4 <- glmmTMB(psite_count ~ scaledYear+
+                scaledmean_streamflow*scaledmean_nitrogen+
+                scaledmean_temperature*scaledmean_nitrogen+
+                scaledmean_temperature*scaledmean_streamflow+
+                (1|Fish_sp.x/IndividualFishID)+
+                (1|season)+
+                ar1(times + 0 | site),
+              data = myxo_count,
+              family = nbinom2())
 
 
-AIC(m1,m2,m3)         
-summary(m2)
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_streamflow)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = myxo_count,
+              family = nbinom1(link = "sqrt"))
+
+m5 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_streamflow)+
+                (1|site/IndividualFishID),
+              data = myxo_count,
+              family = nbinom1())
+
+m6 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_streamflow)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = myxo_count,
+              family = nbinom2())
+
+myxo_count_b <- subset(myxo_count, CatalogNumber!= 161604)
+myxo_count_b$logTL_mm <- log(myxo_count_b$TotalLength_mm)
+
+m5 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*scale(mean_streamflow)+
+                (1|site/Fish_sp.x/IndividualFishID)+
+                offset(logTL_mm)+
+                (1|season),
+              data = myxo_count_b,
+              family = nbinom1(link="sqrt"))
+
+
+m5 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                (1|site/Fish_sp.x/IndividualFishID)+
+                offset(logTL_mm)+
+                (1|season),
+              data = myxo_count_b,
+              family = nbinom1(link="sqrt"))
+
+m5 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                (1|site/Fish_sp.x/IndividualFishID)+
+                offset(logTL_mm)+
+                (1|season),
+              data = myxo_count_b,
+              family = nbinom2(link="log"))
+
+
+
+
+AIC(m3,m4) 
+AIC(m4,m5,m6)         
+
+summary(m5)
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=m3,n=250)
+s=simulateResiduals(fittedModel=m5,n=250)
 s$scaledResiduals
 plot(s)
 
-performance::check_overdispersion(m3)
+performance::check_overdispersion(m4)
 
-tab_model(m2)
-plot_model(m3)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+tab_model(m5)
+plot_model(m5,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
 ## Interactions
 library(interactions) # vignette: https://rdrr.io/cran/interactions/man/interact_plot.html
 
-interact_plot(m3, pred = scaledmean_nitrogen, modx = scaledmean_temperature, plot.points = TRUE,
-              modx.values = c(-1,0,1),data=myxo_count)+
-    ylim(0,100)+apatheme
+interact_plot(m5, pred = mean_nitrogen, modx = mean_temperature, plot.points = TRUE,
+              modx.values = c(18,20,22),data=myxo_count,interval=TRUE)+apatheme+ylim(0,200)
 
-interact_plot(m3, pred = scaledmean_nitrogen, modx = scaledmean_temperature, partial.residuals = TRUE,
-              modx.values = c(-1,0,1),data=myxo_count)+
-  ylim(0,100)+apatheme+xlim(-1,2)
+interact_plot(m5, pred = mean_nitrogen, modx = mean_temperature, plot.points = TRUE,
+              data=myxo_count,interval=TRUE)+apatheme+ylim(0,200)
 
+interact_plot(m5, pred = mean_nitrogen, modx = mean_streamflow, plot.points = TRUE,
+              data=myxo_count,interval = TRUE)+apatheme+ylim(0,200)
 
-  # Flow with CI and psite_genus
+interact_plot(m5, pred = mean_streamflow, modx = mean_temperature, plot.points = TRUE,
+              data=myxo_count,interval = TRUE)+apatheme+ylim(0,150)
 
-mydf <- ggpredict(m3, terms= c("scaledmean_nitrogen[all]")) 
+  
+# Flow with CI and psite_genus
 
-plot(mydf,show_data=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+mydf <- ggpredict(m5, terms= c("YearCollected[all]")) 
+
+plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.05,color=c("#5aae61","#762a83"))+
   apatheme
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m2, c("scaledmean_temperature[all]")) 
+mydf <- ggpredict(m5, terms= c("mean_nitrogen[all]")) 
 
-plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
-  apatheme
+plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+ylim(0,150)
+
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m2, c("mean_streamflow[all]","Fish_sp.x")) 
+mydf <- ggpredict(m5, c("mean_temperature[all]","mean_nitrogen")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
-  apatheme
+  apatheme+ylim(0,150)
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(m5, c("mean_streamflow[all]")) 
+
+plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+ylim(0,150)
 
 
 ### Impact of multiple stressors on the abundance of myxobolus----
