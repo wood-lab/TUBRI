@@ -388,6 +388,14 @@ ggplot(myxo_count, aes(x= mean_streamflow,
   geom_point()+apatheme+
   facet_wrap("Fish_sp.x")
 
+# Evaluate dynamic of nutrients across years
+
+ggplot(myxo_count, aes(x= mean_nitrogen,
+                       y=mean_streamflow))+
+  geom_point()+apatheme+
+  facet_wrap("Fish_sp.x")
+
+
 
 ## GLM for all fish
 
@@ -420,48 +428,81 @@ m2 <- glmmTMB(psite_count ~ scaledYear+
                 Dim.1*scaledmean_nitrogen+
                 Dim.2*scaledmean_nitrogen+
                 offset(scaled_TL_mm)+
-                (1|Fish_sp.x/IndividualFishID)+
+                (1|Fish_sp.x/CatalogNumber/IndividualFishID)+
                 (1|season),
               data = myxo_count,
               family = nbinom2)
 
 
-m2 <- glmmTMB(psite_count ~ scaledYear+
+m3 <- glmmTMB(psite_count ~ scaledYear+
                 scaledmean_streamflow*scaledmean_nitrogen+
                 scaledmean_temperature*scaledmean_nitrogen+
                 scaledmean_temperature*scaledmean_streamflow+
-                offset(scaled_TL_mm)+
-                (1|Fish_sp.x/IndividualFishID)+
+                (1|Fish_sp.x/CatalogNumber/IndividualFishID)+
                 (1|season),
               data = myxo_count,
-              family = nbinom2)
+              family = nbinom1(link = "sqrt"))
+
+myxo_count$times <- as.factor(myxo_count$YearCollected)
+
+m3 <- glmmTMB(psite_count ~ scaledYear+
+                scaledmean_streamflow*scaledmean_nitrogen+
+                scaledmean_temperature*scaledmean_nitrogen+
+                scaledmean_temperature*scaledmean_streamflow+
+                (1|Fish_sp.x/CatalogNumber/IndividualFishID)+
+                (1|season)+
+                ar1(times + 0 | group),
+              data = myxo_count,
+              family = nbinom1(link = "sqrt"))
 
 
 
-AIC(m1,m2)         
+AIC(m1,m2,m3)         
 summary(m2)
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=m2,n=250)
+s=simulateResiduals(fittedModel=m3,n=250)
 s$scaledResiduals
 plot(s)
 
+performance::check_overdispersion(m3)
+
 tab_model(m2)
-plot_model(m2)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+plot_model(m3)+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## Interactions
+library(interactions) # vignette: https://rdrr.io/cran/interactions/man/interact_plot.html
+
+interact_plot(m3, pred = scaledmean_nitrogen, modx = scaledmean_temperature, plot.points = TRUE,
+              modx.values = c(-1,0,1),data=myxo_count)+
+    ylim(0,100)+apatheme
+
+interact_plot(m3, pred = scaledmean_nitrogen, modx = scaledmean_temperature, partial.residuals = TRUE,
+              modx.values = c(-1,0,1),data=myxo_count)+
+  ylim(0,100)+apatheme+xlim(-1,2)
+
+
+  # Flow with CI and psite_genus
+
+mydf <- ggpredict(m3, terms= c("scaledmean_nitrogen[all]")) 
+
+plot(mydf,show_data=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m2, terms= c("scaledmean_nitrogen[all]")) 
+mydf <- ggpredict(m2, c("scaledmean_temperature[all]")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   apatheme
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m2, c("scaledmean_temperature[all]","Fish_sp.x")) 
+mydf <- ggpredict(m2, c("mean_streamflow[all]","Fish_sp.x")) 
 
 plot(mydf,rawdata=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   apatheme
+
 
 ### Impact of multiple stressors on the abundance of myxobolus----
 
