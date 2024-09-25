@@ -1842,11 +1842,74 @@ full_dataset_with_LH$before_after
 
 full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
 
+## Some entries have wrong CI
+
+# Create a unique identifier of location by putting latitude and longitude together
+full_dataset_with_LH$lat_long <- paste(full_dataset_with_LH$Latitude,
+                                       full_dataset_with_LH$Longitude,
+                                    sep="_")
+
+# Fish collected at 30.76222, -89.83111 should be categorized as impact
+full_dataset_with_LH$CI[full_dataset_with_LH$lat_long=="30.76222_-89.83111"]<-"impact"
+
+# Fish collected at 30.76528, -89.83222 should be categorized as control
+full_dataset_with_LH$CI[full_dataset_with_LH$lat_long=="30.76528_-89.83222"]<-"control"
+
+# Fix the 'combo' column respectively
+full_dataset_with_LH$combo[full_dataset_with_LH$lat_long=="30.76528_-89.83222"]<-sub('impact','control',full_dataset_with_LH$combo)
+full_dataset_with_LH$combo[full_dataset_with_LH$lat_long=="30.76222_-89.83111"]<-sub('control','impact',full_dataset_with_LH$combo)
+
+## Create a site column to be later used as random effect in models
+
+# What are the unique combinations of lat and long for control and for impact
+full_dataset_with_LH_control <- subset(full_dataset_with_LH, CI=="control")
+full_dataset_with_LH_impact <- subset(full_dataset_with_LH, CI=="impact")
+
+top.xy_control <- unique(full_dataset_with_LH_control[c("lat_long")])
+top.xy_impact <- unique(full_dataset_with_LH_impact[c("lat_long")])
+
+# Set longitude as factor and use it to establish site categories (four sites in total)
+# This groupings were done by visual clustering in Google Maps
+
+full_dataset_with_LH <- full_dataset_with_LH %>% 
+  mutate(site = case_when(  #control sites
+                           lat_long == '30.76805_-89.83083' ~ "CA",
+                            lat_long == '30.76639_-89.83195' ~ "CA",
+                            lat_long == '30.7675_-89.83028' ~ "CA",
+                            lat_long == '30.76528_-89.83222' ~ "CA",
+                            lat_long == '30.77611_-89.82777' ~ "CB",
+                            lat_long == '30.77861_-89.82972' ~ "CB",
+                            lat_long == '30.77611_-89.82722' ~ "CB",
+                            lat_long == '30.77583_-89.82722' ~ "CB",
+                            lat_long == '30.77472_-89.82806' ~ "CB",
+                            lat_long == '30.77611_-89.82889'  ~ "CB",
+                            lat_long == '30.7825_-89.82806'  ~ "CC",
+                            lat_long == '30.78_-89.82472'  ~ "CC",
+                            lat_long == '30.7825_-89.82027' ~ "CD",
+                            lat_long == '30.78472_-89.81944' ~ "CD",
+                            #impact sites
+                            lat_long == '30.76222_-89.83111' ~ "CA",
+                            lat_long == '30.705_-89.84611' ~ "IA",
+                            lat_long == '30.70222_-89.84417' ~ "IA",
+                            lat_long == '30.70389_-89.84472' ~ "IA",
+                            lat_long == '30.73694_-89.82694' ~ "IB",
+                            lat_long == '30.74195_-89.82528' ~ "IB",
+                            lat_long == '30.74472_-89.82528' ~ "IB",
+                            lat_long == '30.74055_-89.82694' ~ "IB",
+                            lat_long == '30.74_-89.82777' ~ "IB",
+                            lat_long == '30.74083_-89.82611' ~ "IB",
+                            lat_long == '30.75361_-89.82639' ~ "IC",
+                            lat_long == '30.75667_-89.82611' ~ "IC",
+                            lat_long == '30.75417_-89.82694' ~ "IC",
+                            lat_long == '30.75444_-89.82722' ~ "IC"))
+
+full_dataset_with_LH$site <- as.factor(full_dataset_with_LH$site)
+
 
 # Export the sheet
 
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
 
 
 
