@@ -16,7 +16,7 @@ library(sjPlot)
 
 ## Import parasite dataset
 
-full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
+full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
 
 # Import physical data (which includes water temperature and streamflow)
 physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
@@ -79,13 +79,13 @@ print(full_dataset)
 
 # Summarize by taking the mean streamflow per 'year'
 
-streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
-  summarise(meanFlow=mean(Result),
-            .groups = 'drop') #For streamflow there is no data available for the impact category but we asume the same flow will be experienced throughout the relatively short strecht of the river we are working with.
+# streamflow_mean <- streamflow_ms %>% group_by(YearCollected) %>% 
+  # summarise(meanFlow=mean(Result),
+            # .groups = 'drop') #For streamflow there is no data available for the impact category but we asume the same flow will be experienced throughout the relatively short strecht of the river we are working with.
 
 # Merge with parasite data
 
-Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
+# Full_dataset_streamflow <- merge(full_dataset, streamflow_mean, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
 
 ### Adding water temperature data----
@@ -164,82 +164,6 @@ wtemp_summ <- wtemp %>% group_by(YearCollected) %>%
 
 Full_dataset_physical <- merge(Full_dataset_streamflow, wtemp_summ, by.x = "YearCollected", by.y = "YearCollected", all.x = TRUE)
 
-### Nutrients----
-## Import data for nutrients
-
-nutrients <- read_csv("data/Physicochemical/nutrients_resultphyschem.csv")
-
-# Read USGS-gauge site metadata
-
-siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
-
-# Add info on sampling sites (latitude, longitude, CI, etc.)
-
-nutrients_withmetadata <- merge(nutrients, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
-
-# Nitrogen species: nitrogen available to plants occurs in the form of 
-# ammonia (NH3), ammonium (NH4+), nitrate (NO3−), nitrite (NO2-), and 
-# organic nitrogen. Therefore, we used the mixed nitrogen measurement for our analyses.
-# However it only spans between 1973 and 1994. So we will perform the analyses 
-# only for that time period and for the control because I cannot assume that the 
-# downstram impact sites are going to be represented by this data.
-
-
-# Take only mixed forms of nitrogen in mg-N/L
-
-mixN_unitall <- subset(nutrients_withmetadata, Measure == "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)")
-mixN_control <- subset(mixN_unitall, CI == "control")
-mixN <- subset(mixN_control, Unit_full == "mg/l")
-
-
-#### The script below assigns to each fish individual the mean nutrients (mean_nitrogen) that the fish experienced over one year before its collection
-
-# Add a new column to store the mean nutrient in the form of mixed nitrogen forms
-full_dataset$mean_nitrogen <- NA
-
-library(lubridate)
-
-# Combine year, month, and day columns into a date column
-full_dataset$collection_date <- make_date(full_dataset$YearCollected, full_dataset$MonthCollected, 
-                                          full_dataset$DayCollected)
-
-
-mixN$measurement_date <- make_date(mixN$YearCollected, mixN$MonthCollected, 
-                                   mixN$DayCollected)
-
-
-# Loop through each row of 'full_dataset'
-for (i in 1:nrow(full_dataset)) {
-  # Extract the collection date for the individual
-  collection_date <- as.Date(full_dataset$collection_date[i])
-  
-  # Define the start and end date for one year before the collection date
-  start_date <- collection_date - 365
-  end_date <- collection_date
-  
-  # Filter 'mixN' to get the nitrogen data within that one-year range
-  nutrient_data <- mixN[mixN$measurement_date >= start_date & mixN$measurement_date < end_date, "Result"]
-  
-  # Calculate the mean nitrogen and store it in 'full_dataset'
-  if (length(nutrient_data) > 0) {
-    full_dataset$mean_nitrogen[i] <- mean(nutrient_data, na.rm = TRUE)
-  } else {
-    full_dataset$mean_nitrogen[i] <- NA  # If no data is found, store NA
-  }
-}
-
-# View updated 'full_dataset'
-print(full_dataset)
-
-
-# Evaluate dynamic of nutrients across years
-
-ggplot(nutrients_means, aes(x= as.factor(YearCollected),
-                            y=Result, color=CI))+
-  geom_point()+apatheme+
-  ggtitle("Nutrients per year")+
-  facet_wrap("Measure")
-
 ### Season----
 ## Create a season column to be later used as a random factor in the models
 
@@ -262,7 +186,6 @@ full_dataset$season <- as.factor(full_dataset$season)
 
 #### Export the final sheet----
 
-#write.csv(Full_dataset_physical, file="data/processed/Full_dataset_physical_2024.09.16.csv")
-write.csv(full_dataset, file="data/processed/Full_dataset_physical_2024.09.23.csv")
+write.csv(full_dataset, file="data/processed/Full_dataset_physical_2024.09.25.csv")
 
 
