@@ -1883,8 +1883,8 @@ full_dataset_with_LH <- full_dataset_with_LH %>%
                             lat_long == '30.77583_-89.82722' ~ "CB",
                             lat_long == '30.77472_-89.82806' ~ "CB",
                             lat_long == '30.77611_-89.82889'  ~ "CB",
-                            lat_long == '30.7825_-89.82806'  ~ "CC",
-                            lat_long == '30.78_-89.82472'  ~ "CC",
+                            lat_long == '30.7825_-89.82806'  ~ "CD",
+                            lat_long == '30.78_-89.82472'  ~ "CD",
                             lat_long == '30.7825_-89.82027' ~ "CD",
                             lat_long == '30.78472_-89.81944' ~ "CD",
                             #impact sites
