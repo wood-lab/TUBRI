@@ -349,6 +349,53 @@ apatheme= theme_bw(base_size = 14,base_family = "sans")+
 
 ### Analysis of count data----
 
+# Which random structure is best?
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|CatalogNumber/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+
+AIC(m1,m2,m3,m4)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+
+### Best link function
+
 m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
                 scale(mean_streamflow)*scale(mean_nitrogen)*
                 scale(mean_temperature)+
@@ -374,7 +421,7 @@ m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
                 (1|site/IndividualFishID)+
                 (1|season),
               data = carvel_count_ycm,
-              family = nbinom2(link="log")) # with log-link function, nbinom1 does not converge
+              family = nbinom2(link="sqrt")) # with log-link function, nbinom1 does not converge
 
 m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
                 scale(mean_streamflow)*scale(mean_nitrogen)*
@@ -383,12 +430,244 @@ m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
                 (1|site/IndividualFishID)+
                 (1|season),
               data = carvel_count_ycm,
-              family = nbinom2(link="sqrt")) # with log-link function, nbinom1 does not converge
+              family = nbinom2(link="log")) # with log-link function, nbinom1 does not converge
 
 
 AIC(m1,m2,m3,m4)
 
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m1)
+
+tab_model(m1)
+plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+r.squaredGLMM(m1)
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(m1, terms= c("mean_nitrogen")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+# Plot interactions
+
+library(interactions)
+
+interact_plot(m1, pred = mean_nitrogen, modx = mean_temperature,modx.values = c(18,20,22,24),
+              allow.new.levels=TRUE,interval = TRUE,
+              int.width = 0.95)+
+  apatheme+  ggtitle("Full")
+
+
+### Non-point source - Only for MYX.G----
+
+carvel_count_ycm_myxg <- subset(carvel_count_ycm,psite_spp.x == "MYX.G")
+
+
+# Which random structure is best?
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|CatalogNumber/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|season),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+
+AIC(m1,m2,m3,m4)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+### Which link function is best?
+
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm_myxg,
+              family = nbinom1(link="log")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm_myxg,
+              family = nbinom2(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_ycm_myxg,
+              family = nbinom2(link="log")) # with log-link function, nbinom1 does not converge
+
+AIC(m1,m2,m3,m4)
+
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m3,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m3)
+
+tab_model(m2)
+plot_model(m2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+r.squaredGLMM(m2)
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(m2, terms= c("mean_nitrogen")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+# Plot interactions
+
+library(interactions)
+
+interact_plot(m1, pred = mean_nitrogen, modx = mean_temperature,modx.values = c(18,20,22,24),
+              allow.new.levels=TRUE,interval = TRUE,
+              int.width = 0.95)+
+  apatheme+  ggtitle("Full")
+
+
+### Impact of point-source pollution ----
+
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|psite_spp.x)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+AIC(m1,m2,m3) # best random structure according to AIC is m1: (1|site/IndividualFishID)+(1|season)
+
 summary(m1)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m3,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m1)
+
+tab_model(m1)
+plot_model(m3,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## Which is the best link function
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+          CI*scale(mean_temperature)*scale(mean_streamflow)+
+          offset(logTL_mm)+
+          (1|site/CatalogNumber/IndividualFishID)+
+          (1|psite_spp.x)+
+          (1|season),
+        data = carvel_count,
+        family = nbinom1(link="sqrt")) 
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom1(link="log")) 
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom2(link="log")) 
+
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom2(link="sqrt")) 
+
+
+AIC(m1,m2,m3,m4)
+
+#best one
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|psite_spp.x)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom2(link="log")) 
 
 #Evaluate residuals
 s=simulateResiduals(fittedModel=m1,n=250)
@@ -404,9 +683,167 @@ plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed",
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m1, terms= c("mean_nitrogen[all]","mean_temperature")) 
+mydf <- ggpredict(m1, terms= c("YearCollected[n=100]","psite_spp.x")) 
 
 plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   apatheme+ylim(0,150)
 
+mydf <- ggpredict(m1, terms= c("mean_streamflow[n=100]","CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+mydf <- ggpredict(m1, terms= c("mean_temperature[n=100]","CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+xlim(18,24)+ylim(0,1200)
+
+mydf <- ggpredict(m1, terms= c("mean_streamflow[n=100]","mean_temperature")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+# Plot interactions
+
+library(interactions)
+
+interact_plot(m1, pred = mean_streamflow, modx = mean_temperature,
+              allow.new.levels=TRUE,interval = FALSE,plot.points = FALSE,
+              int.width = 0.95,partial.residuals = TRUE)+
+  apatheme+  ggtitle("Full")
+
+#modx.values = c(18,20,22,24),
+
+
+### Impact of point-source pollution - MYX.G----
+
+carvel_count_myxg <- subset(carvel_count,psite_spp.x == "MYX.G")
+
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID),
+              data = carvel_count_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/CatalogNumber/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+AIC(m1,m2,m3) # best random structure according to AIC is m1: (1|site/IndividualFishID)+(1|season)
+
+summary(m1)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m1)
+
+tab_model(m1)
+plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## Which is the best link function
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom1(link="log")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom2(link="log")) # with log-link function, nbinom1 does not converge
+
+m4 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom2(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+
+AIC(m1,m2,m3,m4)
+
+#best one
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                CI*scale(mean_temperature)*scale(mean_streamflow)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m1)
+
+tab_model(m1)
+plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## visualize model
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(m1, terms= c("YearCollected[n=100]")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+
+mydf <- ggpredict(m1, terms= c("mean_streamflow[n=100]","CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+mydf <- ggpredict(m1, terms= c("mean_temperature[n=100]","CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+xlim(18,24)+ylim(0,1200)
+
+mydf <- ggpredict(m1, terms= c("mean_streamflow[n=100]","mean_temperature")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme
+
+# Plot interactions
+
+library(interactions)
+
+interact_plot(m1, pred = mean_streamflow, modx = mean_temperature,
+              allow.new.levels=TRUE,interval = FALSE,plot.points = FALSE,
+              int.width = 0.95,partial.residuals = TRUE)+
+  apatheme+  ggtitle("Full")
+
+#modx.values = c(18,20,22,24),
 
