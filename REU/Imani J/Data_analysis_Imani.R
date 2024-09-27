@@ -9,47 +9,10 @@
 
 setwd("C:/Users/imani/OneDrive - Tuskegee University/Desktop/TUBRI_Monogenea_Project/TUBRI")
 
+full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.25.csv")
 
+full_dataset$logTL_mm <- log(full_dataset$TotalLength_mm)
 
-## Stats with Jolee----
-library(readr)
-
-ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
-
-
-monogenes.ict<-ICTPUNCT[, c ("MONO.IP","MONO.UNK","YearCollected")]
-monogenes.ict
-#install.packages("tidyr")
-library(tidyr)
-#Label of data set<-command in r to change wide format to long format. The parentheses (monogenes.ict) I am telling it to switch from wide to long.
-#I want the code to pull out columns with the name "Mono". Next line of code is being called "Species", the values thate in the one column are not being called "count"
-monogenes.ict_table<-pivot_longer(monogenes.ict,
-                                  cols=starts_with("MONO"),
-                                  names_to = "Species",
-                                  values_to = "count")
-
-install.packages("ggplot2")
-library(ggplot2)
-#Data frame is a command in r, I want year to equal a list within the data set of "Years Collected"
-#I want my monogenes to be called from the data set called "Species"
-#I want my monogenes to come from the data set monogenes.ict column count
-Monogenes.ict_table<- data.frame(Year=c (monogenes.ict_table$YearCollected),
-                                 Monogenes=c(monogenes.ict_table$Species),
-                                 monogenes_affected= c(monogenes.ict_table$count)
-                                             )
-#gg plot is plotting function in r, it allows multiple variables within the plot.
-#first part of code is showing what data set I want to be called from. "aes"-- command in r, x is the variable in my data set, y is the monogenes affected in this data set. 
-#Color is showing my third variable in data aset. "+"- indicates adding aesthic to graph. 
-ggplot(Monogenes.ict_table, aes(x= Year,
-                                y=monogenes_affected
-                                ,color=Monogenes,
-                                group=Monogenes))+
-  geom_point()+ 
-  labs(title = "Counts of Monogenes over the Years", x="Year", y="Monogenean abundance (# monogeneans/fish)",color= 
-        "species")
-# geom point adds points to graph.
-#labs=labels. title= title of graph, all words on graphs are quotes. X axis= label for x axis.
-#y=label for y axis. color= represents the legend or key of labels.
 
 ### Code for monogenean MONO.IP in ICTPUNct abundance across time and pollution impact----
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
@@ -62,7 +25,9 @@ ggplot(Monogenes.ict_table, aes(x= Year,
 
 library(readr)
 
-ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
+#ICTPUNCT <- read_csv("data/processed/Ictalurus_punctatus_processed_machine_readable_UPDATED_2024.08.25.csv")
+
+ICTPUNCT <- subset(full_dataset, Fish_sp.x=="Ictalurus punctatus")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
@@ -74,7 +39,7 @@ ICTPUNCT
 
 #We made a subset based on our data to include only MONO.IP
 
-ICTPUNCT_MONOIP <- subset(ICTPUNCT, psite_spp == 'MONO.IP')
+ICTPUNCT_MONOIP <- subset(ICTPUNCT, psite_spp.x == 'MONO.IP')
 
 #install.packages("ggplot2")
 library(ggplot2)
@@ -120,6 +85,11 @@ glmmonoip1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNu
 glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
 glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
 
+
+#Models have good gianostics
+glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
+glmmonoip2 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom2,data = ICTPUNCT_MONOIP)
+
 # generalized linear model for count data with poisson or negative binomial distribution
 # generalized linear mixed model for countr data with varying slopes
 
@@ -130,7 +100,6 @@ AIC(glmmonoip1,glmmonoip2)
 
 #After evaluating AIC, this one is the best.
 glmmonoip1 <- glmmTMB(psite_count ~ poly(YearCollected,2)*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = ICTPUNCT_MONOIP)
-
 
 summary(glmmonoip1)
 tab_model(glmmonoip1)
@@ -177,7 +146,9 @@ ggsave(file="REU/Imani J/Model plots/ICTPUNCT_Ligictaluridus pricei _modelplot.p
 
 library(readr)
 
-PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.16.csv")
+#PIMVIG <- read_csv("data/processed/Pimephales_vigilax_processed_machine_readable_UPDATED_2024.08.16.csv")
+
+PIMVIG <- subset(full_dataset, Fish_sp.x=="Pimephales vigilax")
 
 # To see your data as a spreadsheet in a new tab, use the View command.
 
@@ -189,7 +160,7 @@ PIMVIG
 
 #We made a subset based on our data to include only monogeneans
 
-PIMVIG_MONO <- subset(PIMVIG, psite_spp == 'MONO.DACT'|psite_spp == 'MONO.GYRO'|psite_spp == 'MONO.LG')
+PIMVIG_MONO <- subset(PIMVIG, psite_spp.x == 'MONO.DACT'|psite_spp.x == 'MONO.GYRO'|psite_spp.x == 'MONO.LG')
 
 View(PIMVIG_MONO)
 
@@ -218,7 +189,7 @@ ggplot(PIMVIG_MONO, aes(x= YearCollected,
 
 # Make a subset only for Pimvig mono.dact
 
-PIMVIG_MONOdact <- subset(PIMVIG, psite_spp == 'MONO.DACT')
+PIMVIG_MONOdact <- subset(PIMVIG, psite_spp.x == 'MONO.DACT')
 
 View(PIMVIG_MONOdact)
 
@@ -229,12 +200,14 @@ library(glmmTMB)
 
 #Model passed diagnostics test
 glmmonodact <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom2,data = PIMVIG_MONOdact)
+glmmonodact <- glmmTMB(psite_count ~ YearCollected*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom2,data = PIMVIG_MONOdact)
 
 # Did not pass KS Test. The Kolmogorov-Smirnov Test is a type of non-parametric test of the equality of discontinuous and continuous a 1D probability distribution that is used to compare the sample with the reference probability test (known as one-sample K-S Test) or among two samples (known as two-sample K-S test). A K-S Test quantifies the distance between the cumulative distribution function of the given reference distribution and the empirical distributions of given two samples, or between the empirical distribution of given two samples.
 glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=poisson,data = PIMVIG_MONOdact)
 
 #Best one
 glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOdact)
+glmmonodact1 <- glmmTMB(psite_count ~ YearCollected*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOdact)
 
 AIC(glmmonodact,glmmonodact1)
 
@@ -275,7 +248,7 @@ ggsave(file="REU/Imani J/Model plots/PIMVIG_Dactylogyrus_modelplot.pdf", width=1
 
 # Pimvig mono.gyro
 
-PIMVIG_MONOgyro <- subset(PIMVIG, psite_spp == 'MONO.GYRO'|psite_spp == 'MONO.LG')
+PIMVIG_MONOgyro <- subset(PIMVIG, psite_spp.x == 'MONO.GYRO'|psite_spp.x == 'MONO.LG')
 
 library(stats)
 library(lme4)
@@ -291,6 +264,7 @@ glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|Catalog
 
 #Best one
 glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOgyro)
+glmmonogyro1 <- glmmTMB(psite_count ~ YearCollected*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom1,data = PIMVIG_MONOgyro)
 
 summary(glmmonogyro1)
 
@@ -335,8 +309,11 @@ ggsave(file="REU/Imani J/Model plots/PIMVIG_Gyrodactylus_modelplot.pdf", width=1
 
 library(readr)
 
-NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
-NOTATH_MONOS <- subset(NOTATH, psite_spp == "MONO.UNK"| psite_spp == "MONO.ALL")
+#NOTATH <- read_csv("data/processed/Notropis_atherinoides_processed_machine_readable.csv")
+
+NOTATH <- subset(full_dataset, Fish_sp.x=="Notropis atherinoides")
+
+NOTATH_MONOS <- subset(NOTATH, psite_spp.x == "MONO.UNK"| psite_spp.x == "MONO.ALL")
 
 library (ggplot2)
 
@@ -379,6 +356,7 @@ library (ggplot2)
   #After evaluating AIC, this one is the best.
   glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+TotalLength_mm+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
   
+  glm_notathmono1 <- glmmTMB(psite_count ~ YearCollected*CI+offset(logTL_mm)+(1|CatalogNumber),family=nbinom1,data = NOTATH_MONOS)
   
   summary(glm_notathmono1)
   
