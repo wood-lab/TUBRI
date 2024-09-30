@@ -834,6 +834,42 @@ plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.05,color=c("#5aae61","#76
   apatheme+xlab("Year")+ylab("# of pseudocysts per fish")
 
 
+### Testing the scaling of predictors -- another method
+### This is another method that includes scaled the predictors beforehand. 
+### However, it takes more coding effort and yields the same result as the method above.
+
+carvel_count_myxg$scaledYear
+
+## Effect of time
+
+m1 <- glmmTMB(psite_count ~ scaledYear+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = carvel_count_myxg,
+              family = nbinom2(link="sqrt")) 
+
+summary(m1)
+
+# Get the scaling parameters
+mean_predictor <- attr(scale(carvel_count_myxg$YearCollected), "scaled:center")
+sd_predictor <- attr(scale(carvel_count_myxg$YearCollected), "scaled:scale")
+
+# Generate predictions with ggpredict
+library(ggeffects)
+pred <- ggpredict(m1, terms = "scaledYear")
+
+# Back-transform to original scale
+pred$YearCollected <- pred$x * sd_predictor + mean_predictor
+
+# Plot the back-transformed predictions
+library(ggplot2)
+
+ggplot(pred, aes(x = YearCollected, y = predicted)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
+  labs(x = "Original Predictor", y = "Predicted Response")+ylim(0,1000)
+
 ###
 m1 <- glmmTMB(psite_count ~ 
                 CI*scale(mean_temperature)*scale(mean_streamflow)+
