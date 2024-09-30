@@ -229,7 +229,7 @@ mod <- cbind(elements_na_wide[1], score[1:2]) # merge scores with original data
 mod 
 
 ### Elements2-----
-
+### Elements
 ## Import data for metals
 
 inorganics <- read_csv("data/Physicochemical/inorganics_resultphyschem.csv")
@@ -241,7 +241,7 @@ inorganics_withmetadata <- merge(inorganics, siteinfo, by.x = "MonitoringLocatio
 # Summarize data table to year, day, and month collected
 inorganics_means_ymd <- inorganics_withmetadata %>% group_by(YearCollected,MonthCollected,DayCollected,CI,Unit,Measure) %>% 
   summarise(Result=mean(Result),
-            .groups = 'drop') # new, summarizing by month to have more data
+            .groups = 'drop') 
 
 # make the table wide
 elements_na_yc_wide <- spread(inorganics_means_ymd, Measure,Result)
@@ -435,6 +435,29 @@ thelohanellus_physical <- subset(full_dataset_myxo, Parasite_genus == "Thelohane
 ## Crease subset for myxozoans that can be counted
 
 myxo_count <- subset(full_dataset_myxo, Parasite_genus == "Myxobolus"|Parasite_genus == "Henneguya"|Parasite_genus == "Unicauda"|Parasite_genus == "Thelohanellus")
+## Add sites for random structure of model
+
+# What are the unique combinations of lat and long
+top.xy <- unique(myxo_count[c("Latitude","Longitude")])
+top.xy
+
+# Set longitude as factor and use it to establish site categories (four sites in total)
+myxo_count$Longitude <- as.numeric(myxo_count$Longitude)
+
+myxo_count <- myxo_count %>% 
+  mutate(site = case_when(  Longitude == -89.83083 ~ "CA",
+                            Longitude == -89.83195 ~ "CA",
+                            Longitude == -89.83028 ~ "CA",
+                            Longitude == -89.83222
+                            ~ "CA",
+                            Longitude == -89.82972~ "CB",
+                            Longitude == -89.82722 ~ "CB",
+                            Longitude == -89.82806 ~ "CC",
+                            Longitude == -89.82027 ~ "CD",
+  ))
+
+myxo_count$site <- as.factor(myxo_count$site)
+
 
 # Scale variables
 
@@ -468,28 +491,6 @@ apatheme= theme_bw(base_size = 14,base_family = "sans")+
 ## size of fish transformation
 myxo_count$logTL_mm <- log(myxo_count$TotalLength_mm)
 
-## Add sites for random structure of model
-
-# What are the unique combinations of lat and long
-top.xy <- unique(myxo_count[c("Latitude","Longitude")])
-top.xy
-
-# Set longitude as factor and use it to establish site categories (four sites in total)
-myxo_count$Longitude <- as.numeric(myxo_count$Longitude)
-
-myxo_count <- myxo_count %>% 
-  mutate(site = case_when(  Longitude == -89.83083 ~ "CA",
-                            Longitude == -89.83195 ~ "CA",
-                            Longitude == -89.83028 ~ "CA",
-                            Longitude == -89.83222
-                            ~ "CA",
-                            Longitude == -89.82972~ "CB",
-                            Longitude == -89.82722 ~ "CB",
-                            Longitude == -89.82806 ~ "CC",
-                            Longitude == -89.82027 ~ "CD",
-  ))
-
-myxo_count$site <- as.factor(myxo_count$site)
 
 # Parasite abundance against temperature
 
@@ -532,6 +533,25 @@ m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
               data = myxo_count,
               family = nbinom2(link="log")) # with log-link function, nbinom1 does not converge
 
+m2 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom1(link="sqrt")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_streamflow)*scale(mean_nitrogen)*
+                scale(mean_temperature)+
+                offset(logTL_mm)+
+                (1|site/IndividualFishID)+
+                (1|season),
+              data = carvel_count,
+              family = nbinom1(link="log")) # with log-link function, nbinom1 does not converge
+AIC(m2,m3)
+
 # try with autocorrelation structure
 
 myxo_count$times <- as.factor(myxo_count$YearCollected)
@@ -557,17 +577,17 @@ plot(s)
 
 performance::check_overdispersion(m2)
 
-tab_model(m1)
-plot_model(m1,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+tab_model(m2)
+plot_model(m2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
 
 ## visualize model
 
 # Flow with CI and psite_genus
 
-mydf <- ggpredict(m2, terms= c("mean_nitrogen[all]")) 
+mydf <- ggpredict(m2, terms= c("mean_temperature[all]")) 
 
-plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.05,color=c("#5aae61","#762a83"))+
-  apatheme
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+ylim(0,150)
 
 # m2 has good diagnostics but distorted estimates. m1 bad diagnostics but OK estimates.
 # I identified an outlier for temperature which was at 26C which induces a partial correlation for temperature and psite_count. 
