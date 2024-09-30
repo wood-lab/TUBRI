@@ -1838,30 +1838,30 @@ for(i in 1:length(full_dataset_with_LH$fish_psite_combo)) {
 full_dataset_with_LH$before_after     
               
 
-# Fix data type for weight. Otherwise, it is read as a character and weight is plotted wrong.
+# Fix data type for weight. Otherwise, it is read as a character and weight is plotted wrong.DMDM
 
 full_dataset_with_LH$Weight_mg <- as.numeric(full_dataset_with_LH$Weight_mg)
 
 ## Some entries have wrong CI
 
-# Create a unique identifier of location by putting latitude and longitude together
+# Create a unique identifier of location by putting latitude and longitude together. DMDM
 full_dataset_with_LH$lat_long <- paste(full_dataset_with_LH$Latitude,
                                        full_dataset_with_LH$Longitude,
                                     sep="_")
 
-# Fish collected at 30.76222, -89.83111 should be categorized as impact
+# Fish collected at 30.76222, -89.83111 should be categorized as impact. DMDM
 full_dataset_with_LH$CI[full_dataset_with_LH$lat_long=="30.76222_-89.83111"]<-"impact"
 
-# Fish collected at 30.76528, -89.83222 should be categorized as control
+# Fish collected at 30.76528, -89.83222 should be categorized as control. DMDM
 full_dataset_with_LH$CI[full_dataset_with_LH$lat_long=="30.76528_-89.83222"]<-"control"
 
 # Fix the 'combo' column respectively
 full_dataset_with_LH$combo[full_dataset_with_LH$lat_long=="30.76528_-89.83222"]<-sub('impact','control',full_dataset_with_LH$combo)
 full_dataset_with_LH$combo[full_dataset_with_LH$lat_long=="30.76222_-89.83111"]<-sub('control','impact',full_dataset_with_LH$combo)
 
-## Create a site column to be later used as random effect in models
+## Create a site column to be later used as random effect in models. DMDM
 
-# What are the unique combinations of lat and long for control and for impact
+# What are the unique combinations of lat and long for control and for impact. DMDM
 full_dataset_with_LH_control <- subset(full_dataset_with_LH, CI=="control")
 full_dataset_with_LH_impact <- subset(full_dataset_with_LH, CI=="impact")
 
@@ -1869,7 +1869,7 @@ top.xy_control <- unique(full_dataset_with_LH_control[c("lat_long")])
 top.xy_impact <- unique(full_dataset_with_LH_impact[c("lat_long")])
 
 # Set longitude as factor and use it to establish site categories (four sites in total)
-# This groupings were done by visual clustering in Google Maps
+# This groupings were done by visual clustering in Google Maps. DMDM
 
 full_dataset_with_LH <- full_dataset_with_LH %>% 
   mutate(site = case_when(  #control sites
@@ -1904,6 +1904,47 @@ full_dataset_with_LH <- full_dataset_with_LH %>%
                             lat_long == '30.75444_-89.82722' ~ "ID"))
 
 full_dataset_with_LH$site <- as.factor(full_dataset_with_LH$site)
+
+# Add distance from pulp mill effluent.
+# This was done by tracing the river through the mid-channel or the middle line 
+# of the main channel in GoogleEarth. Distance is calculated in meters.
+# The values in minus correspond to control sites. DMDM
+
+## Add distance from pulp mill
+
+full_dataset_with_LH <- full_dataset_with_LH %>% 
+  mutate(distance_m = case_when(  #control sites
+    lat_long == '30.76805_-89.83083' ~ "-897.41",
+    lat_long == '30.76639_-89.83195' ~ "-701.21",
+    lat_long == '30.7675_-89.83028' ~ "-897.41",
+    lat_long == '30.76528_-89.83222' ~ "-518.92",
+    lat_long == '30.77611_-89.82777' ~ "-1996.6",
+    lat_long == '30.77861_-89.82972' ~ "-2338.94",
+    lat_long == '30.77611_-89.82722' ~ "-1996.6",
+    lat_long == '30.77583_-89.82722' ~ "-1996.6",
+    lat_long == '30.77472_-89.82806' ~ "-1807.32",
+    lat_long == '30.77611_-89.82889'  ~ "-1996.6",
+    lat_long == '30.7825_-89.82806'  ~ "-3200.2",
+    lat_long == '30.78_-89.82472'  ~ "-3739.59",
+    lat_long == '30.7825_-89.82027' ~ "-4381.77",
+    lat_long == '30.78472_-89.81944' ~ "-4668.17",
+    #impact sites
+    lat_long == '30.76222_-89.83111' ~ "0",
+    lat_long == '30.705_-89.84611' ~ "11293.53",
+    lat_long == '30.70222_-89.84417' ~ "11666.76",
+    lat_long == '30.70389_-89.84472' ~ "11530.25",
+    lat_long == '30.73694_-89.82694' ~ "4493.3",
+    lat_long == '30.74195_-89.82528' ~ "3674.13",
+    lat_long == '30.74472_-89.82528' ~ "3362.11",
+    lat_long == '30.74055_-89.82694' ~ "3936.14",
+    lat_long == '30.74_-89.82777' ~ "4042.43",
+    lat_long == '30.74083_-89.82611' ~ "3852.11",
+    lat_long == '30.75361_-89.82639' ~ "1293.78",
+    lat_long == '30.75667_-89.82611' ~ "907.29",
+    lat_long == '30.75417_-89.82694' ~ "1217.89",
+    lat_long == '30.75444_-89.82722' ~ "1217.89"))
+
+full_dataset_with_LH$distance_m <- as.numeric(full_dataset_with_LH$distance_m)
 
 # Export the sheet
 
