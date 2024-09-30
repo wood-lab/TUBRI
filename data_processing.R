@@ -1888,30 +1888,27 @@ full_dataset_with_LH <- full_dataset_with_LH %>%
                             lat_long == '30.7825_-89.82027' ~ "CD",
                             lat_long == '30.78472_-89.81944' ~ "CD",
                             #impact sites
-                            lat_long == '30.76222_-89.83111' ~ "CA",
-                            lat_long == '30.705_-89.84611' ~ "IA",
-                            lat_long == '30.70222_-89.84417' ~ "IA",
-                            lat_long == '30.70389_-89.84472' ~ "IA",
-                            lat_long == '30.73694_-89.82694' ~ "IB",
-                            lat_long == '30.74195_-89.82528' ~ "IB",
-                            lat_long == '30.74472_-89.82528' ~ "IB",
-                            lat_long == '30.74055_-89.82694' ~ "IB",
-                            lat_long == '30.74_-89.82777' ~ "IB",
-                            lat_long == '30.74083_-89.82611' ~ "IB",
-                            lat_long == '30.75361_-89.82639' ~ "IC",
-                            lat_long == '30.75667_-89.82611' ~ "IC",
-                            lat_long == '30.75417_-89.82694' ~ "IC",
-                            lat_long == '30.75444_-89.82722' ~ "IC"))
+                            lat_long == '30.76222_-89.83111' ~ "IA",
+                            lat_long == '30.705_-89.84611' ~ "IB",
+                            lat_long == '30.70222_-89.84417' ~ "IB",
+                            lat_long == '30.70389_-89.84472' ~ "IB",
+                            lat_long == '30.73694_-89.82694' ~ "IC",
+                            lat_long == '30.74195_-89.82528' ~ "IC",
+                            lat_long == '30.74472_-89.82528' ~ "IC",
+                            lat_long == '30.74055_-89.82694' ~ "IC",
+                            lat_long == '30.74_-89.82777' ~ "IC",
+                            lat_long == '30.74083_-89.82611' ~ "IC",
+                            lat_long == '30.75361_-89.82639' ~ "ID",
+                            lat_long == '30.75667_-89.82611' ~ "ID",
+                            lat_long == '30.75417_-89.82694' ~ "ID",
+                            lat_long == '30.75444_-89.82722' ~ "ID"))
 
 full_dataset_with_LH$site <- as.factor(full_dataset_with_LH$site)
-
 
 # Export the sheet
 
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
-
-
 
 # tallies
 
