@@ -13,7 +13,7 @@ full_dataset <- read_csv("data/processed/Full_dataset_physical_2024.09.25.csv")
 
 full_dataset$logTL_mm <- log(full_dataset$TotalLength_mm)
 
-
+full_dataset$CI <- as.factor(full_dataset$CI)
 ### Code for monogenean MONO.IP in ICTPUNct abundance across time and pollution impact----
 # Once your working directory is set, you're ready to read in the data!  If there are sub-folders inside your 
 # working directory, you'll need to specify them as I have below.
@@ -291,7 +291,7 @@ apatheme=theme_bw()+
         text=element_text(family='Times'))
 
 
-plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+plot(mydf, show_data = TRUE, alpha = 0.3, dot_alpha = 0.6,colors=c("#969696","#ce1256"),jitter = 0.02)+
   labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
   apatheme
 
@@ -373,7 +373,7 @@ library (ggplot2)
   library(ggeffects)
   plot_model(glm_notathmono2)
   
-  mydf <- ggpredict(glm_notathmono1, c("YearCollected [n=100]", "CI"), jitter=TRUE) 
+  mydf <- ggpredict(glm_notathmono1, c("YearCollected [n=100]", "CI")) 
   
   apatheme=theme_bw()+
     theme(panel.grid.major=element_blank(),
@@ -383,7 +383,7 @@ library (ggplot2)
           text=element_text(family='Times'))
   
   
-  plot(mydf, rawdata = TRUE, alpha = 0.3, dot.alpha = 0.6,colors=c("#969696","#ce1256"))+
+  plot(mydf, show_data = TRUE, alpha = 0.3, dot_alpha = 0.6,colors=c("#969696","#ce1256"),jitter=0.02)+
     labs(x = 'Year', y = 'Monogenean abundance (# monogeneans/fish)',title=NULL)+
     apatheme
   

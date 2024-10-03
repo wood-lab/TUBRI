@@ -88,6 +88,7 @@ full_dataset_myxo$Parasite_genus <- as.factor(full_dataset_myxo$Parasite_genus)
 full_dataset_myxo$before_after <- as.factor(full_dataset_myxo$before_after)
 full_dataset_myxo$season <- as.factor(full_dataset_myxo$season)
 full_dataset_myxo$site <- as.factor(full_dataset_myxo$site)
+full_dataset_myxo$distance_m <- as.numeric(full_dataset_myxo$distance_m)
 
 ## Revise reference levels
 
@@ -909,7 +910,7 @@ AIC(m1,m2,m3,m4) # best random structure according to AIC is m1: (1|site/Individ
 summary(m1)
 
 #Evaluate residuals
-s=simulateResiduals(fittedModel=m4,n=250)
+s=simulateResiduals(fittedModel=m1,n=250)
 s$scaledResiduals
 plot(s)
 
@@ -1009,7 +1010,6 @@ mydf <- ggpredict(m1, terms= c("mean_streamflow[n=100]","mean_temperature"),type
 
 plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05)+
   apatheme
-
 
 # Plot interactions
 
