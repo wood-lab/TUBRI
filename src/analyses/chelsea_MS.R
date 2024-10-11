@@ -2,9 +2,15 @@
 # Written by Chelsea Wood (chelwood@uw.edu)
 # August 2024
 
+# Load libraries
+library(tidyverse)
+library(MASS)
+library(lme4)
+
+
 # Read in the dataset
 
-full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.08.06.csv")
+full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
 
 
 # Take out myxos, since they were counted differently (you'll run a parallel analysis for them)
@@ -14,7 +20,6 @@ minus_myxos <- full_dataset_with_LH %>%
 
 # Test how things changed through time
 
-library(MASS)
 time_model_draft<-glm.nb(psite_count~YearCollected,data=minus_myxos)
 summary(time_model_draft)
 
@@ -23,11 +28,18 @@ minus_myxos$fish
 
 minus_myxos$TotalLength_mm
 
-model_draft<-glm.nb(psite_count~YearCollected*CI++Latitude+Fish_sp.x*TotalLength_mm,data=minus_myxos)
+model_draft<-glm.nb(psite_count~YearCollected*CI+Latitude+Fish_sp.x*TotalLength_mm,data=minus_myxos)
 
-model_draft<-glmer.nb(psite_count~CI*YearCollected+(offset(log(scaled_TL_mm))+
+model_draft<-glmer.nb(psite_count~CI*YearCollected+(offset(log(TotalLength_mm)))+
                         (1|Fish_sp.x/fish_psite_combo)+(1|CatalogNumber)+(1|Latitude),
                       data=minus_myxos,family="nbinom")
+
+model_draft<-glmer.nb(psite_count~CI*YearCollected+
+                                                      
+                                                      (1|site/CatalogNumber),
+                                                    data=minus_myxos,
+                                                    family="nbinom")
+(offset(log(TotalLength_mm)))+(1|Fish_sp.x/fish_psite_combo)+
 summary(model_draft)
 
 
