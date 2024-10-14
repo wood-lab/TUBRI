@@ -157,7 +157,7 @@ plot(notrop_pred, show_data = TRUE, dot_alpha = 1, color = "red")+
   annotate("text", x = -Inf, y = Inf, 
            label = paste("p-value: 0.009", "\n",
                          "slope: -0.513"),
-           hjust = -0.5, vjust = 1.5, 
+           hjust = -0.5, vjust = 1.8, 
            size = 4, 
            color = "black", 
            fontface = "italic") +
@@ -179,7 +179,7 @@ plot(hybog_pred, show_data = TRUE, dot_alpha = 1, color = "#008000")+
   annotate("text", x = -Inf, y = Inf, 
            label = paste("p-value: 0.0004", "\n",
                          "slope: -0.724"),
-           hjust = -0.5, vjust = 1.5, 
+           hjust = -0.5, vjust = 1.75, 
            size = 4, 
            color = "black", 
            fontface = "italic") +
@@ -207,34 +207,64 @@ View(hybog_desmond)
 
 ###################plots
 #ictalurus
-ict_w_2SL_only <- ggplot(ict_desmond, aes(Year,weight_to_sl))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Weight/Length Ratio")+
-  geom_smooth(method = "lm", formula = y ~ x)+
-  theme_minimal()+
+#model
+ict_model_sl <- lmerTest::lmer(weight_to_sl~Year + (1|Cat_Num), data= ict_desmond)
+ict_sum_sl <- summary(ict_model_sl)
+plot(ict_model_sl)
+#predicting line
+ict_pred_sl <- ggpredict(ict_model_sl, c("Year [n=100]"))
+#plotting
+plot(ict_pred_sl, show_data = TRUE, dot_alpha = 1, color = "blue")+ 
+  labs(x = 'Year Collected', y = 'Weight-to-Length Ratio (mg/mm)',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.455", "\n",
+                         "slope: 1.143"),
+           hjust = -0.5, vjust = 1.5, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-ict_w2SL_only
+
 
 #notropis
-notrop_w2SL_only <- ggplot(notrop_desmond, aes(Year,weight_to_sl))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Weight/Length Ratio")+
-  geom_smooth(method = "lm", formula = y ~ x)+
-  theme_minimal()+
+#model
+notrop_model_sl <- lmerTest::lmer(weight_to_sl~Year + (1|Cat_Num), data= notrop_desmond)
+summary(notrop_model_sl)
+plot(notrop_model)
+#predicting line
+notrop_pred_sl <- ggpredict(notrop_model_sl, c("Year [n=100]"))
+#plot
+plot(notrop_pred_sl, show_data = TRUE, dot_alpha = 1, color = "red")+ 
+  labs(x = 'Year Collected', y = 'Weight-to-Length Ratio (mg/mm)',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.0266", "\n",
+                         "slope: -0.422"),
+           hjust = -0.5, vjust = 1.8, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-notrop_w2SL_only
+
 
 #hybog
-hybog_w2SL_only <- ggplot(hybog_desmond, aes(Year,weight_to_sl))+
-  geom_point(size=4)+
-  xlab("Year collected")+
-  ylab("Weight/Length Ratio")+
-  geom_smooth(method = "lm", formula = y ~ x)+
-  theme_minimal()+
+#model
+hybog_model_sl <- lmerTest::lmer(weight_to_sl~Year + (1|Cat_Num), data= hybog_desmond)
+summary(hybog_model_sl)
+plot(hybog_model_sl)
+#predicting line
+hybog_pred_sl <- ggpredict(hybog_model_sl, c("Year [n=100]"))
+#plot
+plot(hybog_pred_sl, show_data = TRUE, dot_alpha = 1, color = "#008000")+ 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL)+
+  annotate("text", x = -Inf, y = Inf, 
+           label = paste("p-value: 0.0028", "\n",
+                         "slope: -1.159"),
+           hjust = -0.5, vjust = 1.75, 
+           size = 4, 
+           color = "black", 
+           fontface = "italic") +
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=10),panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color="grey95"),panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-hybog_w2SL_only
+
 
 #Possible weight/SL~Year Summaries
 ict_model1 <- lmerTest::lmer((Weight/SL)~Year + (1|Cat_Num), data= ict_desmond)
