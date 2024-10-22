@@ -1510,3 +1510,110 @@ mydf <- ggpredict(m3, terms= c("CI"))
 plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
   apatheme+xlab("Streamflow (m3/sec)")+ylab("# of pseudocysts per fish")+ylim(0,75)
 
+
+### Impact of point-source pollution - CARVEL MYX.CM only CI----
+
+caarvel_presence_myxcm <- subset(carvel_presence,psite_spp.x == "MYX.CM")
+
+
+### Which link function is the best?
+m1 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = caarvel_presence_myxcm,
+              family = binomial(link="logit")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = caarvel_presence_myxcm,
+              family = binomial(link="probit")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = caarvel_presence_myxcm,
+              family = binomial(link="inverse")) # with log-link function, nbinom1 does not converge
+
+
+AIC(m1,m2,m3) # best is binomial(probit), the logit did not converge
+
+summary(m2)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m2,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m2)
+
+tab_model(m2)
+plot_model(m2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## visualize model
+
+# Flow with CI and psite_genus
+mydf <- ggpredict(m2, terms= c("CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+xlab("Streamflow (m3/sec)")+ylab("# of pseudocysts per fish")+ylim(0,1)
+
+
+### Impact of point-source pollution - CARVEL MYX.STWY only CI----
+gamaff_presence_myxstwy <- subset(gamaff_presence,psite_spp.x == "MYX.STWY")
+
+
+### Which link function is the best?
+m1 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = gamaff_presence_myxstwy,
+              family = binomial(link="logit")) # with log-link function, nbinom1 does not converge
+
+m2 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = gamaff_presence_myxstwy,
+              family = binomial(link="probit")) # with log-link function, nbinom1 does not converge
+
+m3 <- glmmTMB(psite_count ~ 
+                CI+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|YearCollected/season),
+              data = gamaff_presence_myxstwy,
+              family = binomial(link="inverse")) # with log-link function, nbinom1 does not converge
+
+
+AIC(m1,m2,m3) # best is binomial(probit)
+
+summary(m2)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m2,n=250)
+s$scaledResiduals
+plot(s)
+
+performance::check_overdispersion(m2)
+
+tab_model(m2)
+plot_model(m2,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## visualize model
+
+# Flow with CI and psite_genus
+mydf <- ggpredict(m2, terms= c("CI")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,jitter=0.05,color=c("#5aae61","#762a83"))+
+  apatheme+xlab("Streamflow (m3/sec)")+ylab("# of pseudocysts per fish")+ylim(0,1)
+
