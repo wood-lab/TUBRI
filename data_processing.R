@@ -13,6 +13,9 @@ library(skimr)
 library(lubridate)
 library(tidyverse)
 library(reshape2)
+library(readxl)
+library(readr)
+library(dplyr)
 
 
 # Here's the workflow that you need to follow for each fish species:
@@ -90,7 +93,8 @@ META.UNK<-(pim_vig_with_metadata$META.UNK.AnalFin+pim_vig_with_metadata$META.UNK
 MONO.DACT<-(2*pim_vig_with_metadata$MONO.DACT.GILL)              
 MONO.GYRO<-pim_vig_with_metadata$MONO.GYRO.Flush+(2*pim_vig_with_metadata$MONO.GYRO.Gill)              
 MONO.LG<-2*(pim_vig_with_metadata$MONO.LG.Gill+pim_vig_with_metadata$MONO.LG.PectoralFin)           
-MYX.GEOM<-pim_vig_with_metadata$MYX.GEOM.Flush+pim_vig_with_metadata$MYX.GEOM.Intestines  
+
+# Not a parasite: MYX.GEOM<-pim_vig_with_metadata$MYX.GEOM.Flush+pim_vig_with_metadata$MYX.GEOM.Intestines  
 
 ### MYX.GO were found in many organs. Sometimes, those were organs that were not found in all fish
 ### (e.g., gonads). However, even if the gonads (or spleen, or heart) were too small to ID, we feel confident that
@@ -196,7 +200,7 @@ pim_vig_processed_data<-cbind.data.frame(pim_vig_with_metadata$CatalogNumber,pim
                               pim_vig_with_metadata$Latitude.y,
                               pim_vig_with_metadata$Longitude.y,ACANTH.BIGB,ACANTH.BKR,            
                               CEST.COMP,CEST.GODZ,CEST.L,CEST.NTG,CEST.PEA,CEST.UNK,CEST.VIT,COPE.CL,COPE.GRAB,
-                              META.HS,META.UNK,MONO.DACT,MONO.GYRO,MONO.LG,MYX.GEOM,MYX.GO,MYX.THEL,
+                              META.HS,META.UNK,MONO.DACT,MONO.GYRO,MONO.LG,MYX.GO,MYX.THEL,
                               MYXO.BC,MYXO.SBAD,MYXO.UNK,MYXO.UP,NEM.CAP,NEM.CONA,NEM.DICH,NEM.LARV,NEM.TRBK,
                               NEM.UNK,TREM.BUC,TREM.MET,TREM.METAF,TREM.METAGS,TREM.MS,TREM.NEA,TREM.RNDA,
                               TREM.SSS,TREM.UNK)
@@ -334,6 +338,7 @@ CEST.COMP<-ict_pun_with_metadata$CEST.COMP.Intestine
 CEST.MEG<-ict_pun_with_metadata$CEST.MEG.Intestine
 # not a parasite, ignore: CYST.BD<-ict_pun_with_metadata$CYST.BD.GILL                    
 # not a parasite, ignore: CYST.MX<-ict_pun_with_metadata$CYST.MX.ConnectiveTissue+ict_pun_with_metadata$CYST.MX.GILL                     
+# not a parasite, ignore: MYX.GEOM<-ict_pun_with_metadata$MYX.GEOM.Intestine               
 
 # There are many, many cysts in ICTPUN, some of which contain no discernable structure within - no folded up worm,
 # no myxozoans. We originally classified them as larval trematodes, but upon further inspection could not confirm
@@ -372,7 +377,6 @@ ict_pun_with_metadata$CYST.UNK.Liver[ict_pun_with_metadata$DissectionDate<"6/26/
 LEECH.KUT<-ict_pun_with_metadata$LEECH.KUT.FLUSH                  
 MONO.IP<-ict_pun_with_metadata$MONO.IP.FLUSH+(2*ict_pun_with_metadata$MONO.IP.GILL)                    
 MONO.UNK<-(2*ict_pun_with_metadata$MONO.UNKN.GILL)           
-MYX.GEOM<-ict_pun_with_metadata$MYX.GEOM.Intestine               
 NEM.CYST<-ict_pun_with_metadata$CYST.NEM.ConnectiveTissue+ict_pun_with_metadata$NEM.CYST.Liver
 NEM.NMTS<-ict_pun_with_metadata$NEM.NMTS.FLUSH+ict_pun_with_metadata$NEM.NMTS.Intestine+
   ict_pun_with_metadata$NEM.NMTS.Stomach                 
@@ -507,7 +511,7 @@ ict_pun_processed_data<-cbind.data.frame(ict_pun_with_metadata$CatalogNumber,ict
                                          ict_pun_with_metadata$combo,
                                          ict_pun_with_metadata$Latitude.y,
                                          ict_pun_with_metadata$Longitude.y,ACAN.OSTR, CEST.COMP, CEST.MEG, 
-                                         LEECH.KUT, MONO.IP, MONO.UNK, MYX.GEOM, NEM.CYST, NEM.NMTS, NEM.PHAR, 
+                                         LEECH.KUT, MONO.IP, MONO.UNK, NEM.CYST, NEM.NMTS, NEM.PHAR, 
                                          NEM.PTY, NEM.SP, NEM.TAF, NEM.UNK, NMORPH, TREM.2, TREM.ALLO, TREM.BLE, 
                                          TREM.CREP, TREM.F, TREM.META.GG, MYX.TAIL, TREM.META.UNK, 
                                          TREM.LG, TREM.LIP, TREM.MEGICT, TREM.PHYLS, TREM.SMILE, TREM.UNK)
@@ -1345,7 +1349,7 @@ TREM.META.UNK<-car_vel_today_with_metadata$META.UNK.CAUDALFIN+
   car_vel_today_with_metadata$meta.unk.connectivetissues+(2*car_vel_today_with_metadata$meta.unk.eye)+
   car_vel_today_with_metadata$META.UNK.INTESTINE   
 # this is probably Udonella, a commensal of a copepod parasite: MONO.NID<-car_vel_today_with_metadata$MONO.NID.Flush
-MYX.BNA<-as.numeric(car_vel_today_with_metadata$myx.bna.gallbladder)          
+# not a parasite: MYX.BNA<-as.numeric(car_vel_today_with_metadata$myx.bna.gallbladder)          
 MYX.CM<-as.numeric(car_vel_today_with_metadata$MYX.CM.GALLBLADDER)            
 MYX.E<-(2*car_vel_today_with_metadata$MYX.E.EYE)+(2*car_vel_today_with_metadata$MYX.E.GILL)  
 
@@ -1356,7 +1360,6 @@ MYX.F<-car_vel_today_with_metadata$MYX.F.ANALFIN+car_vel_today_with_metadata$MYX
   (2*car_vel_today_with_metadata$MYX.F.PECTORALFIN)+(2*car_vel_today_with_metadata$MYX.F.PELVICFIN)+
   (2*car_vel_today_with_metadata$MYX.F.PELVICFIN.1)+(2*car_vel_today_with_metadata$MYX.F.SKIN)                    
 MYX.G<-car_vel_today_with_metadata$Myx.g.Flush+(2*car_vel_today_with_metadata$MYX.G.GILL)                    
-MYX.GM<-as.numeric(car_vel_today_with_metadata$MYX.GM.Gallbladder)          
 MYX.KL<-as.numeric(car_vel_today_with_metadata$MYX.KL.Kidney)                 
 MYX.S<-(2*car_vel_today_with_metadata$MYX.S.SKIN)                    
 MYX.UNK<-as.numeric(car_vel_today_with_metadata$MYX.UNK.SWIMBLADDER)          
@@ -1365,6 +1368,8 @@ MYX.UNK<-as.numeric(car_vel_today_with_metadata$MYX.UNK.SWIMBLADDER)
 # gut contents, not parasite: NEM.B.STOMACH                 
 # gut contents, not parasite: NEM.CER.INTESTINE            
 # gut contents, not parasite: NEM.CER.Stomach   
+# According to Stephen Atkinson, this is a contamination: MYX.GM<-as.numeric(car_vel_today_with_metadata$MYX.GM.Gallbladder)          
+
 
 # Did we really have 55 NEM.CERL in one intestine?
 NEM.CERL<-car_vel_today_with_metadata$NEM.CERL.INTESTINE
@@ -1401,7 +1406,7 @@ car_vel_processed_data<-cbind.data.frame(car_vel_today_with_metadata$CatalogNumb
                                          car_vel_today_with_metadata$Latitude.y,
                                          car_vel_today_with_metadata$Longitude.y,
                                          CEST.ARCH,CEST.MEGAN,CEST.TRI,CEST.UNK,CEST.WS,CILI.FU,COPE.HNY,
-                                         TREM.META.UNK,MYX.BNA,MYX.CM,MYX.E,MYX.F,MYX.G,MYX.GM,
+                                         TREM.META.UNK,MYX.CM,MYX.E,MYX.F,MYX.G,
                                          MYX.KL,MYX.S,MYX.UNK,NEM.CERL,TREM.CV,TREM.LARV,TREM.ORS,TREM.SEP)
 
 # Name the columns
@@ -1946,10 +1951,6 @@ full_dataset_with_LH <- full_dataset_with_LH %>%
 
 full_dataset_with_LH$distance_m <- as.numeric(full_dataset_with_LH$distance_m)
 
-# Export the sheet
-
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.08.27.csv")
-write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
 
 # tallies
 
@@ -1958,3 +1959,123 @@ length(unique(full_dataset_with_LH$psite_spp.x))
 sum(full_dataset_with_LH$psite_count,na.rm=T)
 min(full_dataset_with_LH$YearCollected)
 max(full_dataset_with_LH$YearCollected)
+
+
+### Adding streamflow data----
+
+# Import physical data (which includes water temperature and streamflow)
+physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
+
+# Read USGS-gage site metadata
+siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.) to the physical data
+
+physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+## Unfortunately streamflow data is only available for the control site. However we assume that the streamflow should be continuous downstream the rivers and do not expect big differences in this parameter.
+
+# Make a subset only for streamflow in m^3/sec
+streamflow <- subset(physicalUSGS_withmetadata, Measure=="Stream flow")
+streamflow_ms <- subset(streamflow, Unit=="m3/sec")
+
+#### The script below assigns to each fish individual the mean streamflow (mean_streamflow) that the fish experienced over one year before its collection
+
+# Add a new column to store the mean streamflow
+full_dataset_with_LH$mean_streamflow <- NA
+
+library(lubridate)
+
+# Combine year, month, and day columns into a date column
+full_dataset_with_LH$collection_date <- make_date(full_dataset_with_LH$YearCollected, full_dataset_with_LH$MonthCollected, 
+                                                  full_dataset_with_LH$DayCollected)
+
+
+streamflow_ms$measurement_date <- make_date(streamflow_ms$YearCollected, streamflow_ms$MonthCollected, 
+                                            streamflow_ms$DayCollected)
+
+
+# Loop through each row of 'full_dataset_with_LH'
+for (i in 1:nrow(full_dataset_with_LH)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(full_dataset_with_LH$collection_date[i])
+  
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter 'streamflow_ms' to get the streamflow data within that one-year range
+  streamflow_data <- streamflow_ms[streamflow_ms$measurement_date >= start_date & streamflow_ms$measurement_date < end_date, "Result"]
+  
+  # Calculate the mean streamflow and store it in 'full_dataset_with_LH'
+  if (length(streamflow_data) > 0) {
+    full_dataset_with_LH$mean_streamflow[i] <- mean(streamflow_data, na.rm = TRUE)
+  } else {
+    full_dataset_with_LH$mean_streamflow[i] <- NA  # If no data is found, store NA
+  }
+}
+
+### Adding water temperature data----
+# Make a subset of only water temperature
+wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
+
+## Check if there is a significant difference between control and impact 
+
+# Summarize by taking the mean, max, and median temperature per 'year'
+
+wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
+  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
+            .groups = 'drop') # For water temperature there is also data for the impact category (although for less years). However, there is no significant difference between control and impact so we take the mean per year ignoring CI. See analysis (LM) relevant to this data above We have to keep in mind that the gage at the impact category is way downstream. So there might be some warming frmo the pulp mill that is probably not captured by the gage.
+
+# wtemp change throughout time
+
+wtemp_summ$CI <- as.factor(wtemp_summ$CI)
+
+m1 <- lm(meanTemp~YearCollected*CI, data=wtemp_summ)
+m2 <- lm(meanTemp~YearCollected, data=wtemp_summ)
+
+summary(m1) 
+summary(m2) 
+
+tab_model(m1)
+tab_model(m2)# The estimate of YearCollected is the same/consistent for both models (an increase of 0.09 degC/year). No difference between control and impact.
+
+#### The script below assigns to each fish individual the mean temperature (mean_temperature) that the fish experienced over one year before its collection
+
+# Add a new column to store the mean temperatures
+full_dataset_with_LH$mean_temperature <- NA
+
+library(lubridate)
+
+# Combine year, month, and day columns into a date column
+full_dataset_with_LH$collection_date <- make_date(full_dataset_with_LH$YearCollected, full_dataset_with_LH$MonthCollected, 
+                                                  full_dataset_with_LH$DayCollected)
+
+
+wtemp$measurement_date <- make_date(wtemp$YearCollected, wtemp$MonthCollected, 
+                                    wtemp$DayCollected)
+
+
+# Loop through each row of 'full_dataset_with_LH'
+for (i in 1:nrow(full_dataset_with_LH)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(full_dataset_with_LH$collection_date[i])
+  
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter 'wtemp' to get the temperature data within that one-year range
+  temp_data <- wtemp[wtemp$measurement_date >= start_date & wtemp$measurement_date < end_date, "Result"]
+  
+  # Calculate the mean temperature and store it in 'full_dataset_with_LH'
+  if (length(temp_data) > 0) {
+    full_dataset_with_LH$mean_temperature[i] <- mean(temp_data, na.rm = TRUE)
+  } else {
+    full_dataset_with_LH$mean_temperature[i] <- NA  # If no data is found, store NA
+  }
+}
+
+
+#### Export the datasheet
+write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
