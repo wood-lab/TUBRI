@@ -2077,5 +2077,25 @@ for (i in 1:nrow(full_dataset_with_LH)) {
 }
 
 
+### Add Seasons----
+## Create a season column to be later used as a random factor in the models
+
+full_dataset_with_LH$MonthCollected <- as.numeric(full_dataset_with_LH$MonthCollected)
+
+full_dataset_with_LH <- full_dataset_with_LH %>% 
+  mutate(season = case_when(  MonthCollected >= 1 &
+                                MonthCollected <= 2 
+                              ~ "winter",
+                              MonthCollected >= 3 &
+                                MonthCollected <= 5 ~ "spring",
+                              MonthCollected >= 6 &
+                                MonthCollected <= 8 ~ "summer",
+                              MonthCollected >= 9 &
+                                MonthCollected <= 11 ~ "fall",
+                              MonthCollected == 12 ~ "winter",
+  ))
+
+full_dataset_with_LH$season <- as.factor(full_dataset_with_LH$season)
+
 #### Export the datasheet
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
