@@ -1509,6 +1509,57 @@ ggplot(subset(ug_L, Measure %in% c("Iron","Aluminum","Arsenic")), aes(x= YearCol
   facet_wrap("CI")+
   xlab("Year")+ylab("Streamflow (m3/sec)")
 
+ug_L_c <- subset(ug_L, CI=="control")
+ug_L_cy <- subset(ug_L_c, YearCollected > 1972 &
+                   YearCollected < 1995)
+
+## Elements PC1
+
+ggplot(subset(ug_L_cy, Measure %in% c("Iron","Manganese")), aes(x= YearCollected,
+                                                                      y=Result))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Concentration (ug/L)")+
+  geom_hline(yintercept=10, linetype="dashed", color = "black", size=0.5)
+  geom_hline(yintercept=10, linetype="dashed", color = "red", size=0.5)
+
+ggplot(subset(ug_L_cy, Measure %in% c("Barium")), aes(x= YearCollected,
+                                                                                y=Result,fill=Measure))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Concentration (ug/L)")+
+  geom_hline(yintercept=10, linetype="dashed", color = "black", size=0.5)
+  geom_hline(yintercept=10, linetype="dashed", color = "red", size=0.5)
+
+ggplot(subset(ug_L_cy, Measure %in% c("Lead")), aes(x= YearCollected,
+                                                      y=Result,fill=Measure))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Lead concentration (ug/L)")+
+  geom_hline(yintercept=2.5, linetype="dashed", color = "black", size=0.5)
+  #geom_hline(yintercept=NULL, linetype="dashed", color = "red", size=0.5)
+
+## Elements PC2
+
+ggplot(subset(ug_L_cy, Measure %in% c("Copper")), aes(x= YearCollected,
+                                                                y=Result,fill=Measure))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Copper concentration (ug/L)")#+
+  #geom_hline(yintercept=10, linetype="dashed", color = "black", size=0.5)
+  #geom_hline(yintercept=10, linetype="dashed", color = "red", size=0.5)
+
+ggplot(subset(ug_L_cy, Measure %in% c("Chromium")), aes(x= YearCollected,
+                                                                          y=Result,fill=Measure))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Chromium concentration (ug/L)")#+
+  #geom_hline(yintercept=10, linetype="dashed", color = "black", size=0.5)
+  #geom_hline(yintercept=10, linetype="dashed", color = "red", size=0.5)
+
+ggplot(subset(ug_L_cy, Measure %in% c("Nickel")), aes(x= YearCollected,
+                                                                          y=Result,fill=Measure))+
+  geom_bar(stat = "identity",color="grey",fill="grey")+apatheme+
+  xlab("Year")+ylab("Nickel concentration (ug/L)")#+
+  #geom_hline(yintercept=10, linetype="dashed", color = "black", size=0.5)
+  #geom_hline(yintercept=10, linetype="dashed", color = "red", size=0.5)
+
+
 # Essentials
 
 ggplot(subset(ug_L, Measure %in% c("Cobalt","Selenium","Copper","Zinc","Molybdenum","Nickel")), aes(x= as.factor(YearCollected),
