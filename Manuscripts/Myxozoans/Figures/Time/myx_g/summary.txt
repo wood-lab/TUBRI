@@ -1,0 +1,23 @@
+ Family: nbinom2  ( log )
+Formula:          psite_count ~ scale(YearCollected) + offset(logTL_mm) + (1 |      site) + (1 | season)
+Data: myx_g
+
+     AIC      BIC   logLik deviance df.resid 
+  1535.6   1551.6   -762.8   1525.6      176 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ site   (Intercept) 0.07198  0.2683  
+ season (Intercept) 0.62552  0.7909  
+Number of obs: 181, groups:  site, 5; season, 4
+
+Dispersion parameter for nbinom2 family (): 0.212 
+
+Conditional model:
+                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)            0.2488     0.4517   0.551   0.5818    
+scale(YearCollected)  -0.6394     0.1887  -3.389   0.0007 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
