@@ -14,6 +14,8 @@ library(ggeffects)
 library(ggplot2)
 library(cowplot)
 library(performance)
+library(patchwork)
+library(forcats)
 
 #### Data import and daughter dataframe creation----
 
@@ -1165,7 +1167,7 @@ plot(s)
 
 # Plot predictions
 
-mydf <- ggpredict(ms_model, terms= c("mean_temperature[ALL]")) 
+mydf <- ggpredict(ms_model, terms= c("mean_temperature[n=100]")) 
 
 plot(mydf,show_data=TRUE,show_residuals=TRUE,color=c("#5aae61","#762a83"),jitter=0.1)+
   labs(x = "Temperature (°C)", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
@@ -1188,36 +1190,122 @@ plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#5aae61"))+
 
 
 # Plot predictions
-mydf <- ggpredict(ms_model, terms= c("Elements_PC2[n=50]")) 
+mydf2 <- ggpredict(ms_model, terms= c("Elements_PC2[n=50]")) 
 
-plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#5aae61"))+
+plot(mydf2,show_data=FALSE,show_residuals=TRUE,color=c("#5aae61"))+
   labs(x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
   apatheme2
 
 # Plot predictions
 
-mydf <- ggpredict(ms_model, terms= c("Elements_PC1[n=100]","mean_temperature[18.5,20.5]")) 
+mydf3 <- ggpredict(ms_model, terms= c("Elements_PC1[n=100]","mean_temperature[18.5,20.5]")) 
 
-p2 <- plot(mydf,show_data=TRUE,show_residuals=FALSE,color=c("#74add1","#d73027"),jitter=0.1,alpha=0.2)+
+p2 <- plot(mydf3,show_data=TRUE,show_residuals=FALSE,color=c("#74add1","#d73027"),jitter=0.1,alpha=0.2)+
   labs(color="Temperature (°C)",x = "Elements PC1", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
   apatheme
 #"#fee090",
 
 # Plot predictions
 
-mydf <- ggpredict(ms_model, terms= c("Elements_PC2[n=100]","mean_temperature[18.2,20.2]")) 
+mydf4 <- ggpredict(ms_model, terms= c("Elements_PC2[n=100]","mean_temperature[18.2,20.2]")) 
 
-p3 <- plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#74add1","#d73027"),jitter = 0.2)+
+p3 <- plot(mydf4,show_data=FALSE,show_residuals=TRUE,color=c("#74add1","#d73027"),jitter = 0.2)+
   labs(color="Temperature (°C)",x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
   apatheme
 
-### FIGURE 2----
-# --- estimates plot---
-p1 <- plot_model(ms_model,auto.label = FALSE,type = "est",ci.lvl = 0.95,colors = c("black"))+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+### FIGURE 3----
 
-# --- Combine them with bold labels ---
-plot_grid(p1, p2, p3, labels = c("A", "B","C"), label_fontface = "bold")
+# Calculate confidence intervals and estimates
+conf_int_myxg_ms <- confint(ms_model)
 
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.png", width=300, height=150, dpi=1000, units = "mm")
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.pdf", width=300, height=150, dpi=1000, units = "mm")
+# Combine estimates and confidence intervals into a data frame
+results_myxg_ms <- data.frame(
+  Estimate = conf_int_myxg_ms[2,3],
+  Upper_CI = conf_int_myxg_ms[2,2],
+  Lower_CI = conf_int_myxg_ms[2,1]
+)
 
+# Convert matrix to data frame and add term names
+conf_int_myxg_ms_df <- as.data.frame(conf_int_myxg_ms)
+conf_int_myxg_ms_df$term <- rownames(conf_int_myxg_ms)
+
+# Rename columns for clarity
+colnames(conf_int_myxg_ms_df) <- c("Lower_CI", "Upper_CI", "Estimate", "term")
+
+# Clean and order the terms
+conf_int_myxg_ms_clean <- conf_int_myxg_ms_df %>%
+  filter(!grepl("Std.Dev.|Intercept", term)) %>%
+  mutate(
+    term_clean = term %>%
+      gsub("scale\\(", "", .) %>%
+      gsub("\\)", "", .) %>%
+      gsub("_", " ", .),
+    color_group = ifelse(term_clean %in% c(
+      "mean temperature",
+      "Elements PC2",
+      "mean temperature:Elements PC1",
+      "mean temperature:Elements PC2"
+    ), "red", "black")
+  )
+
+# Set term_clean as a factor in reversed order
+conf_int_myxg_ms_clean$term_clean <- factor(conf_int_myxg_ms_clean$term_clean, levels = rev(conf_int_myxg_ms_clean$term_clean))
+
+# Plot
+ggplot(conf_int_myxg_ms_clean,
+             aes(x = term_clean, y = Estimate,
+                 ymin = Lower_CI, ymax = Upper_CI, color = color_group)) +
+  geom_pointrange(size = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed", size = 1.0, color = "darkgrey") +
+  scale_color_identity() +
+  coord_flip() +
+  labs(x = "", y = "z-tranformed estimates (± 95% CI)") +
+  apatheme2 +
+  theme(axis.text.y = element_text(size = 10, face = "bold"))
+
+# Save
+ggsave("Manuscripts/Myxozoans/Figures/Figure3.png", gg, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure3.pdf", gg, width = 150, height = 150, units = "mm", dpi = 1000)
+
+#### Figure 4----
+# Set a theme for all your plots
+apatheme3= theme_bw(base_size = 10,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+# Prepare each plot 
+pA <- plot(mydf, show_data = TRUE, show_residuals = TRUE, color = c("#5aae61", "#762a83"), jitter = 0.1) +
+  labs(x = "Temperature (°C)", y = "Parasite abundance", title = NULL) +
+  apatheme3 +
+  ggtitle("A") +
+  theme(plot.title = element_text(face = "bold", hjust = -0.2))
+
+mydf2 <- ggpredict(ms_model, terms = c("Elements_PC2[n=50]"))
+pB <- plot(mydf2, show_data = FALSE, show_residuals = TRUE, color = c("#5aae61")) +
+  labs(x = "Elements PC2", y = "Parasite abundance", title = NULL) +
+  apatheme3 +
+  ggtitle("B") +
+  theme(plot.title = element_text(face = "bold", hjust = -0.2))
+
+mydf3 <- ggpredict(ms_model, terms = c("Elements_PC1[n=100]", "mean_temperature[18.5,20.5]"))
+pC <- plot(mydf3, show_data = TRUE, show_residuals = FALSE, color = c("#74add1", "#d73027"), jitter = 0.1, alpha = 0.2) +
+  labs(color = "Temp (°C)", x = "Elements PC1", y = "Parasite abundance", title = NULL) +
+  apatheme3 +
+  ggtitle("C") +
+  theme(plot.title = element_text(face = "bold", hjust = -0.2))
+
+mydf4 <- ggpredict(ms_model, terms = c("Elements_PC2[n=100]", "mean_temperature[18.2,20.2]"))
+pD <- plot(mydf4, show_data = FALSE, show_residuals = TRUE, color = c("#74add1", "#d73027"), jitter = 0.2) +
+  labs(color = "Temp (°C)", x = "Elements PC2", y = "Parasite abundance", title = NULL) +
+  apatheme3 +
+  ggtitle("D") +
+  theme(plot.title = element_text(face = "bold", hjust = -0.2))
+
+# Combine in 2x2 layout
+final_plot <- (pA | pB) / (pC | pD)
+
+# Save
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
