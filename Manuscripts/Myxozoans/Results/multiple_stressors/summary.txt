@@ -1,0 +1,40 @@
+ Family: nbinom2  ( sqrt )
+Formula:          psite_count ~ scale(mean_temperature) * scale(mean_nitrogen) +  
+    scale(mean_temperature) * Elements_PC1 + scale(mean_temperature) *  
+    Elements_PC2 + offset(sqrt(TotalLength_mm)) + (1 | site) +      (1 | season)
+Data: myx_g_yc
+
+     AIC      BIC   logLik deviance df.resid 
+   503.0    523.8   -240.5    481.0       38 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance  Std.Dev. 
+ site   (Intercept) 7.611e+00 2.7587814
+ season (Intercept) 2.647e-08 0.0001627
+Number of obs: 49, groups:  site, 2; season, 4
+
+Dispersion parameter for nbinom2 family (): 0.513 
+
+Conditional model:
+                                             Estimate Std. Error z value Pr(>|z|)
+(Intercept)                                    2.1164     2.2806   0.928 0.353412
+scale(mean_temperature)                       -3.5482     1.5993  -2.219 0.026515
+scale(mean_nitrogen)                          -0.4274     1.5175  -0.282 0.778230
+Elements_PC1                                   0.9682     0.8230   1.176 0.239421
+Elements_PC2                                   1.4548     0.6197   2.347 0.018902
+scale(mean_temperature):scale(mean_nitrogen)  -0.7423     1.1800  -0.629 0.529274
+scale(mean_temperature):Elements_PC1          -2.3158     1.0111  -2.290 0.022003
+scale(mean_temperature):Elements_PC2           2.4842     0.6863   3.620 0.000295
+                                                
+(Intercept)                                     
+scale(mean_temperature)                      *  
+scale(mean_nitrogen)                            
+Elements_PC1                                    
+Elements_PC2                                 *  
+scale(mean_temperature):scale(mean_nitrogen)    
+scale(mean_temperature):Elements_PC1         *  
+scale(mean_temperature):Elements_PC2         ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

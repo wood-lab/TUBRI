@@ -13,6 +13,7 @@ library(sjPlot)
 library(ggeffects)
 library(ggplot2)
 library(cowplot)
+library(performance)
 
 #### Data import and daughter dataframe creation----
 
@@ -57,7 +58,7 @@ prevalence_higherthan5percent <- subset(summary_prevalence, Prevalence > 0.05)
 myx_cm <- subset(full_dataset_myxo, psite_spp.x == "MYX.CM")
 myx_f <- subset(full_dataset_myxo, psite_spp.x == "MYX.F")
 myx_g <- subset(full_dataset_myxo, psite_spp.x == "MYX.G")
-myx_stwy <- subset(full_dataset_myxo, psite_spp.x == "MYX.SWTY")
+myx_stwy <- subset(full_dataset_myxo, psite_spp.x == "MYX.STWY")
 myx_tail <- subset(full_dataset_myxo, psite_spp.x == "MYX.TAIL")
 myx_sp <- subset(full_dataset_myxo, psite_spp.x == "MYX.SP")
 myx_go <- subset(full_dataset_myxo, psite_spp.x == "MYX.GO")
@@ -849,7 +850,7 @@ gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, 
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.png", width=150, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
 
-### Figure 2----
+### FIGURE 2----
 # --- Myx.G plot---
 p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color = c("#5aae61")) +
   labs(
@@ -863,6 +864,359 @@ p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color 
   apatheme
 # --- Combine them with bold labels ---
 plot_grid(gg, p1, labels = c("A", "B"), label_fontface = "bold")
+
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.png", width=300, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.pdf", width=300, height=150, dpi=1000, units = "mm")
+
+
+#### The effect of time on prevalence data----
+
+## Carpiodes velifer - MYX.CM
+
+# GLMM - which family is the best?
+m1 <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_cm,
+              family = binomial(link = "logit")) 
+
+m2 <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_cm,
+              family = binomial(link = "probit")) 
+
+AIC(m1,m2)
+summary(m1)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+plot(s)
+
+# This one coverged and it's good
+myxo_cm_time <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                          offset(logTL_mm)+
+                          (1|site)+
+                          (1|season),
+                        data = myx_cm,
+                        family = binomial(link = "logit")) 
+
+summary <- summary(myxo_cm_time)
+
+# Save model output 
+capture.output(summary, file = "Manuscripts/Myxozoans/Figures/Time/myx_cm/summary.txt")
+
+#Save diagnostics
+dev.off()
+pdf("Manuscripts/Myxozoans/Figures/Time/myx_cm/diagnostics.pdf",width=8,height=5,colormodel="rgb")
+plot(s) 
+dev.off()
+
+## Extract estimates and confidence intervals for myx_cm
+
+# Calculate confidence intervals and estimates
+conf_int_myxscm <- confint(myxo_cm_time)
+
+# Combine estimates and confidence intervals into a data frame
+results_myxscm <- data.frame(
+  Estimate = conf_int_myxscm[2,3],
+  Upper_CI = conf_int_myxscm[2,2],
+  Lower_CI = conf_int_myxscm[2,1]
+)
+
+results_myxscm$Fish_sp <- "Carpiodes velifer"
+results_myxscm$Parasite <- "MYX.CM"
+
+#Evaluate model
+tab_model(myxo_cm_time)
+plot_model(myxo_cm_time,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## visualize model
+mydf <- ggpredict(myxo_cm_time, terms= c("YearCollected[n=100]")) 
+
+plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.01,color=c("#5aae61"))+
+  labs(x = 'Year', y = 'Probability of myxozoan infection (%)',title=NULL)+
+  apatheme
+
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/myx_cm/Carvel_MyxCM_Presence_Year.png", width=150, height=120, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/myx_cm/Carvel_MyxCM_Presence_Year.pdf", width=150, height=120, dpi=1000, units = "mm")
+
+## Gambusia affinis - MYX.STWY
+
+# GLMM - which family is the best?
+m1 <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_stwy,
+              family = binomial(link = "logit")) #116.772
+
+m2 <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_stwy,
+              family = binomial(link = "probit")) #118.394
+
+AIC(m1,m2)
+summary(m1)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m1,n=250)
+s$scaledResiduals
+plot(s)
+
+# The best is m1
+
+myxo_stwy_time <- glmmTMB(psite_presence ~ scale(YearCollected)+
+                            offset(logTL_mm)+
+                            (1|site)+
+                            (1|season),
+                          data = myx_stwy,
+                          family = binomial(link = "logit")) 
+
+summary <- summary(myxo_stwy_time)
+
+# Save model output 
+capture.output(summary, file = "Manuscripts/Myxozoans/Figures/Time/myx_stwy/summary.txt")
+
+#Save diagnostics
+dev.off()
+pdf("Manuscripts/Myxozoans/Figures/Time/myx_stwy/diagnostics.pdf",width=8,height=5,colormodel="rgb")
+plot(s) 
+dev.off()
+
+## Extract estimates and confidence intervals for myx_cm
+
+# Calculate confidence intervals and estimates
+conf_int_myxstwy <- confint(myxo_stwy_time)
+
+# Combine estimates and confidence intervals into a data frame
+results_myxstwy <- data.frame(
+  Estimate = conf_int_myxstwy[2,3],
+  Upper_CI = conf_int_myxstwy[2,2],
+  Lower_CI = conf_int_myxstwy[2,1]
+)
+
+results_myxstwy$Fish_sp <- "Gambusia affinis"
+results_myxstwy$Parasite <- "MYX.STWY"
+
+#Evaluate model
+tab_model(myxo_stwy_time)
+plot_model(myxo_stwy_time,type = "est")+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+## visualize model
+
+# Flow with CI and psite_genus
+
+mydf <- ggpredict(myxo_stwy_time, terms= c("YearCollected[n=100]")) 
+
+plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.01,color=c("#5aae61"))+
+  labs(x = 'Year', y = 'Probability of myxozoan infection (%)',title=NULL)+
+  apatheme
+
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/myx_stwy/GAMAFF_MyxSTWY_Presence_Year.png", width=150, height=120, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/myx_stwy/GAMAFF_MyxSTWY_Presence_Year.pdf", width=150, height=120, dpi=1000, units = "mm")
+
+#### Non-point source - Only for MYX.G----
+
+# Some data only spans between 1973 and 1994. So we will perform the analyses 
+# only for that time period and for the control because I cannot assume that the 
+# downstram impact sites are going to be represented by this data.
+
+m1 <- glmmTMB(psite_count ~ scale(YearCollected)+
+                scale(mean_temperature)+
+                Elements_PC1+
+                Elements_PC2+
+                scale(mean_nitrogen)+
+                offset(sqrt(TotalLength_mm))+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom1(link="sqrt")) ## YearCollected and Elements_PC2 are highly correlated based on the VIF values
+
+vif_values <- check_collinearity(m1)
+
+
+m1 <- glmmTMB(psite_count ~ 
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom1(link="log")) #518.0079
+
+m2 <- glmmTMB(psite_count ~ 
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(sqrt(TotalLength_mm))+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom2(link="sqrt")) #503.0135
+
+m3 <- glmmTMB(psite_count ~ 
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(sqrt(TotalLength_mm))+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom1(link="sqrt")) #509.2888
+
+m4 <- glmmTMB(psite_count ~ 
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom2(link="log")) #did not converge
+
+m5 <- glmmTMB(psite_count ~ poly(mean_temperature,2) +
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(logTL_mm)+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom1(link="log")) #519.1605
+
+m6 <- glmmTMB(psite_count ~ poly(mean_temperature,2) +
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(sqrt(TotalLength_mm))+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom2(link="sqrt")) #504.8136, really bad fit
+
+m7 <- glmmTMB(psite_count ~ poly(mean_temperature,2) +
+                scale(mean_temperature)*scale(mean_nitrogen)+
+                scale(mean_temperature)*Elements_PC1+
+                scale(mean_temperature)*Elements_PC2+
+                offset(sqrt(TotalLength_mm))+
+                (1|site)+
+                (1|season),
+              data = myx_g_yc,
+              family=nbinom1(link="sqrt")) #509.4216
+
+vif_values <- check_collinearity(m2)
+
+AIC(m1,m2,m3,m4,m5,m6,m7)
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=m2,n=250)
+s$scaledResiduals
+plot(s)
+
+summary(m2)
+
+# The best model is 
+ms_model <- glmmTMB(psite_count ~ 
+                      scale(mean_temperature)*scale(mean_nitrogen)+
+                      scale(mean_temperature)*Elements_PC1+
+                      scale(mean_temperature)*Elements_PC2+
+                      offset(sqrt(TotalLength_mm))+
+                      (1|site)+
+                      (1|season),
+                    data = myx_g_yc,
+                    family=nbinom2(link="sqrt")) #503.0135
+
+
+tab_model(ms_model)
+plot_model(ms_model,auto.label = FALSE,type = "est",ci.lvl = 0.95,colors = c("black"))+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+summary(ms_model)
+
+summary <- summary(ms_model)
+
+# Save model output 
+capture.output(summary, file = "Manuscripts/Myxozoans/Results/multiple_stressors/summary.txt")
+
+#Save diagnostics
+dev.off()
+pdf("Manuscripts/Myxozoans/Results/multiple_stressors/diagnostics.pdf",width=8,height=5,colormodel="rgb")
+plot(s) 
+dev.off()
+
+# Save estimate plot
+#Save diagnostics
+dev.off()
+pdf("Manuscripts/Myxozoans/Results/multiple_stressors/estimates.pdf",width=8,height=5)
+plot_model(ms_model,title="",axis.title = ("Estimates"),type = "est",ci.lvl = 0.95,colors = c("black"))+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+dev.off()
+
+ggsave(file="Manuscripts/Myxozoans/Results/multiple_stressors/estimates.png", width=125, height=150, dpi=1000, units = "mm")
+
+#Evaluate residuals
+s=simulateResiduals(fittedModel=ms_model,n=250)
+s$scaledResiduals
+plot(s)
+
+# Plot predictions
+
+mydf <- ggpredict(ms_model, terms= c("mean_temperature[ALL]")) 
+
+plot(mydf,show_data=TRUE,show_residuals=TRUE,color=c("#5aae61","#762a83"),jitter=0.1)+
+  labs(x = "Temperature (°C)", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme2
+
+# Plot predictions
+
+mydf <- ggpredict(ms_model, terms= c("mean_nitrogen[n=50]")) 
+
+plot(mydf,show_data=TRUE,show_residuals=TRUE,color=c("#5aae61","#762a83"))+
+  labs(x = "Nitrogen (mg/L)", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme2
+
+# Plot predictions
+mydf <- ggpredict(ms_model, terms= c("Elements_PC1[n=50]")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#5aae61"))+
+  labs(x = "Elements PC1", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme2
+
+
+# Plot predictions
+mydf <- ggpredict(ms_model, terms= c("Elements_PC2[n=50]")) 
+
+plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#5aae61"))+
+  labs(x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme2
+
+# Plot predictions
+
+mydf <- ggpredict(ms_model, terms= c("Elements_PC1[n=100]","mean_temperature[18.5,20.5]")) 
+
+p2 <- plot(mydf,show_data=TRUE,show_residuals=FALSE,color=c("#74add1","#d73027"),jitter=0.1,alpha=0.2)+
+  labs(color="Temperature (°C)",x = "Elements PC1", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme
+#"#fee090",
+
+# Plot predictions
+
+mydf <- ggpredict(ms_model, terms= c("Elements_PC2[n=100]","mean_temperature[18.2,20.2]")) 
+
+p3 <- plot(mydf,show_data=FALSE,show_residuals=TRUE,color=c("#74add1","#d73027"),jitter = 0.2)+
+  labs(color="Temperature (°C)",x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
+  apatheme
+
+### FIGURE 2----
+# --- estimates plot---
+p1 <- plot_model(ms_model,auto.label = FALSE,type = "est",ci.lvl = 0.95,colors = c("black"))+apatheme+geom_hline(yintercept=1, linetype="dashed", color = "black", size=0.5)
+
+# --- Combine them with bold labels ---
+plot_grid(p1, p2, p3, labels = c("A", "B","C"), label_fontface = "bold")
 
 ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.png", width=300, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.pdf", width=300, height=150, dpi=1000, units = "mm")

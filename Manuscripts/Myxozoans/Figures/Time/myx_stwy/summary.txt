@@ -1,0 +1,22 @@
+ Family: binomial  ( logit )
+Formula:          psite_presence ~ scale(YearCollected) + offset(logTL_mm) + (1 |  
+    site) + (1 | season)
+Data: myx_stwy
+
+     AIC      BIC   logLik deviance df.resid 
+   116.8    129.1    -54.4    108.8      157 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance  Std.Dev. 
+ site   (Intercept) 2.439e-09 4.938e-05
+ season (Intercept) 9.253e-10 3.042e-05
+Number of obs: 161, groups:  site, 7; season, 4
+
+Conditional model:
+                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)           -5.6629     0.2608 -21.714   <2e-16 ***
+scale(YearCollected)   0.2403     0.2635   0.912    0.362    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
