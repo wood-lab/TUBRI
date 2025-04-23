@@ -7,6 +7,9 @@ library(readr)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+library(tidyverse)
+library(FactoMineR)
+library(missMDA)
 
 #### Load data and data exploration-----
 ## Set a theme for downstream plots
@@ -159,99 +162,185 @@ full_dataset_myxo <- subset(full_dataset, Parasite_taxonomic_group == "Myxozoa")
 ## Take the log of the size to later include it in the analysis as offset
 full_dataset_myxo$logTL_mm <- log(full_dataset_myxo$TotalLength_mm)
 
-#### Summary stats-----
 ## Remove columns with myxozoans that aren't confirmed to be myxozoans and therefore are not identified
 full_dataset_myxo <- subset(full_dataset_myxo, !is.na(Parasite_genus)) # These were thought to be myxozoans at the beginning but they are not, therefore no genus was assigned
 full_dataset_myxo <- subset(full_dataset_myxo, psite_spp.x!="MYX.GM") # According to Stephen Atkinson (OSU), this is likely a contamination and also it is in the gall bladder so does not count for abundance
 full_dataset_myxo <- subset(full_dataset_myxo, psite_spp.x!="MYX.GEOM") # According to Stephen Atkinson (OSU), this is not a myxozoan
 
-## Summary stats
-prevalence_myxo <- subset(full_dataset_myxo, !is.na(psite_presence))
-abundance_myxo <- subset(full_dataset_myxo, !is.na(psite_count))
+## Export the dataset for downstream analyses
+write.csv(full_dataset_myxo, 
+          file = "/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans//data/myxozoans_time.csv", 
+          row.names = FALSE)
 
-## Which parasites have a prevalence of more than 5%
-summary_prevalence <- prevalence_myxo %>% group_by(Fish_sp.x,psite_spp.x) %>% 
-  summarise(Prevalence=mean(psite_presence),
+#### Add element concentrations----
+
+## We add the element concentrations at this stage because we have to reduce 
+## dimensionality with a Principal Component Analysis and I want to restrict it 
+## to the data between 1972-1995, which is the data we will use for this analysis.
+
+## Crease subset for myxozoans that can be counted (pseudo-abundance).
+myxo_count <- subset(full_dataset_myxo, Parasite_genus == "Myxobolus"|Parasite_genus == "Henneguya"|Parasite_genus == "Unicauda"|Parasite_genus == "Thelohanellus")
+
+## Restrict to year and control for the interactions analysis
+
+# Restrict to the years that we are going to work with
+myxo_count_y <- subset(myxo_count, 
+                       YearCollected > 1972 &
+                         YearCollected < 1995 )
+
+# Restrict to control because we have environmental data for that area of the river
+myxo_count_yc <- subset(myxo_count_y, 
+                        CI == "control" )
+
+### Elements
+## Import data for metals
+inorganics <- read_csv("data/Physicochemical/inorganics_resultphyschem.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.)
+inorganics_withmetadata <- merge(inorganics, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
+# Summarize data table to year, day, and month collected
+inorganics_means_ymd <- inorganics_withmetadata %>% group_by(YearCollected,MonthCollected,DayCollected,CI,Unit,Measure) %>% 
+  summarise(Result=mean(Result),
             .groups = 'drop') 
 
-prevalence_higherthan5percent <- subset(summary_prevalence, Prevalence > 0.05)
+# make the table wide
+elements_na_wide <- spread(inorganics_means_ymd, Measure,Result)
 
-# The parasites with more than 5% of prevalence are: MYX.CM, MYX.F, MYX.G, MYX.SWTY, MYX.TAIL, MYX.SP, MYX.GO, MYX.THEL, MYXO.SBAD
+## take only the years and control sites
+# Restrict to the years that we are going to work with
+elements_y <- subset(elements_na_wide, 
+                       YearCollected > 1972 &
+                         YearCollected < 1995 )
 
-### FIGURE 1 ###
+# Restrict to control because we have environmental data for that area of the river
+elements_yc <- subset(elements_y, 
+                        CI == "control" )
 
-## Make plot showing the prevalence of infection of fish per parasite
-# What is the number of fish we dissected per fish species
-fish_dissected <- full_dataset_myxo %>% group_by(Fish_sp.x) %>% 
-  summarise(number_dissected=length(unique(IndividualFishID)),
-            .groups = 'drop') 
+# Make a subset for element concentration in water
 
-# Calculate prevalence by parasite genus and fish species
-summary_psitegenus <- prevalence_myxo %>%
-  group_by(Parasite_genus, Fish_sp.x,IndividualFishID) %>%            
-  summarize(genus_numinfected = sum(psite_presence), .groups = "drop") # This part ensures that we have one fish per parasite genus
+elements_water_w <- subset(elements_yc, Unit=="ug/l"|
+                             Unit=="mg/l")
 
-summary_psitegenus$psite_presence <- ifelse(summary_psitegenus$genus_numinfected > 0,# create binary data to calculate prevalence
-                                            1,    # what if condition is TRUE
-                                            0)       # what if condition is FALSE
 
-# Calculate prevalence by parasite genus and fish species
-summary_prevalence <- summary_psitegenus %>%
-  group_by(Parasite_genus, Fish_sp.x) %>%             # Group by parasite genus and snail species
-  summarize(Prevalence = (mean(psite_presence)*100), .groups = "drop")
+# Combine year, month, and day columns into a date column
+elements_water_w$measurement_date <- make_date(elements_water_w$YearCollected, 
+                                               elements_water_w$MonthCollected, 
+                                               elements_water_w$DayCollected)
 
-# plot
-ggplot(summary_prevalence, aes(x= Fish_sp.x,
-                               y=Prevalence,color=Parasite_genus,
-                               fill=Parasite_genus))+
-  geom_bar(stat = "identity")+apatheme+
-  ggtitle(NULL)+
-  scale_color_manual(name = "Parasite genus:",
-                     values = c("Chloromyxum" = "#543005", 
-                                "Henneguya" = "#8c510a", 
-                                "Myxidium" = "#dfc27d", 
-                                "Myxobolus" = "#c7eae5",
-                                "Thelohanellus" = "#35978f",
-                                "Unicauda" = "#01665e"),
-                     labels = c("Chloromyxum" = expression(italic("Chloromyxum")*" sp."), 
-                                "Henneguya"= expression(italic("Henneguya")*" sp."), 
-                                "Myxidium" = expression(italic("Myxidium")*" sp."), 
-                                "Myxobolus" = expression(italic("Myxobolus")*" spp."),
-                                "Thelohanellus" = expression(italic("Thelohanellus")*" sp."),
-                                "Unicauda" = expression(italic("Unicauda")*" sp."))) +
-  scale_fill_manual(name = "Parasite genus:",
-                    values = c("Chloromyxum" = "#543005", 
-                               "Henneguya" = "#8c510a", 
-                               "Myxidium" = "#dfc27d", 
-                               "Myxobolus" = "#c7eae5",
-                               "Thelohanellus" = "#35978f",
-                               "Unicauda" = "#01665e"), 
-                    labels = c("Chloromyxum" = expression(italic("Chloromyxum")*" sp."), 
-                               "Henneguya"= expression(italic("Henneguya")*" sp."), 
-                               "Myxidium" = expression(italic("Myxidium")*" sp."), 
-                               "Myxobolus" = expression(italic("Myxobolus")*" spp."),
-                               "Thelohanellus" = expression(italic("Thelohanellus")*" sp."),
-                               "Unicauda" = expression(italic("Unicauda")*" sp."))) +
+# Initialize new columns in myxo_count to store mean values for each variable
+
+myxo_count_yc$As <- NA
+myxo_count_yc$Ba <- NA
+myxo_count_yc$Cd <- NA
+myxo_count_yc$Cr <- NA
+myxo_count_yc$Cu <- NA
+myxo_count_yc$Pb <- NA
+myxo_count_yc$Fe <- NA
+myxo_count_yc$Mg <- NA
+myxo_count_yc$Mn <- NA
+myxo_count_yc$Hg <- NA
+myxo_count_yc$Ni <- NA
+myxo_count_yc$Zn <- NA
+
+# Loop through each row of 'myxo_count_yc'
+for (i in 1:nrow(myxo_count_yc)) {
+  # Extract the collection date for the individual
+  collection_date <- as.Date(myxo_count_yc$collection_date[i])
   
-  xlab("Fish species")+ylab("Prevalence of infection (%)")+
-  scale_x_discrete(limits = c("Carpiodes velifer", 
-                              "Pimephales vigilax", 
-                              "Notropis atherinoides",
-                              "Gambusia affinis",
-                              "Hybognathus nuchalis",
-                              "Ictalurus punctatus"),
-                   labels = c("Carpiodes velifer"="Carpiodes velifer 
-                             n = 180", 
-                              "Pimephales vigilax"="Pimephales vigilax 
-                             n = 193", 
-                              "Notropis atherinoides"="Notropis atherinoides 
-                             n = 206",
-                              "Gambusia affinis"="Gambusia affinis 
-                             n = 208",
-                              "Hybognathus nuchalis"="Hybognathus nuchalis 
-                             n = 221",
-                              "Ictalurus punctatus"="Ictalurus punctatus 
-                             n = 88")) + ylim(0,100)
+  # Define the start and end date for one year before the collection date
+  start_date <- collection_date - 365
+  end_date <- collection_date
+  
+  # Filter "elements_water_w" to get the data within that one-year range
+  filtered_data <- elements_water_w[elements_water_w$measurement_date >= start_date & elements_water_w$measurement_date < end_date, ]
+  
+  # Calculate the mean for each variable and store it in 'myxo_count_yc'
+  if (nrow(filtered_data) > 0) {
+    myxo_count_yc$As[i] <- mean(filtered_data$Arsenic, na.rm = TRUE)
+    myxo_count_yc$Ba[i] <- mean(filtered_data$Barium, na.rm = TRUE)
+    myxo_count_yc$Cd[i] <- mean(filtered_data$Cadmium, na.rm = TRUE)
+    myxo_count_yc$Cr[i] <- mean(filtered_data$Chromium, na.rm = TRUE)
+    myxo_count_yc$Cu[i] <- mean(filtered_data$Copper, na.rm = TRUE)
+    myxo_count_yc$Pb[i] <- mean(filtered_data$Lead, na.rm = TRUE)
+    myxo_count_yc$Fe[i] <- mean(filtered_data$Iron, na.rm = TRUE)
+    myxo_count_yc$Mg[i] <- mean(filtered_data$Magnesium, na.rm = TRUE)
+    myxo_count_yc$Mn[i] <- mean(filtered_data$Manganese, na.rm = TRUE)
+    myxo_count_yc$Hg[i] <- mean(filtered_data$Mercury, na.rm = TRUE)
+    myxo_count_yc$Ni[i] <- mean(filtered_data$Nickel, na.rm = TRUE)
+    myxo_count_yc$Zn[i] <- mean(filtered_data$Zinc, na.rm = TRUE)
+    
+  } else {
+    myxo_count_yc$As[i] <- NA
+    myxo_count_yc$Ba[i] <- NA
+    myxo_count_yc$Cd[i] <- NA
+    myxo_count_yc$Cr[i] <- NA
+    myxo_count_yc$Cu[i] <- NA
+    myxo_count_yc$Pb[i] <- NA
+    myxo_count_yc$Fe[i] <- NA
+    myxo_count_yc$Mg[i] <- NA
+    myxo_count_yc$Mn[i] <- NA
+    myxo_count_yc$Hg[i] <- NA
+    myxo_count_yc$Ni[i] <- NA
+    myxo_count_yc$Zn[i] <- NA
+  }
+}
 
-ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1.png", width=240, height=180, dpi=1000, units = "mm")
-ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1.pdf", width=240, height=180, dpi=1000, units = "mm")
+## Remove non-numeric variables 
+
+elements_na_wide_num <- myxo_count_yc[-c(1:39)]
+View(elements_na_wide_num)
+
+# scale variables
+elements_na_wide_scaled <- scale(elements_na_wide_num)
+
+# Estimate the number of dimensions for the Principal Component Analysis by cross-validation
+# The number of components which leads to the smallest mean square error of prediction (MSEP) is retained. 
+# For the Kfold cross-validation, pNA percentage of missing values is inserted and predicted with a PCA model using ncp.min to ncp.max dimensions.
+nb <- estim_ncpPCA(elements_na_wide_scaled,method.cv = "Kfold", verbose = FALSE)
+nb$ncp #5
+
+plot(0:5, nb$criterion, xlab = "nb dim", ylab = "MSEP")
+
+# Because we have a lot of NAs and PCAs can't handle that, we have to impute values based on our data
+# The (regularized) iterative PCA algorithm (by default) first consists imputing missing values with initial values such as the mean of the variable.
+# It is adviced to use the regularized version of the algorithm to avoid the overfitting problems which are very frequent when there are many missing values. 
+res.comp <- imputePCA(elements_na_wide_scaled, ncp = 5) # iterativePCA algorithm
+res.comp$completeObs[1:3,] # the imputed data set
+
+imp <- cbind.data.frame(res.comp$completeObs)
+
+res.pca <- PCA(imp, quanti.sup = 1, quali.sup = 12, ncp = 5, graph=FALSE) # generate PCA
+
+plot(res.pca, choix="var")+apatheme# visualize PCA
+
+#Save diagnostics
+dev.off()
+pdf("Manuscripts/Myxozoans/Results/elements_pca/PCA_elements.pdf",width=8,height=5,colormodel="rgb")
+plot(res.pca, choix="var")+apatheme# visualize PCA
+dev.off()
+
+# Extract contribution of variables to the components
+contributions_pca <- res.pca$var$contrib
+loadings_pca <- res.pca$var$coord
+
+# Save contributions
+capture.output(contributions_pca, file = "Manuscripts/Myxozoans/Results/elements_pca/contributions.txt")
+
+# Add principal components to your data frame
+score <- as_tibble(factoextra::get_pca_ind(res.pca)$coord) #extract individual scores to be used in glm
+
+myxo_count_ycm <- cbind(myxo_count_yc, score[1:2]) # merge scores with original data
+
+# Rename columns
+myxo_count_ycm <- myxo_count_ycm %>%
+  rename(
+    Elements_PC1 = Dim.1,
+    Elements_PC2 = Dim.2
+  )
+
+## Export the dataset for downstream analyses
+write.csv(myxo_count_ycm, 
+          file = "/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans//data/myxozoans_multiplestressors.csv", 
+          row.names = FALSE)
+
