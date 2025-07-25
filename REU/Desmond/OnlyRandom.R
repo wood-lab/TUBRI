@@ -9,6 +9,7 @@ library(ggplot2)
 library(lme4)
 library(lmerTest)
 library(ggeffects)
+library(readr)
 #################################################################SIZE DATA FROM DISSECTED FISHES
 #############################ictalurus
 #loading in dada
@@ -76,7 +77,7 @@ summary(lm(notroptrim$StandardLength_mm~notroptrim$YearCollected))
 
 #############################hybog
 #loading in data
-hybograw <-Hybognathus_nuchalis_Datasheet_2024_07_25
+hybograw <-read_csv("data/raw/Hybognathus_nuchalis_Datasheet_2024.07.25.csv")
 View(hybograw)
 
 #plotting ALL
@@ -279,3 +280,88 @@ summary(hybog_model1)
 install.packages("usethis")
 library(usethis)
 use_git_config(user.name= "Fisherguy18", user.email="djboyd@email.sc.edu")
+
+
+
+
+
+
+library(glmmTMB)
+
+
+#ELIANA'S PROJECT 2025
+hybog_polished <- read_csv("data/processed/Hybognathus_nuchalis_processed_human_readable_UPDATED_2024.08.01.csv")
+hybog_polished <- hybog_polished %>% 
+  janitor::clean_names()
+View(hybog_polished)
+
+summary(lm(hybograw$TotalLength_mm~hybograw$YearCollected))
+
+hybog_model <- glmmTMB(total_length_mm ~ year_collected + ci + (1|catalog_number), data= hybog_polished)
+summary(hybog_model)
+
+hybog_model1 <- glmmTMB(total_length_mm ~ year_collected + ci, data= hybog_polished)
+summary(hybog_model1)
+
+AIC(hybog_model)
+AIC(hybog_model1)
+
+
+hybog_pred <- ggpredict(hybog_model, c("year_collected", "ci"))
+
+plot(hybog_pred, show_data = TRUE, dot_alpha = 1) + 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
+  scale_color_manual(values = c("control" = "#76A973", 
+                                "impact" = "#825F87")) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+
+gamaff_polished <- read_csv("data/processed/Gambusia_affinis_processed_human_readable_UPDATED_2024.08.17.csv")
+gamaff_polished <- gamaff_polished %>%
+  janitor::clean_names()
+View(gamaff_polished)
+
+gamaff_model <- glmmTMB(total_length_mm ~ year_collected + ci + (1|catalog_number), data= gamaff_polished)
+summary(gamaff_model)
+
+gamaff_model1 <- glmmTMB(total_length_mm ~ year_collected + ci, data= gamaff_polished)
+summary(gamaff_model1)
+
+AIC(gamaff_model)
+AIC(gamaff_model1)
+
+gamaff_pred <- ggpredict(gamaff_model, c("year_collected", "ci"))
+
+plot(gamaff_pred, show_data = TRUE, dot_alpha = 1) + 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
+  scale_color_manual(values = c("control" = "#76A973", 
+                                "impact" = "#825F87")) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line())
+
+
+######using desmond's data
+big_model <- glmmTMB(TL~Year + Species + (1|Cat_Num), data=desmond_data)
+summary(big_model)
+
+big_pred <- ggpredict(big_model, c("Year", "Species"))
+
+plot(big_pred, show_data = TRUE, dot_alpha = 1) + 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
+  scale_color_manual(values = c("Ictalurus_punctatus" = "#deebf7", 
+                                "Notropis_atherinoides" = "#9ecae1", 
+                                "Hybognathus_nuchalis" = "#3182bd")) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        legend.direction = "horizontal", 
+        legend.position = "top")
