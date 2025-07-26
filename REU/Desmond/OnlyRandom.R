@@ -353,11 +353,14 @@ summary(big_model)
 
 big_pred <- ggpredict(big_model, c("Year", "Species"))
 
-plot(big_pred, show_data = TRUE, dot_alpha = 1) + 
+plot(big_pred, show_data = TRUE, show_ci=TRUE, dot_alpha = 1) + 
   labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
   scale_color_manual(values = c("Ictalurus_punctatus" = "#deebf7", 
                                 "Notropis_atherinoides" = "#9ecae1", 
                                 "Hybognathus_nuchalis" = "#3182bd")) +
+  scale_fill_manual(values = c("Ictalurus_punctatus" = "#deebf7", 
+                               "Notropis_atherinoides" = "#9ecae1", 
+                               "Hybognathus_nuchalis" = "#3182bd")) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
