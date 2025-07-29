@@ -83,7 +83,69 @@ myx_g_y <- subset(myx_g_ms,
 myx_g_yc <- subset(myx_g_y, 
                    CI == "control" )
 
-#### FIGURE 1-----
+#### FIGURE 1----
+## Making map representing the full myxozoan sampling points (based on "full_dataset_myxo")
+
+# Just make sure everything looks okay and is making sense
+
+install.packages("devtools")
+devtools::install_github("stadiamaps/ggmap") 
+library("ggmap")
+register_stadiamaps("45588e55-a703-4f6e-9ef0-ee6ed672b73a", write = TRUE)
+library(ggspatial)
+
+bounds<-c(left=-89.87, bottom=30.69, right=-89.79, top=30.80)
+
+# Add the pulp mill outflow and USGS gauge
+extra_points <- data.frame(
+  Longitude = c(-89.8209072,-89.832),  # Replace with your desired longitudes
+  Latitude = c(30.79324276, 30.765582),    # Replace with your desired latitudes
+  CI = c("Gauge", "Outflow")            # Optional: for mapping or color/shape grouping
+)
+
+all_points <- rbind(
+  full_dataset_myxo[, c("Longitude", "Latitude", "CI")],
+  extra_points[, c("Longitude", "Latitude", "CI")]
+)
+
+## Create map
+map_check <- get_stadiamap(bounds, zoom = 13, maptype = "stamen_toner_lite") %>%
+  ggmap() +
+  geom_point(
+    data = all_points,
+    aes(x = Longitude, y = Latitude, shape = CI, fill = CI),
+    size = 4, color = "black"
+  ) +
+  annotation_north_arrow(
+    location = "br",     # "tl", "tr", "bl", "br" for corner position
+    which_north = "true",
+    style = north_arrow_fancy_orienteering,
+    height = unit(1, "cm"),
+    width = unit(1, "cm")
+  ) +
+  scale_shape_manual(  name = "Legend:",values = c("control" = 21, "impact" = 21, "Gauge" = 22, "Outflow" = 24),
+                       labels = c("control" = "Control", "impact" = "Impact", "Gauge" = "Gauge","Outflow" = "Outflow")
+  ) +
+  scale_fill_manual(name = "Legend:",values = c("control" = "#4393c3", "impact" = "#b2182b", "Gauge" = "black", "Outflow" = "black"),
+                    labels = c("control" = "Control", "impact" = "Impact", "Gauge" = "Gauge","Outflow" = "Outflow")
+  ) +
+  xlab("") + ylab("") +
+  theme(
+    legend.position = "right",
+    plot.margin = unit(c(0, 0, 0, 0), "cm"),
+    axis.title.x = element_text(size = 20),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1
+  ))
+
+map_check
+
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1_map.png", width=240, height=180, dpi=1000, units = "mm")
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1_map.pdf", width=240, height=180, dpi=1000, units = "mm")
+
+#### FIGURE 2-----
 
 ## Make plot showing the prevalence of infection of fish per parasite
 # What is the number of fish we dissected per fish species
@@ -165,8 +227,8 @@ ggplot(summary_prevalence, aes(x= Fish_sp.x,
                               "Ictalurus punctatus"="Ictalurus punctatus 
                              n = 88")) + ylim(0,100)
 
-ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1.png", width=240, height=180, dpi=1000, units = "mm")
-ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1.pdf", width=240, height=180, dpi=1000, units = "mm")
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure2.png", width=240, height=180, dpi=1000, units = "mm")
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure2.pdf", width=240, height=180, dpi=1000, units = "mm")
 
 
 #### The effect of time on abundance data----
@@ -859,7 +921,7 @@ gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, 
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.png", width=150, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
 
-#### FIGURE 2----
+#### FIGURE 3----
 # --- Myx.G plot---
 p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color = c("#5aae61")) +
   labs(
@@ -874,8 +936,8 @@ p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color 
 # --- Combine them with bold labels ---
 plot_grid(gg, p1, labels = c("A", "B"), label_fontface = "bold")
 
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.png", width=300, height=150, dpi=1000, units = "mm")
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure2.pdf", width=300, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.png", width=300, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.pdf", width=300, height=150, dpi=1000, units = "mm")
 
 
 #### The effect of time on prevalence data----
@@ -1240,7 +1302,7 @@ p3 <- plot(mydf4,show_data=FALSE,show_residuals=TRUE,color=c("#74add1","#d73027"
   labs(color="Temperature (°C)",x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
   apatheme
 
-#### FIGURE 3----
+#### FIGURE 4----
 
 # Calculate confidence intervals and estimates
 conf_int_myxg_ms <- confint(ms_model)
@@ -1291,10 +1353,10 @@ ggplot(conf_int_myxg_ms_clean,
   theme(axis.text.y = element_text(size = 10, face = "bold"))
 
 # Save
-ggsave("Manuscripts/Myxozoans/Figures/Figure3.png", gg, width = 150, height = 150, units = "mm", dpi = 1000)
-ggsave("Manuscripts/Myxozoans/Figures/Figure3.pdf", gg, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", gg, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.pdf", gg, width = 150, height = 150, units = "mm", dpi = 1000)
 
-#### Figure 4----
+#### Figure 5----
 # Set a theme for all your plots
 apatheme3= theme_bw(base_size = 10,base_family = "sans")+
   theme(panel.grid.major=element_blank(),
@@ -1335,7 +1397,7 @@ pD <- plot(mydf4, show_data = FALSE, show_residuals = TRUE, color = c("#74add1",
 final_plot <- (pA | pB) / (pC | pD)
 
 # Save
-ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
+ggsave("Manuscripts/Myxozoans/Figures/Figure5.png", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
 
 #### Explore other parasites----
 
