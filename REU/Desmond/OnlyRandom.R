@@ -368,3 +368,19 @@ plot(big_pred, show_data = TRUE, show_ci=TRUE, dot_alpha = 1) +
         axis.line=element_line(),
         legend.direction = "horizontal", 
         legend.position = "top")
+
+plot(big_pred, show_data = TRUE, show_ci=TRUE, dot_alpha = 1) + 
+  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
+  scale_color_manual(values = c("Ictalurus_punctatus" = "#08519c", 
+                                "Notropis_atherinoides" = "#9ecae1", 
+                                "Hybognathus_nuchalis" = "#3182bd")) +
+  scale_fill_manual(values = c("Ictalurus_punctatus" = "#08519c", 
+                               "Notropis_atherinoides" = "#9ecae1", 
+                               "Hybognathus_nuchalis" = "#3182bd")) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        legend.direction = "horizontal", 
+        legend.position = "top")
