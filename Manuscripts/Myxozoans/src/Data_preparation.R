@@ -75,11 +75,11 @@ tab_model(m2)# The estimate of YearCollected is the same/consistent for both mod
 #### The script below assigns to each fish individual the mean temperature (mean_temperature) that the fish experienced over one year before its collection
 
 # Add a new column to store the mean temperatures
-full_dataset_with_LH$mean_temperature <- NA
+full_dataset$mean_temperature <- NA
 
 # Combine year, month, and day columns into a date column
-full_dataset_with_LH$collection_date <- make_date(full_dataset_with_LH$YearCollected, full_dataset_with_LH$MonthCollected, 
-                                                  full_dataset_with_LH$DayCollected)
+full_dataset$collection_date <- make_date(full_dataset$YearCollected, full_dataset_with_LH$MonthCollected, 
+                                          full_dataset$DayCollected)
 
 wtemp$measurement_date <- make_date(wtemp$YearCollected, wtemp$MonthCollected, 
                                     wtemp$DayCollected)

@@ -91,6 +91,13 @@ fish_dissected <- full_dataset_myxo %>% group_by(Fish_sp.x) %>%
   summarise(number_dissected=length(unique(IndividualFishID)),
             .groups = 'drop') 
 
+# Overview of abundance
+summary_abundance <- full_dataset_myxo %>%
+  group_by(psite_spp.x, Fish_sp.x) %>%            
+  summarize(min = min(psite_count),
+            max = max(psite_count),
+            mean = mean(psite_count),.groups = "drop") # This part ensures that we have one fish per parasite genus
+
 # Calculate prevalence by parasite genus and fish species
 summary_psitegenus <- prevalence_myxo %>%
   group_by(Parasite_genus, Fish_sp.x,IndividualFishID) %>%            
@@ -852,7 +859,7 @@ gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, 
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.png", width=150, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
 
-### FIGURE 2----
+#### FIGURE 2----
 # --- Myx.G plot---
 p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color = c("#5aae61")) +
   labs(
@@ -1142,6 +1149,26 @@ summary(ms_model)
 
 summary <- summary(ms_model)
 
+# Calculate confidence intervals and estimates
+conf_int_ms_model <- confint(ms_model)
+
+# Combine estimates and confidence intervals into a data frame
+results <- data.frame(
+  Estimate = conf_int_ms_model[2,3],
+  Upper_CI = conf_int_ms_model[2,2],
+  Lower_CI = conf_int_ms_model[2,1]
+)
+
+# Combine estimates and confidence intervals into a data frame
+results2 <- data.frame(
+  Estimate = conf_int_ms_model[5,3],
+  Upper_CI = conf_int_ms_model[5,2],
+  Lower_CI = conf_int_ms_model[5,1]
+)
+
+results_myxstwy$Fish_sp <- "Gambusia affinis"
+results_myxstwy$Parasite <- "MYX.STWY"
+
 # Save model output 
 capture.output(summary, file = "Manuscripts/Myxozoans/Results/multiple_stressors/summary.txt")
 
@@ -1213,7 +1240,7 @@ p3 <- plot(mydf4,show_data=FALSE,show_residuals=TRUE,color=c("#74add1","#d73027"
   labs(color="Temperature (°C)",x = "Elements PC2", y = 'Parasite abundance (# pseudocysts/fish)',title=NULL)+
   apatheme
 
-### FIGURE 3----
+#### FIGURE 3----
 
 # Calculate confidence intervals and estimates
 conf_int_myxg_ms <- confint(ms_model)
@@ -1309,3 +1336,12 @@ final_plot <- (pA | pB) / (pC | pD)
 
 # Save
 ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
+
+#### Explore other parasites----
+
+## Import parasite dataset
+full_dataset <- read_csv("data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
+
+## Take only myxozoan parasites
+protozoa <- subset(full_dataset, Parasite_taxonomic_group == "Protozoa")
+
