@@ -48,6 +48,16 @@ full_dataset$psite_presence <- ifelse(full_dataset$psite_count > 0,
 
 ## This was done in the mother data frame before importing the mother data frame here but the code is added for reference
 
+# Import physical data (which includes water temperature and streamflow)
+physicalUSGS <- read_csv("data/Physicochemical/physical_resultphyschem.csv")
+
+# Read USGS-gage site metadata
+siteinfo <-  read_csv("data/Physicochemical/station_info.csv")
+
+# Add info on sampling sites (latitude, longitude, CI, etc.) to the physical data
+
+physicalUSGS_withmetadata <- merge(physicalUSGS, siteinfo, by.x = "MonitoringLocationIdentifier", by.y = "MonitoringLocationIdentifier", all.x = TRUE)
+
 # Make a subset of only water temperature
 wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
 
@@ -58,6 +68,17 @@ wtemp <- subset(physicalUSGS_withmetadata, Measure=="Temperature, water")
 wtemp_summ <- wtemp %>% group_by(YearCollected,CI) %>% 
   summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
             .groups = 'drop') # For water temperature there is also data for the impact category (although for less years). However, there is no significant difference between control and impact so we take the mean per year ignoring CI. See analysis (LM) relevant to this data above We have to keep in mind that the gage at the impact category is way downstream. So there might be some warming frmo the pulp mill that is probably not captured by the gage.
+
+
+wtemp_month <- wtemp %>% group_by(MonthCollected,CI) %>% 
+  summarise(meanTemp=mean(Result),medianTemp=median(Result),maxTemp=max(Result),
+            .groups = 'drop') # For water temperature there is also data for the impact category (although for less years). However, there is no significant difference between control and impact so we take the mean per year ignoring CI. See analysis (LM) relevant to this data above We have to keep in mind that the gage at the impact category is way downstream. So there might be some warming frmo the pulp mill that is probably not captured by the gage.
+
+# Data overview
+mean(wtemp_summ$meanTemp)
+max(wtemp_summ$maxTemp)
+
+
 
 # wtemp change throughout time
 
