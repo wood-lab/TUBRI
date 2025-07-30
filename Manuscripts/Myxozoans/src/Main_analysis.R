@@ -87,16 +87,12 @@ myx_g_yc <- subset(myx_g_y,
 ## Making map representing the full myxozoan sampling points (based on "full_dataset_myxo")
 
 # Just make sure everything looks okay and is making sense
-
-install.packages("devtools")
 devtools::install_github("stadiamaps/ggmap") 
 library("ggmap")
 register_stadiamaps("45588e55-a703-4f6e-9ef0-ee6ed672b73a", write = TRUE)
 library(ggspatial)
 
-bounds<-c(left=-89.87, bottom=30.69, right=-89.79, top=30.80)
-
-# Add the pulp mill outflow and USGS gauge
+# Add the pulp mill outflow and USGS gauge (30.765582, -89.832)
 extra_points <- data.frame(
   Longitude = c(-89.8209072,-89.832),  # Replace with your desired longitudes
   Latitude = c(30.79324276, 30.765582),    # Replace with your desired latitudes
@@ -106,6 +102,13 @@ extra_points <- data.frame(
 all_points <- rbind(
   full_dataset_myxo[, c("Longitude", "Latitude", "CI")],
   extra_points[, c("Longitude", "Latitude", "CI")]
+)
+
+bounds <- c(
+  left = min(all_points$Longitude) - 0.01,
+  bottom = min(all_points$Latitude) - 0.01,
+  right = max(all_points$Longitude) + 0.01,
+  top = max(all_points$Latitude) + 0.01
 )
 
 ## Create map
