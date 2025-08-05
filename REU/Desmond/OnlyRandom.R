@@ -370,7 +370,7 @@ plot(big_pred, show_data = TRUE, show_ci=TRUE, dot_alpha = 1) +
         legend.position = "top")
 
 plot(big_pred, show_data = TRUE, show_ci=TRUE, dot_alpha = 1) + 
-  labs(x = 'Year Collected', y = 'Standard Length in mm',title=NULL) +
+  labs(x = 'Year Collected', y = 'Total Length in mm',title=NULL) +
   scale_color_manual(values = c("Ictalurus_punctatus" = "#08519c", 
                                 "Notropis_atherinoides" = "#9ecae1", 
                                 "Hybognathus_nuchalis" = "#3182bd")) +
