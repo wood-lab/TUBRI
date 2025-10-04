@@ -147,6 +147,7 @@ map_check
 
 ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1_map.png", width=240, height=180, dpi=1000, units = "mm")
 ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1_map.pdf", width=240, height=180, dpi=1000, units = "mm")
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure1_map.tif", width=240, height=180, dpi=1000, units = "mm")
 
 #### FIGURE 2-----
 
@@ -190,12 +191,12 @@ ggplot(summary_prevalence, aes(x= Fish_sp.x,
                                 "Myxobolus" = "#c7eae5",
                                 "Thelohanellus" = "#35978f",
                                 "Unicauda" = "#01665e"),
-                     labels = c("Chloromyxum" = expression(italic("Chloromyxum")*" sp."), 
-                                "Henneguya"= expression(italic("Henneguya")*" sp."), 
-                                "Myxidium" = expression(italic("Myxidium")*" sp."), 
-                                "Myxobolus" = expression(italic("Myxobolus")*" spp."),
-                                "Thelohanellus" = expression(italic("Thelohanellus")*" sp."),
-                                "Unicauda" = expression(italic("Unicauda")*" sp."))) +
+                     labels = c("Chloromyxum" = expression(italic("Chloromyxum")), 
+                                "Henneguya"= expression(italic("Henneguya")), 
+                                "Myxidium" = expression(italic("Myxidium")), 
+                                "Myxobolus" = expression(italic("Myxobolus")),
+                                "Thelohanellus" = expression(italic("Thelohanellus")),
+                                "Unicauda" = expression(italic("Unicauda")))) +
   scale_fill_manual(name = "Parasite genus:",
                     values = c("Chloromyxum" = "#543005", 
                                "Henneguya" = "#8c510a", 
@@ -203,12 +204,12 @@ ggplot(summary_prevalence, aes(x= Fish_sp.x,
                                "Myxobolus" = "#c7eae5",
                                "Thelohanellus" = "#35978f",
                                "Unicauda" = "#01665e"), 
-                    labels = c("Chloromyxum" = expression(italic("Chloromyxum")*" sp."), 
-                               "Henneguya"= expression(italic("Henneguya")*" sp."), 
-                               "Myxidium" = expression(italic("Myxidium")*" sp."), 
-                               "Myxobolus" = expression(italic("Myxobolus")*" spp."),
-                               "Thelohanellus" = expression(italic("Thelohanellus")*" sp."),
-                               "Unicauda" = expression(italic("Unicauda")*" sp."))) +
+                    labels = c("Chloromyxum" = expression(italic("Chloromyxum")), 
+                               "Henneguya"= expression(italic("Henneguya")), 
+                               "Myxidium" = expression(italic("Myxidium")), 
+                               "Myxobolus" = expression(italic("Myxobolus")),
+                               "Thelohanellus" = expression(italic("Thelohanellus")),
+                               "Unicauda" = expression(italic("Unicauda")))) +
   
   xlab("Fish species")+ylab("Prevalence of infection (%)")+
   scale_x_discrete(limits = c("Carpiodes velifer", 
@@ -232,6 +233,7 @@ ggplot(summary_prevalence, aes(x= Fish_sp.x,
 
 ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure2.png", width=240, height=180, dpi=1000, units = "mm")
 ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure2.pdf", width=240, height=180, dpi=1000, units = "mm")
+ggsave(file="/Users/dakeishladiaz-morales/TUBRI/Manuscripts/Myxozoans/Figures/Figure2.tif", width=240, height=180, dpi=1000, units = "mm")
 
 
 #### The effect of time on abundance data----
@@ -324,6 +326,7 @@ plot(mydf,show_data=TRUE,show_residuals=FALSE,jitter=0.01,color=c("#5aae61"))+
 
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/Carvel_MyxG_Year.png", width=150, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/Carvel_MyxG_Year.pdf", width=150, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/Carvel_MyxG_Year.tif", width=150, height=150, dpi=1000, units = "mm")
 
 ## Carpiodes velifer - MYX.F
 
@@ -897,17 +900,17 @@ apatheme2= theme_bw(base_size = 14,base_family = "sans")+
 # Plot the estimates with confidence intervals
 gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, ymax = Upper_CI, color = Parasite)) +
   geom_pointrange(size=0.6) +
-  labs(x = "Parasite - Host - Organ", y = "Effect of time") +
+  labs(x = "Parasite + Host + Organ", y = "Effect of time") +
   geom_hline(yintercept = 0, linetype = "dashed", size = 1.0, color = "darkgrey") +
   apatheme2 + coord_flip() +
   scale_x_discrete(labels = c(
-    "MYX.G" = expression(italic("Myxobolus")*" spp. 2 "*italic("- C. velifer ")*"gills"),
-    "MYX.F" = expression(italic("Myxobolus")*" spp. 1 "*italic("- C. velifer ")*"fins"),
-    "MYX.THEL" = expression(italic("Thelohanellus")*" sp."*italic("- P. vigilax ")*"gills"),
-    "MYX.SBAD" = expression(italic("Myxobolus")*" spp. 4"*italic("- P. vigilax ")*"fins"),
-    "MYX.GO" = expression(italic("Myxobolus")*" spp. 5 "*italic("- P. vigilax ")*"gills"),
-    "MYX.TAIL" = expression(italic("Henneguya")*" sp."*italic("- I. punctatus ")*"gills"),
-    "MYX.SP" = expression(italic("Myxobolus")*" spp. 3" *italic("- N. atherinoides ")*"fins")
+    "MYX.G" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+gills"),
+    "MYX.F" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+fins"),
+    "MYX.THEL" = expression(italic("Thelohanellus")*"+"*italic("P. vigilax")*"+gills"),
+    "MYX.SBAD" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+fins"),
+    "MYX.GO" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+gills"),
+    "MYX.TAIL" = expression(italic("Henneguya")*"+"*italic("I. punctatus")*"+gills"),
+    "MYX.SP" = expression(italic("Myxobolus")*"+" *italic("N. atherinoides")*"+fins")
   ),
   limits = c("MYX.GO","MYX.SBAD","MYX.THEL","MYX.SP","MYX.TAIL", "MYX.G","MYX.F")) +
   scale_color_manual(values = c(
@@ -923,6 +926,7 @@ gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, 
 
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.png", width=150, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
 
 #### FIGURE 3----
 # --- Myx.G plot---
@@ -930,7 +934,7 @@ p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color 
   labs(
     x = "Year",
     y = expression(atop(
-      italic("Myxobolus")*" spp. 2 "*italic("- C. velifer ")*"gills",
+      italic("Myxobolus")*"+"*italic("C. velifer")*"+gills",
       "Parasite abundance (# pseudocysts/fish)"
     )),
     title = NULL
@@ -941,6 +945,7 @@ plot_grid(gg, p1, labels = c("A", "B"), label_fontface = "bold")
 
 ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.png", width=300, height=150, dpi=1000, units = "mm")
 ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.pdf", width=300, height=150, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.tif", width=300, height=150, dpi=1000, units = "mm")
 
 
 #### The effect of time on prevalence data----
@@ -1344,7 +1349,7 @@ conf_int_myxg_ms_clean <- conf_int_myxg_ms_df %>%
 conf_int_myxg_ms_clean$term_clean <- factor(conf_int_myxg_ms_clean$term_clean, levels = rev(conf_int_myxg_ms_clean$term_clean))
 
 # Plot
-ggplot(conf_int_myxg_ms_clean,
+gg_fig4 <- ggplot(conf_int_myxg_ms_clean,
              aes(x = term_clean, y = Estimate,
                  ymin = Lower_CI, ymax = Upper_CI, color = color_group)) +
   geom_pointrange(size = 0.6) +
@@ -1356,8 +1361,10 @@ ggplot(conf_int_myxg_ms_clean,
   theme(axis.text.y = element_text(size = 10, face = "bold"))
 
 # Save
-ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", gg, width = 150, height = 150, units = "mm", dpi = 1000)
-ggsave("Manuscripts/Myxozoans/Figures/Figure4.pdf", gg, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.png", gg_fig4, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.pdf", gg_fig4, width = 150, height = 150, units = "mm", dpi = 1000)
+ggsave("Manuscripts/Myxozoans/Figures/Figure4.tif", gg_fig4, width = 150, height = 150, units = "mm", dpi = 1000)
+
 
 #### Figure 5----
 # Set a theme for all your plots
@@ -1376,6 +1383,7 @@ pA <- plot(mydf, show_data = TRUE, show_residuals = TRUE, color = c("#5aae61", "
   theme(plot.title = element_text(face = "bold", hjust = -0.2))
 
 mydf2 <- ggpredict(ms_model, terms = c("Elements_PC2[n=50]"))
+
 pB <- plot(mydf2, show_data = FALSE, show_residuals = TRUE, color = c("#5aae61")) +
   labs(x = "Elements PC2", y = "Parasite abundance", title = NULL) +
   apatheme3 +
@@ -1383,6 +1391,7 @@ pB <- plot(mydf2, show_data = FALSE, show_residuals = TRUE, color = c("#5aae61")
   theme(plot.title = element_text(face = "bold", hjust = -0.2))
 
 mydf3 <- ggpredict(ms_model, terms = c("Elements_PC1[n=100]", "mean_temperature[18.5,20.5]"))
+
 pC <- plot(mydf3, show_data = TRUE, show_residuals = FALSE, color = c("#74add1", "#d73027"), jitter = 0.1, alpha = 0.2) +
   labs(color = "Temp (°C)", x = "Elements PC1", y = "Parasite abundance", title = NULL) +
   apatheme3 +
@@ -1390,6 +1399,7 @@ pC <- plot(mydf3, show_data = TRUE, show_residuals = FALSE, color = c("#74add1",
   theme(plot.title = element_text(face = "bold", hjust = -0.2))
 
 mydf4 <- ggpredict(ms_model, terms = c("Elements_PC2[n=100]", "mean_temperature[18.2,20.2]"))
+
 pD <- plot(mydf4, show_data = FALSE, show_residuals = TRUE, color = c("#74add1", "#d73027"), jitter = 0.2) +
   labs(color = "Temp (°C)", x = "Elements PC2", y = "Parasite abundance", title = NULL) +
   apatheme3 +
@@ -1401,6 +1411,7 @@ final_plot <- (pA | pB) / (pC | pD)
 
 # Save
 ggsave("Manuscripts/Myxozoans/Figures/Figure5.png", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
+ggsave("Manuscripts/Myxozoans/Figures/Figure5.tif", final_plot, width = 200, height = 125, units = "mm", dpi = 300)
 
 #### Explore other parasites----
 

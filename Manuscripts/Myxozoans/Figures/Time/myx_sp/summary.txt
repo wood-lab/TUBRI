@@ -1,5 +1,6 @@
  Family: nbinom1  ( sqrt )
-Formula:          psite_count ~ scale(YearCollected) + offset(sqrt(TotalLength_mm)) +      (1 | site) + (1 | season)
+Formula:          psite_count ~ scale(YearCollected) + offset(sqrt(TotalLength_mm)) +  
+    (1 | site) + (1 | season)
 Data: myx_sp
 
      AIC      BIC   logLik deviance df.resid 

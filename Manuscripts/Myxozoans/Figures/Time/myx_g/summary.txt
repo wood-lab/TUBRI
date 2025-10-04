@@ -1,5 +1,6 @@
  Family: nbinom2  ( log )
-Formula:          psite_count ~ scale(YearCollected) + offset(logTL_mm) + (1 |      site) + (1 | season)
+Formula:          psite_count ~ scale(YearCollected) + offset(logTL_mm) + (1 |  
+    site) + (1 | season)
 Data: myx_g
 
      AIC      BIC   logLik deviance df.resid 
