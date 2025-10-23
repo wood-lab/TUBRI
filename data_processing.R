@@ -2109,7 +2109,13 @@ hyb_nuc_processed_data$FishSpecies <- "Hybognathus nuchalis"
 per_vig_processed_data$FishSpecies <- "Percina vigil"
 car_vel_processed_data$FishSpecies <- "Carpiodes velifer"
 gam_aff_processed_data$FishSpecies <- "Gambusia affinis"
-
+nrow(pim_vig_processed_data)
+nrow(ict_pun_processed_data)
+nrow(not_ath_processed_data)
+nrow(hyb_nuc_processed_data) 
+nrow(per_vig_processed_data)
+nrow(car_vel_processed_data)
+nrow(gam_aff_processed_data)
 
 merge1 <- merge(pim_vig_processed_data, ict_pun_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
 View(merge1)
