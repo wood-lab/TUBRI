@@ -2099,3 +2099,20 @@ full_dataset_with_LH$season <- as.factor(full_dataset_with_LH$season)
 
 ####Export the datasheet----
 write.csv(full_dataset_with_LH, file="data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
+
+###Writing code to combine all human-readable files into one
+#here are all the file names, need to add a "fish species" column before combining
+pim_vig_processed_data$FishSpecies <- "Pimephales vigilax"
+ict_pun_processed_data$FishSpecies <- "Ictalurus punctatus"
+not_ath_processed_data$FishSpecies <- "Notropis atherinoides"
+hyb_nuc_processed_data$FishSpecies <- "Hybognathus nuchalis"
+per_vig_processed_data$FishSpecies <- "Percina vigil"
+car_vel_processed_data$FishSpecies <- "Carpiodes velifer"
+gam_aff_processed_data$FishSpecies <- "Gambusia affinis"
+
+
+merge1 <- merge(pim_vig_processed_data, ict_pun_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+View(merge1)
+merge2 <- merge(merge1, not_ath_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+merge3 <- merge(merge2, hyb_nuc_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+merge4 <- merge(merge3, per_vig_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
