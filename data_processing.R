@@ -2116,3 +2116,9 @@ View(merge1)
 merge2 <- merge(merge1, not_ath_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
 merge3 <- merge(merge2, hyb_nuc_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
 merge4 <- merge(merge3, per_vig_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+merge5 <- merge(merge4, car_vel_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+merge6 <- merge(merge5, gam_aff_processed_data, by = c("CatalogNumber", "YearCollected", "MonthCollected", "DayCollected", "IndividualFishID", "Dissector_and_Examiner", "DissectionDate", "Sex", "TotalLength_mm", "StandardLength_mm", "Weight_mg", "CI", "combo", "Latitude", "Longitude", "FishSpecies"), all=TRUE)
+View(merge6)
+
+#now save this as its own datasheet
+write.csv(merge6, "data/processed/full_dataset_human_readable_2025.10.23")
