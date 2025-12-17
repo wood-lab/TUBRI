@@ -907,11 +907,11 @@ gg <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, 
   scale_x_discrete(labels = c(
     "MYX.G" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+gills"),
     "MYX.F" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+fins"),
-    "MYX.THEL" = expression(italic("Thelohanellus")*"+"*italic("P. vigilax")*"+gills"),
-    "MYX.SBAD" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+fins"),
-    "MYX.GO" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+gills"),
-    "MYX.TAIL" = expression(italic("Henneguya")*"+"*italic("I. punctatus")*"+gills"),
-    "MYX.SP" = expression(italic("Myxobolus")*"+" *italic("N. atherinoides")*"+fins")
+    "MYX.THEL" = expression(italic("Thelohanellus")*"+"*italic("P. vigilax")*"+skin"),
+    "MYX.SBAD" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+gills"),
+    "MYX.GO" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+conn. tissue"),
+    "MYX.TAIL" = expression(italic("Henneguya")*"+"*italic("I. punctatus")*"+fins"),
+    "MYX.SP" = expression(italic("Myxobolus")*"+" *italic("N. atherinoides")*"+gills")
   ),
   limits = c("MYX.GO","MYX.SBAD","MYX.THEL","MYX.SP","MYX.TAIL", "MYX.G","MYX.F")) +
   scale_color_manual(values = c(
@@ -930,23 +930,56 @@ ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, h
 ggsave(file="Manuscripts/Myxozoans/Figures/Time/estimates_all.pdf", width=150, height=150, dpi=1000, units = "mm")
 
 #### FIGURE 3----
+apatheme5= theme_bw(base_size = 14,base_family = "sans")+
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        panel.border=element_blank(),
+        axis.line=element_line(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
 # --- Myx.G plot---
 p1 <- plot(mydf, show_data = TRUE, show_residuals = FALSE, jitter = 0.01, color = c("#5aae61")) +
   labs(
     x = "Year",
     y = expression(atop(
-      italic("Myxobolus")*"+"*italic("C. velifer")*"+gills",
-      "Parasite abundance (# pseudocysts/mm fish total length)"
+      italic("Myxobolus")*" + "*italic("C. velifer")*" + gills",
+      "Parasite abundance"
     )),
     title = NULL
   ) +
-  apatheme
-# --- Combine them with bold labels ---
-plot_grid(gg, p1, labels = c("A", "B"), label_fontface = "bold")
+  apatheme5
 
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.png", width=300, height=150, dpi=1000, units = "mm")
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.pdf", width=300, height=150, dpi=1000, units = "mm")
-ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.tif", width=300, height=150, dpi=1000, units = "mm")
+p2 <- ggplot(myxgo_predict,
+             aes(x = x, y = predicted)) +
+  
+  geom_errorbar(
+    aes(ymin = conf.low, ymax = conf.high),
+    width = 0.15,
+    linewidth = 0.8
+  ) +
+  
+  geom_point(
+    size = 6,
+    shape = 21,
+    fill = c("#4393c3", "#b2182b")
+  ) +
+  
+  xlab("Site") +
+  ylab(expression(atop(
+    italic("Myxobolus")*" + "*italic("P. vigilax")*" + connective tissue",
+    "Parasite abundance"
+  ))) +
+  
+  theme_minimal() + apatheme5
+
+# --- Combine them with bold labels ---
+plot_grid(gg, p1, gg2, p2, labels = c("A", "B","C","D"), label_fontface = "bold")
+
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.png", width=300, height=300, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.pdf", width=300, height=300, dpi=1000, units = "mm")
+ggsave(file="Manuscripts/Myxozoans/Figures/Figure3.tif", width=300, height=300, dpi=1000, units = "mm")
 
 
 #### The effect of time on prevalence data----
@@ -1644,7 +1677,7 @@ plot_model(myx_go_ci,type = "est")+apatheme+geom_hline(yintercept=1, linetype="d
 # Plot
 myxgo_predict <-ggpredict(myx_go_ci,c("CI"))
 
-myxgo_plot <- ggplot(myxgo_predict,
+myxgo_plot_ci <- ggplot(myxgo_predict,
                      aes(x = x, y = predicted)) +
   
   geom_errorbar(
@@ -1851,17 +1884,17 @@ apatheme2= theme_bw(base_size = 14,base_family = "sans")+
 # Plot the estimates with confidence intervals
 gg2 <- ggplot(results_combined, aes(x = Parasite, y = Estimate, ymin = Lower_CI, ymax = Upper_CI, color = Parasite)) +
   geom_pointrange(size=0.6) +
-  labs(x = "Parasite + Host + Organ", y = "Effect of time") +
+  labs(x = "Parasite + Host + Organ", y = "Effect of pulp mill") +
   geom_hline(yintercept = 0, linetype = "dashed", size = 1.0, color = "darkgrey") +
   apatheme2 + coord_flip() +
   scale_x_discrete(labels = c(
     "MYX.G" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+gills"),
     "MYX.F" = expression(italic("Myxobolus")*"+"*italic("C. velifer")*"+fins"),
-    "MYX.THEL" = expression(italic("Thelohanellus")*"+"*italic("P. vigilax")*"+gills"),
-    "MYX.SBAD" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+fins"),
-    "MYX.GO" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+gills"),
-    "MYX.TAIL" = expression(italic("Henneguya")*"+"*italic("I. punctatus")*"+gills"),
-    "MYX.SP" = expression(italic("Myxobolus")*"+" *italic("N. atherinoides")*"+fins")
+    "MYX.THEL" = expression(italic("Thelohanellus")*"+"*italic("P. vigilax")*"+skin"),
+    "MYX.SBAD" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+gills"),
+    "MYX.GO" = expression(italic("Myxobolus")*"+"*italic("P. vigilax")*"+conn. tissue"),
+    "MYX.TAIL" = expression(italic("Henneguya")*"+"*italic("I. punctatus")*"+fins"),
+    "MYX.SP" = expression(italic("Myxobolus")*"+" *italic("N. atherinoides")*"+gills")
   ),
   limits = c("MYX.GO","MYX.SBAD","MYX.THEL","MYX.SP","MYX.TAIL", "MYX.G","MYX.F")) +
   scale_color_manual(values = c(
