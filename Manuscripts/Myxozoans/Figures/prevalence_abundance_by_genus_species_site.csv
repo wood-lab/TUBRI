@@ -1,0 +1,23 @@
+Parasite_genus,Fish_sp.x,CI,min_abundance,max_abundance,mean_abundance,n_infected,nfish,prevalence
+Chloromyxum,Carpiodes velifer,control,0,1,0.08695652173913046,8,92,8.695652173913043
+Chloromyxum,Carpiodes velifer,impact,0,1,0.13636363636363638,12,88,13.636363636363635
+Henneguya,Ictalurus punctatus,control,0,2,0.12903225806451615,3,31,9.67741935483871
+Henneguya,Ictalurus punctatus,impact,0,322,5.701754385964912,3,57,5.263157894736842
+Myxidium,Gambusia affinis,control,0,1,0.05952380952380952,5,84,5.952380952380952
+Myxidium,Gambusia affinis,impact,0,1,0.09677419354838711,12,124,9.67741935483871
+Myxidium,Hybognathus nuchalis,control,0,1,0.03999999999999997,4,100,4
+Myxidium,Hybognathus nuchalis,impact,0,1,0.008264462809917376,1,121,0.8264462809917356
+Myxobolus,Carpiodes velifer,control,0,856,85.36956521739131,69,92,75
+Myxobolus,Carpiodes velifer,impact,0,1118,83.02272727272727,59,88,67.04545454545455
+Myxobolus,Gambusia affinis,control,0,1,0.023809523809523794,2,84,2.380952380952381
+Myxobolus,Gambusia affinis,impact,0,1,0.016129032258064526,2,124,1.6129032258064515
+Myxobolus,Hybognathus nuchalis,control,0,3,0.07999999999999997,4,100,4
+Myxobolus,Hybognathus nuchalis,impact,0,10,0.3801652892561986,10,121,8.264462809917356
+Myxobolus,Notropis atherinoides,control,0,28,1.4358974358974355,15,78,19.230769230769234
+Myxobolus,Notropis atherinoides,impact,0,174,3.625,24,128,18.75
+Myxobolus,Pimephales vigilax,control,0,52,1.136363636363638,13,88,14.772727272727273
+Myxobolus,Pimephales vigilax,impact,0,130,1.7428571428571429,10,105,9.523809523809524
+Thelohanellus,Pimephales vigilax,control,0,9,0.4090909090909091,11,88,12.5
+Thelohanellus,Pimephales vigilax,impact,0,28,0.7809523809523815,13,105,12.380952380952381
+Unicauda,Hybognathus nuchalis,control,0,28,0.580000000000001,4,100,4
+Unicauda,Hybognathus nuchalis,impact,0,16,0.16528925619834692,3,121,2.479338842975207
