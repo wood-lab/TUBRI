@@ -9,11 +9,10 @@ library(lme4)
 library(emmeans)
 library(ggeffects)
  
-test
 
 # Read in the dataset
 
-full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.09.25.csv")
+full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
 
 
 # Take out myxos, since they were counted differently (you'll run a parallel analysis for them).
@@ -32,7 +31,6 @@ minus_myxos <- minus_myxos %>%
   filter(Parasite_taxonomic_group!="Protozoa")
 
 levels(as.factor(minus_myxos$Parasite_taxonomic_group))
-
 
 str(minus_myxos)
 
@@ -58,6 +56,8 @@ length(psite_species)
 # Now lets remove any parasites that occur at <5% prevalence in their host species.
 
 minus_myxos$positive <- ifelse(minus_myxos$psite_count > 0 , 1, 0)
+
+#### what about NAs?
 
 thing <- minus_myxos %>%
   group_by(fish_psite_combo) %>%
@@ -94,6 +94,8 @@ final_dataset <- minus_myxos %>%
 
 levels(as.factor(final_dataset$fish_psite_combo))
 
+sum(final_dataset$psite_count,na.rm=TRUE)
+
 
 # Test how things changed through time
 
@@ -101,10 +103,10 @@ time_model_draft<-glm.nb(psite_count~YearCollected,data=final_dataset)
 summary(time_model_draft)
 
 model_draft_glm_CI<-glm.nb(psite_count~YearCollected*CI+Latitude+Fish_sp.x*TotalLength_mm,data=final_dataset)
-summary(model_draft)
+summary(model_draft_glm_CI)
 
 model_draft_glm_LH<-glm.nb(psite_count~YearCollected*Life_History+Latitude+Fish_sp.x*TotalLength_mm,data=final_dataset)
-summary(model_draft)
+summary(model_draft_glm_LH)
 
 model_draft<-glmer.nb(psite_count~CI*before_after*Life_History+Fish_sp.x*scale(TotalLength_mm)+
                         (1|fish_psite_combo)+(1|CatalogNumber),
@@ -112,7 +114,13 @@ model_draft<-glmer.nb(psite_count~CI*before_after*Life_History+Fish_sp.x*scale(T
 
 summary(model_draft)
 
-big_predictions<-ggeffect(model_draft,c("before_after", "CI", "Life_History"))
+
+model_draft<-glmer.nb(psite_count~CI*before_after*Life_History+Fish_sp.x*scale(TotalLength_mm)+
+                        (1|fish_psite_combo)+(1|CatalogNumber),
+                      data=final_dataset,family="nbinom")
+summary(model_draft)
+
+big_predictions<-ggeffect(model_draft,c("before_after", "Life_History"))
 
 big_predictions$x
 
@@ -134,6 +142,200 @@ big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
         legend.text = element_text(size=12))
 big_plot
 
+
+
+
+model_draft_2<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                        (1|fish_psite_combo)+(1|CatalogNumber),
+                      data=final_dataset,family="nbinom")
+summary(model_draft_2)
+
+big_predictions<-ggeffect(model_draft_2,c("before_after", "CI"))
+
+big_predictions$x
+
+big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+big_plot
+
+
+
+model_draft_3<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                          (before_after|fish_psite_combo)+(1|CatalogNumber),
+                        data=final_dataset,family="nbinom")
+summary(model_draft_3)
+
+big_predictions<-ggeffect(model_draft_3,c("before_after", "CI"))
+
+big_predictions$x
+
+big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+big_plot
+
+
+# Extract the fixed and random effects
+
+a<-fixef(model_draft_3)
+b<-ranef(model_draft_3,condVar=TRUE)
+
+
+# Extract the variances of the random effects
+
+qq<-attr(b[[2]],"postVar")
+e<-sqrt(qq)
+e<-e[2,2,]
+
+
+# Calculate the CIs
+
+liminf=(b[[2]][2]+a[2])-(e*2)
+mean_=(b[[2]][2]+a[2])
+limsup=(b[[2]][2]+a[2])+(e*2)
+
+dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
+
+# add CIs
+
+for(i in 1:nrow(mean_)){
+  lines(x=c(liminf[i,1],limsup[i,1]),y=
+          c(i,i))
+}
+
+raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
+names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
+
+# Visualize
+
+ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
+  geom_point(size=3)+
+  geom_errorbar(data=raneff_data,mapping=aes(ymin=min,ymax=max),width=0.5)+
+  geom_hline(yintercept = -0.3334432, linetype = "dotted")+
+  geom_hline(yintercept = 0, linetype = "solid")+
+  coord_flip()+
+  xlab("parasite taxon")+
+  ylab("change over time")+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
+        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_y_reverse()
+                   #labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
+#theme(legend.position="none")
+ranef_plot
+
+
+# check the data cleaning script to ensure that all psite groupings are valid
+# pick out the sig interactions for the individual parasite taxa and plot them
+# maybe the narrative is "no overall change, big change for some psites, variable directions"
+
+model_draft_4<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                          (CI*before_after|fish_psite_combo)+(1|CatalogNumber),
+                        data=final_dataset,family="nbinom")
+summary(model_draft_4)
+
+big_predictions<-ggeffect(model_draft_4,c("before_after", "CI"))
+
+big_predictions$x
+
+big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+big_plot
+
+
+# Extract the fixed and random effects
+
+a<-fixef(model_draft_4)
+b<-ranef(model_draft_4,condVar=TRUE)
+
+
+# Extract the variances of the random effects
+
+qq<-attr(b[[2]],"postVar")
+e<-sqrt(qq)
+e<-e[2,2,]
+
+
+# Calculate the CIs
+
+liminf=(b[[2]][2]+a[2])-(e*2)
+mean_=(b[[2]][2]+a[2])
+limsup=(b[[2]][2]+a[2])+(e*2)
+
+dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
+
+# add CIs
+
+for(i in 1:nrow(mean_)){
+  lines(x=c(liminf[i,1],limsup[i,1]),y=
+          c(i,i))
+}
+
+raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
+names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
+
+# Visualize
+
+ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
+  geom_point(size=3)+
+  geom_errorbar(data=raneff_data,mapping=aes(ymin=min,ymax=max),width=0.5)+
+  geom_hline(yintercept = -0.52998176, linetype = "dotted")+
+  geom_hline(yintercept = 0, linetype = "solid")+
+  coord_flip()+
+  xlab("parasite taxon")+
+  ylab("change over time")+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
+        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_y_reverse()
+#labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
+#theme(legend.position="none")
+ranef_plot
 
 
 # Break it up into individual host species

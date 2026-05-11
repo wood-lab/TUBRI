@@ -1,0 +1,32 @@
+﻿data_combo,psite_taxonomic_identity,life_stage,psite_uniform_code,
+Carpiodes velifer_CEST.MEGAN,Megancestus carpiodi,adult,,
+Carpiodes velifer_TREM.META.UNK,Trematoda,metacercaria,,
+Gambusia affinis_MONO.SASE,Salsuginus seculus,adult,,
+Gambusia affinis_TREM.POS,Posthodiplostomum minimum,metacercaria,,ID confirmed by Leo
+Hybognathus nuchalis_MONO.DACT,Dactylogyrus nuchalis,adult,,
+Hybognathus nuchalis_TREM.ASS,Trematoda,metacercaria,,
+Hybognathus nuchalis_TREM.BC,Neascus sp.,metacercaria,,
+Hybognathus nuchalis_TREM.CM,Posthodiplostomum minimum,metacercaria,,ID confirmed by Leo
+Hybognathus nuchalis_TREM.META.GO,Trematoda,metacercaria,,
+Hybognathus nuchalis_TREM.META.HET,Trematoda,metacercaria,,
+Hybognathus nuchalis_TREM.META.SP,Trematoda,metacercaria,,
+Ictalurus punctatus_MONO.IP,Ligictaluridus pricei,adult,,
+Ictalurus punctatus_NEM.NMTS,Nematoda,adult,,
+Ictalurus punctatus_NEM.PHAR,Rhabdochona sp.,adult,,
+Ictalurus punctatus_NEM.SP,Spinitectus sp.,adult,,
+Ictalurus punctatus_TREM.ALLO,Alloglossidium sp.,adult,,
+Ictalurus punctatus_TREM.LG,Trematoda,metacercaria,,
+Ictalurus punctatus_TREM.MEGICT,Megalogonia ictaluri,adult,,ID confirmed by Leo
+Notropis atherinoides_MONO.ALL,Dactylogyrus sp.,adult,,
+Notropis atherinoides_TREM.CYST,Trematoda,metacercaria,,
+Notropis atherinoides_TREM.LARV,Heterophyidae,metacercaria,,
+Notropis atherinoides_TREM.META,Trematoda,metacercaria,,
+Percina vigil_ACANTH.CYA,Acanthocephala,cystacanth,,
+Percina vigil_NEM.LARV,Ascaroidea,larval,,
+Pimephales vigilax_META.UNK,Trematoda,metacercaria,,
+Pimephales vigilax_MONO.DACT,Dactylogyrus sp.,adult,,
+Pimephales vigilax_TREM.BUC,Bucephalidae,metacercaria,,
+Pimephales vigilax_TREM.MET,Posthodiplostomum minimum minimum,metacercaria,,ID confirmed by Leo
+Pimephales vigilax_TREM.METAF,Trematoda,metacercaria,,
+Pimephales vigilax_TREM.METAGS,Bucephalidae,metacercaria,,ID confirmed by Leo
+Pimephales vigilax_TREM.SSS,Trematoda,metacercaria,,
