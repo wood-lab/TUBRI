@@ -257,9 +257,16 @@ ranef_plot
 # check the data cleaning script to ensure that all psite groupings are valid
 # pick out the sig interactions for the individual parasite taxa and plot them
 # maybe the narrative is "no overall change, big change for some psites, variable directions"
+# add an analysis of inflection point?
+
 
 model_draft_4<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
                           (CI*before_after|fish_psite_combo)+(1|CatalogNumber),
+                        data=final_dataset,family="nbinom")
+summary(model_draft_4)
+
+model_draft_5<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                          (CI*before_after|fish_psite_combo)+(1|YearCollected)+(1|CatalogNumber),
                         data=final_dataset,family="nbinom")
 summary(model_draft_4)
 
@@ -296,14 +303,14 @@ b<-ranef(model_draft_4,condVar=TRUE)
 
 qq<-attr(b[[2]],"postVar")
 e<-sqrt(qq)
-e<-e[2,2,]
+e<-e[4,2,]
 
 
 # Calculate the CIs
 
-liminf=(b[[2]][2]+a[2])-(e*2)
-mean_=(b[[2]][2]+a[2])
-limsup=(b[[2]][2]+a[2])+(e*2)
+liminf=(b[[2]][4]+a[11])-(e*2)
+mean_=(b[[2]][4]+a[11])
+limsup=(b[[2]][4]+a[11])+(e*2)
 
 dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
 
@@ -336,6 +343,36 @@ ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
 #labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
 #theme(legend.position="none")
 ranef_plot
+
+
+### Make individual prediction plots for each fish_psite_combo
+
+raneff_predictions<-ggpredict(model_draft_4,c("before_after", "CI", "fish_psite_combo"))
+
+str(raneff_predictions)
+raneff_predictions$facet
+
+raneff_plots<-ggplot(raneff_predictions,aes(x,predicted),group=group,color=group)+
+  facet_wrap(vars(facet),nrow=9,ncol=4)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=raneff_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raneff_plots
+
+
+
 
 
 # Break it up into individual host species
