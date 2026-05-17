@@ -429,6 +429,202 @@ ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
 ranef_plot
 
 # Whole lotta nuthin'. Not very informative. Would probably be better just to plot the raw data across time, 
-# r to do the changepoint analysis originally planned if you want to explore the granular temporal trend.
+# or to do the changepoint analysis originally planned if you want to explore the granular temporal trend.
+
+
+
+### Okay now time to look at the raw data - first in BA form, then in granular temporal gradient, with
+### changepoint analysis.
+
+str(final_dataset)
+
+raw_plot<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
+  #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_violin(aes(fill=CI))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  ylim(0,1)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plot
+
+
+raw_plots_per_psite<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
+  facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  #geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=4,pch=19)+
+  geom_violin(aes(fill=CI))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plots_per_psite
+
+
+# Now over time
+
+raw_plot_time<-ggplot(final_dataset,aes(YearCollected,psite_count),group=CI,color=CI)+
+  #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_smooth(aes(color=CI))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  ylim(0,50)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plot_time
+
+
+raw_plot_time_per_psite<-ggplot(final_dataset,aes(YearCollected,psite_count),group=CI,color=CI)+
+  facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  #geom_smooth(aes(color=CI))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plot_time_per_psite
+
+
+### Make a nice plot of all lots
+
+library(maps)
+library(mapdata)
+#library(maptools) #for shapefiles
+library(scales) #for transparency
+#library(rgdal)
+library(maps)
+library(mapdata)
+library(ggmap)
+#library(ggsn)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(cowplot)
+library(sp)
+#library(rgeos)
+library(raster)
+library(magick)
+library(pdftools)
+
+
+# First you need to reduce the dataset to make each fish a row
+
+fish_sampled <- final_dataset %>%
+  group_by(Fish_sp.x,IndividualFishID,CI,Latitude,Longitude,YearCollected) %>%
+  summarize(count = n())
+
+
+# Make the map
+
+bounds<-c(left=-89.855, bottom=30.69, right=-89.81, top=30.81)
+map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% ggmap()+
+  geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
+  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
+  scale_fill_manual(values=c("white","#bdbdbd"))+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "none")+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=10),axis.text.y=element_text(size=10))
+#geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+map
+
+# create legend
+bounds<-c(left=-87.6, bottom=31.5, right=-87.35, top=32.05)
+legend<-get_stadiamap(bounds, zoom=11, maptype = "stamen_terrain_background") %>% ggmap()+
+  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21)+
+  scale_fill_manual(values=c("white","black","#bdbdbd"),limits=c("control","mill","impact"))+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "right", legend.title = element_blank(), legend.key=element_blank(), legend.text = element_text(size=20))+
+  guides(fill = guide_legend(override.aes = list(size=7)))+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=4),axis.text.y=element_text(size=8))
+#geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+legend
+
+
+# Plot the fish sampled
+
+library(wesanderson)
+wes_palette("Zissou1")
+pal<-wes_palette(name = "Zissou1", 7, type = "continuous")
+
+fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
+  scale_y_discrete(limits=rev,labels=c("I","C"))+
+  facet_wrap(vars(Fish_sp.x),nrow=3,ncol=3)+
+  geom_point(data=fish_sampled,aes(x=YearCollected,fill=Fish_sp.x),
+             position=position_jitter(width=0.15),shape=21,size=3)+
+  scale_fill_manual(values=pal[1:7],name='')+
+  xlab("")+
+  ylab("")+
+  geom_vline(xintercept=1972.5,linetype="dashed")+
+  geom_hline(yintercept=1.5,linetype="solid")+
+  #Katrina: geom_vline(xintercept=2005,linetype="dotted")+
+  xlim(1962,2006)+
+  theme_bw()+
+  theme(legend.position = "none")+
+  guides(fill = guide_legend(override.aes = list(size=7)))+
+  theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=18))
+fish_plot
+
+
+# Set the map and the plot side-by-side
+library(cowplot)
+final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,5))+
+  draw_plot(map,x=0,y=0,width=4,height=5)+
+  draw_plot(fish_plot,x=4,y=0,width=6,height=5)
+#draw_label("(a)",x=0.25,y=4.75,size=30)+
+#draw_label("(b)",x=5,y=4.75,size=30)+
+#draw_label("(c)",x=10.4,y=4.75,size=30)
+final_figure
+
+
 
 

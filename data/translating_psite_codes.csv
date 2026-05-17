@@ -1,32 +1,32 @@
-﻿data_combo,psite_taxonomic_group,psite_taxonomic_identity,life_stage,psite_uniform_code,notes,priority_for_leo
-Percina vigil_ACANTH.CYA,Acanthocephala,Acanthocephala sp. 1,cystacanth,PERVIG-ACAN-SP1,,
-Ictalurus punctatus_TREM.ALLO,Trematoda,Alloglossidium sp.,adult,ICTPUN-TREM-ALL,,
-Percina vigil_NEM.LARV,Nematoda,Ascaridoidea sp.,larval,PERVIG-NEM-ASC,,
-Pimephales vigilax_TREM.BUC,Trematoda,Bucephalidae sp. 1,metacercaria,PIMVIG-TREM-BU1,,x
-Pimephales vigilax_TREM.METAGS,Trematoda,Bucephalidae sp. 2,metacercaria,PIMVIG-TREM-BU2,ID confirmed by Leo,
-Hybognathus nuchalis_MONO.DACT,Monogenea,Dactylogyrus nuchalis,adult,HYBNUC-MONO-DAC,,
-Notropis atherinoides_MONO.ALL,Monogenea,Dactylogyrus sp.,adult,NOTATH-MONO-DAC,,
-Pimephales vigilax_MONO.DACT,Monogenea,Dactylogyrus sp.,adult,PIMVIG-MONO-DAC,,
-Notropis atherinoides_TREM.LARV,Trematoda,Heterophyidae sp.,metacercaria,NOTATH-TREM-HET,,
-Ictalurus punctatus_MONO.IP,Monogenea,Ligictaluridus pricei,adult,ICTPUN-MONO-LIG,,
-Ictalurus punctatus_TREM.MEGICT,Trematoda,Megalogonia ictaluri,adult,ICTPUN-TREM-MEG,ID confirmed by Leo,
-Carpiodes velifer_CEST.MEGAN,Cestoda,Megancestus carpiodi,adult,CARVEL-CEST-MEG,,
-Hybognathus nuchalis_TREM.BC,Trematoda,Neascus sp.,metacercaria,HYBNUC-TREM-NEA,,
-Ictalurus punctatus_NEM.NMTS,Nematoda,Nematoda sp. 1,adult,ICTPUN-NEM-SP1,,
-Gambusia affinis_TREM.POS,Trematoda,Posthodiplostomum minimum,metacercaria,GAMAFF-TREM-POS,ID confirmed by Leo,
-Hybognathus nuchalis_TREM.CM,Trematoda,Posthodiplostomum minimum,metacercaria,HYBNUC-TREM-POS,ID confirmed by Leo,
-Pimephales vigilax_TREM.MET,Trematoda,Posthodiplostomum minimum minimum,metacercaria,PIMVIG-TREM-POS,ID confirmed by Leo,
-Ictalurus punctatus_NEM.PHAR,Nematoda,Rhabdochona sp.,adult,ICTPUN-NEM-RHA,,
-Gambusia affinis_MONO.SASE,Monogenea,Salsuginus seculus,adult,GAMAFF-MONO-SAL,,
-Ictalurus punctatus_NEM.SP,Nematoda,Spinitectus sp.,adult,ICTPUN-NEM-SPI,,
-Carpiodes velifer_TREM.META.UNK,Trematoda,Trematoda sp. 1,metacercaria,CARVEL-TREM-SP1,,x
-Hybognathus nuchalis_TREM.ASS,Trematoda,Trematoda sp. 1,metacercaria,HYBNUC-TREM-SP1,,x
-Ictalurus punctatus_TREM.LG,Trematoda,Trematoda sp. 1,metacercaria,ICTPUN-TREM-SP1,,x
-Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,metacercaria,NOTATH-TREM-SP1,,x
-Pimephales vigilax_META.UNK,Trematoda,Trematoda sp. 1,metacercaria,PIMVIG-TREM-SP1,,x
-Hybognathus nuchalis_TREM.META.GO,Trematoda,Trematoda sp. 2,metacercaria,HYBNUC-TREM-SP2,,x
-Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,,x
-Pimephales vigilax_TREM.METAF,Trematoda,Trematoda sp. 2,metacercaria,PIMVIG-TREM-SP2,,x
-Hybognathus nuchalis_TREM.META.HET,Trematoda,Trematoda sp. 3,metacercaria,HYBNUC-TREM-SP3,,x
-Pimephales vigilax_TREM.SSS,Trematoda,Trematoda sp. 3,metacercaria,PIMVIG-TREM-SP3,,x
-Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,,x
+﻿fish_host_sp,data_combo,psite_taxonomic_group,psite_taxonomic_identity,life_stage,psite_uniform_code,notes,priority_for_leo
+Carpiodes velifer,Carpiodes velifer_CEST.MEGAN,Cestoda,Megancestus carpiodi,adult,CARVEL-CEST-MEG,,
+Carpiodes velifer,Carpiodes velifer_TREM.META.UNK,Trematoda,Trematoda sp. 1,metacercaria,CARVEL-TREM-SP1,,x
+Gambusia affinis,Gambusia affinis_MONO.SASE,Monogenea,Salsuginus seculus,adult,GAMAFF-MONO-SAL,,
+Gambusia affinis,Gambusia affinis_TREM.POS,Trematoda,Posthodiplostomum minimum,metacercaria,GAMAFF-TREM-POS,ID confirmed by Leo,
+Hybognathus nuchalis,Hybognathus nuchalis_MONO.DACT,Monogenea,Dactylogyrus nuchalis,adult,HYBNUC-MONO-DAC,,
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.ASS,Trematoda,Trematoda sp. 1,metacercaria,HYBNUC-TREM-SP1,,x
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.BC,Trematoda,Neascus sp.,metacercaria,HYBNUC-TREM-NEA,,
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.CM,Trematoda,Posthodiplostomum minimum,metacercaria,HYBNUC-TREM-POS,ID confirmed by Leo,
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.GO,Trematoda,Trematoda sp. 2,metacercaria,HYBNUC-TREM-SP2,,x
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.HET,Trematoda,Trematoda sp. 3,metacercaria,HYBNUC-TREM-SP3,,x
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,,x
+Ictalurus punctatus,Ictalurus punctatus_MONO.IP,Monogenea,Ligictaluridus pricei,adult,ICTPUN-MONO-LIG,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.NMTS,Nematoda,Nematoda sp. 1,adult,ICTPUN-NEM-SP1,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.PHAR,Nematoda,Rhabdochona sp.,adult,ICTPUN-NEM-RHA,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.SP,Nematoda,Spinitectus sp.,adult,ICTPUN-NEM-SPI,,
+Ictalurus punctatus,Ictalurus punctatus_TREM.ALLO,Trematoda,Alloglossidium sp.,adult,ICTPUN-TREM-ALL,,
+Ictalurus punctatus,Ictalurus punctatus_TREM.LG,Trematoda,Trematoda sp. 1,metacercaria,ICTPUN-TREM-SP1,,x
+Ictalurus punctatus,Ictalurus punctatus_TREM.MEGICT,Trematoda,Megalogonia ictaluri,adult,ICTPUN-TREM-MEG,ID confirmed by Leo,
+Notropis atherinoides,Notropis atherinoides_MONO.ALL,Monogenea,Dactylogyrus sp.,adult,NOTATH-MONO-DAC,,
+Notropis atherinoides,Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,metacercaria,NOTATH-TREM-SP1,,x
+Notropis atherinoides,Notropis atherinoides_TREM.LARV,Trematoda,Heterophyidae sp.,metacercaria,NOTATH-TREM-HET,,
+Notropis atherinoides,Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,,x
+Percina vigil,Percina vigil_ACANTH.CYA,Acanthocephala,Acanthocephala sp. 1,cystacanth,PERVIG-ACAN-SP1,,
+Percina vigil,Percina vigil_NEM.LARV,Nematoda,Ascaridoidea sp.,larval,PERVIG-NEM-ASC,,
+Pimephales vigilax,Pimephales vigilax_META.UNK,Trematoda,Trematoda sp. 1,metacercaria,PIMVIG-TREM-SP1,,x
+Pimephales vigilax,Pimephales vigilax_MONO.DACT,Monogenea,Dactylogyrus sp.,adult,PIMVIG-MONO-DAC,,
+Pimephales vigilax,Pimephales vigilax_TREM.BUC,Trematoda,Bucephalidae sp. 1,metacercaria,PIMVIG-TREM-BU1,,x
+Pimephales vigilax,Pimephales vigilax_TREM.MET,Trematoda,Posthodiplostomum minimum minimum,metacercaria,PIMVIG-TREM-POS,ID confirmed by Leo,
+Pimephales vigilax,Pimephales vigilax_TREM.METAF,Trematoda,Trematoda sp. 2,metacercaria,PIMVIG-TREM-SP2,,x
+Pimephales vigilax,Pimephales vigilax_TREM.METAGS,Trematoda,Bucephalidae sp. 2,metacercaria,PIMVIG-TREM-BU2,ID confirmed by Leo,
+Pimephales vigilax,Pimephales vigilax_TREM.SSS,Trematoda,Trematoda sp. 3,metacercaria,PIMVIG-TREM-SP3,,x
