@@ -8,6 +8,7 @@ library(MASS)
 library(lme4)
 library(emmeans)
 library(ggeffects)
+library(ggplot2)
  
 
 # Read in the dataset
@@ -518,6 +519,28 @@ raw_plot_time_per_psite<-ggplot(final_dataset,aes(YearCollected,psite_count),gro
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=12))
 raw_plot_time_per_psite
+
+
+raw_plot_body_size<-ggplot(final_dataset,aes(YearCollected,TotalLength_mm),group=CI,color=CI)+
+  facet_wrap(vars(Fish_sp.x),nrow=2,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_smooth(aes(color=CI),method="lm")+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("year")+
+  ylab("total length of host fish (mm)")+
+  theme_minimal()+
+  #ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=12,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),
+        panel.grid.minor=element_line(color=NA),panel.spacing = unit(1, "lines"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plot_body_size
+
+
 
 
 ### Make a nice plot of all lots
