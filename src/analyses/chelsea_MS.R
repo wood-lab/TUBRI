@@ -89,6 +89,38 @@ high_prev_psites <- thing %>%
 view(high_prev_psites)
 length(high_prev_psites$fish_psite_combo)
 
+
+# Investigate why there are some repeated prevalences
+
+check <- minus_myxos %>%
+  filter(fish_psite_combo == "Hybognathus nuchalis_TREM.ASS" |
+           fish_psite_combo == "Hybognathus nuchalis_TREM.BC")
+View(check)
+
+check <- minus_myxos %>%
+  filter(fish_psite_combo == "Hybognathus nuchalis_TREM.META.GO" |
+           fish_psite_combo == "Hybognathus nuchalis_TREM.META.HET")
+View(check)
+
+check <- minus_myxos %>%
+  filter(fish_psite_combo == "Ictalurus punctatus_NEM.PHAR" |
+           fish_psite_combo == "Ictalurus punctatus_NEM.SP")
+View(check)
+
+check <- minus_myxos %>%
+  filter(fish_psite_combo == "Pimephales vigilax_TREM.BUC" |
+           fish_psite_combo == "Pimephales vigilax_TREM.SSS")
+View(check)
+
+# All looks fine! These repetitions are not errors. 
+# They arise because, within a given fish species, the denominator is the same across all parasite taxa 
+# found in that fish species (= to the number of fish individuals examined), so any parasite taxa found 
+# in the same number of fish individuals (i.e., with the same numerator) will exhibit the same prevalence. 
+# For example, both Neascus sp. and Trematode sp. 1 were found in 18 of 221 Hybognathus nuchalis examined 
+# (= 0.0814). Table caption updated accordingly.
+
+
+
 high_prev_psites$fish_psite_combo
 
 final_dataset <- minus_myxos %>%
@@ -457,6 +489,62 @@ raw_plot<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=12))
 raw_plot
+
+# Not very useful. Maybe we can aggregate this a bit to make the pattern easier to see, 
+# averaging within individual fish?
+
+within_fish <- final_dataset %>%
+  group_by(CI,before_after,IndividualFishID) %>%
+  summarize(mean_psite_count = mean(psite_count))
+
+raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,before_after)))+
+  #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 1),
+             size=3,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "line", 
+    aes(group = CI),
+    linewidth = 1, 
+    color = "red"
+  )+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("time period (relative to 1973 Clean Water Act)")+
+  ylab("mean parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  #ylim(0,1)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raw_plot
+
+truncated_raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,before_after)))+
+  #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 1),
+             size=3,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
+  xlab("time period (relative to 1973 Clean Water Act)")+
+  ylab("mean parasite abundance\n per parasite taxon per host individual")+
+  theme_minimal()+
+  ylim(0,20)+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+truncated_raw_plot
 
 
 raw_plots_per_psite<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
