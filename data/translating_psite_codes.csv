@@ -9,7 +9,7 @@ Hybognathus nuchalis,Hybognathus nuchalis_TREM.BC,Trematoda,Neascus sp.,metacerc
 Hybognathus nuchalis,Hybognathus nuchalis_TREM.CM,Trematoda,Posthodiplostomum minimum,metacercaria,HYBNUC-TREM-POS,ID confirmed by Leo,
 Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.GO,Trematoda,Trematoda sp. 2,metacercaria,HYBNUC-TREM-SP2,,x
 Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.HET,Trematoda,Trematoda sp. 3,metacercaria,HYBNUC-TREM-SP3,,x
-Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,,x
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,,too small
 Ictalurus punctatus,Ictalurus punctatus_MONO.IP,Monogenea,Ligictaluridus pricei,adult,ICTPUN-MONO-LIG,,
 Ictalurus punctatus,Ictalurus punctatus_NEM.NMTS,Nematoda,Nematoda sp. 1,adult,ICTPUN-NEM-SP1,,
 Ictalurus punctatus,Ictalurus punctatus_NEM.PHAR,Nematoda,Rhabdochona sp.,adult,ICTPUN-NEM-RHA,,
@@ -18,9 +18,9 @@ Ictalurus punctatus,Ictalurus punctatus_TREM.ALLO,Trematoda,Alloglossidium sp.,a
 Ictalurus punctatus,Ictalurus punctatus_TREM.LG,Trematoda,Trematoda sp. 1,metacercaria,ICTPUN-TREM-SP1,,x
 Ictalurus punctatus,Ictalurus punctatus_TREM.MEGICT,Trematoda,Megalogonia ictaluri,adult,ICTPUN-TREM-MEG,ID confirmed by Leo,
 Notropis atherinoides,Notropis atherinoides_MONO.ALL,Monogenea,Dactylogyrus sp.,adult,NOTATH-MONO-DAC,,
-Notropis atherinoides,Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,metacercaria,NOTATH-TREM-SP1,,x
+Notropis atherinoides,Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,metacercaria,NOTATH-TREM-SP1,,too small
 Notropis atherinoides,Notropis atherinoides_TREM.LARV,Trematoda,Heterophyidae sp.,metacercaria,NOTATH-TREM-HET,,
-Notropis atherinoides,Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,,x
+Notropis atherinoides,Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,,too small
 Percina vigil,Percina vigil_ACANTH.CYA,Acanthocephala,Acanthocephala sp. 1,cystacanth,PERVIG-ACAN-SP1,,
 Percina vigil,Percina vigil_NEM.LARV,Nematoda,Ascaridoidea sp.,larval,PERVIG-NEM-ASC,,
 Pimephales vigilax,Pimephales vigilax_META.UNK,Trematoda,Trematoda sp. 1,metacercaria,PIMVIG-TREM-SP1,,x
