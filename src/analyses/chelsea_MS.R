@@ -46,12 +46,18 @@ total_n_fish <- total_n_fish_lines %>%
   group_by(Fish_sp.x) %>%
   summarize(count = n())
 
+body_size_fish <- minus_myxos %>%
+  group_by(Fish_sp.x) %>%
+  summarize(TL = mean(TotalLength_mm), min_TL = min(TotalLength_mm), max_TL = max(TotalLength_mm))
+
 sum(total_n_fish$count)
 
 sum(minus_myxos$psite_count,na.rm=TRUE)
 
 psite_species <- levels(as.factor(minus_myxos$fish_psite_combo))
 length(psite_species)
+
+
 
 
 # Now lets remove any parasites that occur at <5% prevalence in their host species.
