@@ -703,14 +703,14 @@ fish_sampled <- final_dataset %>%
 
 bounds<-c(left=-89.855, bottom=30.69, right=-89.81, top=30.81)
 map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% ggmap()+
-  geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
   geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
-  scale_fill_manual(values=c("white","#bdbdbd"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
   xlab("")+
   ylab("")+
   theme(legend.position = "none")+
   theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=10),axis.text.y=element_text(size=10))
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))
 #geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
 #geom_hline(yintercept=35.2102673,linetype="dashed")+
 #geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
@@ -719,57 +719,73 @@ map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% g
 #annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
 map
 
-# create legend
-bounds<-c(left=-87.6, bottom=31.5, right=-87.35, top=32.05)
-legend<-get_stadiamap(bounds, zoom=11, maptype = "stamen_terrain_background") %>% ggmap()+
-  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21)+
-  scale_fill_manual(values=c("white","black","#bdbdbd"),limits=c("control","mill","impact"))+
+# Make the inset map
+
+bounds<-c(left=-124.77, bottom=24.52, right=-66.95, top=49.38)
+inset_map_us<-get_stadiamap(bounds, zoom=5, maptype = "stamen_terrain_background") %>% ggmap()+
   xlab("")+
   ylab("")+
-  theme(legend.position = "right", legend.title = element_blank(), legend.key=element_blank(), legend.text = element_text(size=20))+
-  guides(fill = guide_legend(override.aes = list(size=7)))+
+  theme(legend.position = "none")+
   theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=4),axis.text.y=element_text(size=8))
-#geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
+  geom_rect(xmin=-92,ymin=28.922129,xmax=-88.821197,ymax=31,fill="black",alpha=0.1,linetype="blank")
 #geom_hline(yintercept=35.2102673,linetype="dashed")+
 #geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
 #geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
 #annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
 #annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
-legend
+inset_map_us
+
+bounds<-c(left=-92, bottom=28.922129, right=-88.821197, top=31)
+inset_map_la<-get_stadiamap(bounds, zoom=7, maptype = "stamen_terrain") %>% ggmap()+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "none")+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
+  geom_rect(xmin=-89.855,ymin=30.69,xmax=-89.81,ymax=30.81,fill="black",alpha=0.2,linetype="blank")
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+inset_map_la
 
 
 # Plot the fish sampled
 
-library(wesanderson)
-wes_palette("Zissou1")
-pal<-wes_palette(name = "Zissou1", 7, type = "continuous")
-
 fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
   scale_y_discrete(limits=rev,labels=c("I","C"))+
-  facet_wrap(vars(Fish_sp.x),nrow=3,ncol=3)+
-  geom_point(data=fish_sampled,aes(x=YearCollected,fill=Fish_sp.x),
+  facet_wrap(vars(Fish_sp.x),nrow=4,ncol=2)+
+  geom_point(data=fish_sampled,aes(x=YearCollected,fill=CI),
              position=position_jitter(width=0.15),shape=21,size=3)+
-  scale_fill_manual(values=pal[1:7],name='')+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
   xlab("")+
   ylab("")+
-  geom_vline(xintercept=1972.5,linetype="dashed")+
+  annotate("rect", xmin = -Inf, xmax = 1972+(292/366), ymin = -Inf, ymax = Inf,
+           fill = "black", alpha = 0.2)+
+  geom_vline(xintercept=1972+(292/366),linetype="dashed")+
   geom_hline(yintercept=1.5,linetype="solid")+
   #Katrina: geom_vline(xintercept=2005,linetype="dotted")+
   xlim(1962,2006)+
   theme_bw()+
   theme(legend.position = "none")+
   guides(fill = guide_legend(override.aes = list(size=7)))+
+  scale_x_continuous(breaks=seq(1960,2010,10))+
   theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
-        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),legend.text = element_text(size=18))
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),
+        legend.text = element_text(size=18),strip.text = element_text(face="italic"),
+        strip.background = element_blank())
 fish_plot
 
 
 # Set the map and the plot side-by-side
 library(cowplot)
-final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,5))+
-  draw_plot(map,x=0,y=0,width=4,height=5)+
-  draw_plot(fish_plot,x=4,y=0,width=6,height=5)
+final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,10))+
+  draw_plot(map,x=0.5,y=-0.1,width=6,height=9.75)+
+  draw_plot(inset_map_us,x=-0.8,y=5.5,width=4,height=3)+
+  draw_plot(inset_map_la,x=-0.8,y=1.5,width=4,height=3.5)+
+  draw_plot(fish_plot,x=4.8,y=0,width=5,height=10)
 #draw_label("(a)",x=0.25,y=4.75,size=30)+
 #draw_label("(b)",x=5,y=4.75,size=30)+
 #draw_label("(c)",x=10.4,y=4.75,size=30)
