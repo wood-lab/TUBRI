@@ -1,0 +1,13 @@
+﻿fish_host_sp,data_combo,psite_taxonomic_group,psite_taxonomic_identity,life_stage,psite_uniform_code,number of vouchers
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,5
+Notropis atherinoides,Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,metacercaria,NOTATH-TREM-SP1,5
+Notropis atherinoides,Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,5
+Carpiodes velifer,Carpiodes velifer_TREM.META.UNK,Trematoda,Trematoda sp. 1,metacercaria,CARVEL-TREM-SP1,5
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.ASS,Trematoda,Trematoda sp. 1,metacercaria,HYBNUC-TREM-SP1,5
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.GO,Trematoda,Trematoda sp. 2,metacercaria,HYBNUC-TREM-SP2,5
+Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.HET,Trematoda,Trematoda sp. 3,metacercaria,HYBNUC-TREM-SP3,5
+Ictalurus punctatus,Ictalurus punctatus_TREM.LG,Trematoda,Trematoda sp. 1,metacercaria,ICTPUN-TREM-SP1,5
+Pimephales vigilax,Pimephales vigilax_META.UNK,Trematoda,Trematoda sp. 1,metacercaria,PIMVIG-TREM-SP1,5
+Pimephales vigilax,Pimephales vigilax_TREM.BUC,Trematoda,Bucephalidae sp. 1,metacercaria,PIMVIG-TREM-BU1,5
+Pimephales vigilax,Pimephales vigilax_TREM.METAF,Trematoda,Trematoda sp. 2,metacercaria,PIMVIG-TREM-SP2,5
+Pimephales vigilax,Pimephales vigilax_TREM.SSS,Trematoda,Trematoda sp. 3,metacercaria,PIMVIG-TREM-SP3,5

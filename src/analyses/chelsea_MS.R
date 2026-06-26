@@ -165,7 +165,7 @@ big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
   geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
   geom_line(aes(group=group,color=group))+
   #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("year")+
+  xlab("")+
   ylab("predicted parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
@@ -284,11 +284,12 @@ summary(model_draft_5c)
 big_predictions<-ggeffect(model_draft_5c,c("before_after", "CI"))
 
 big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
-  geom_point(aes(group=group,color=group),size=4,pch=19)+
-  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
-  geom_line(aes(group=group,color=group))+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("year")+
+  geom_point(aes(group=group,color=group),size=4,pch=19,position = position_dodge(width = 0.5))+
+  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),
+                width=0.04,position = position_dodge(width = 0.5))+
+  geom_line(aes(group=group,color=group),position = position_dodge(width = 0.5))+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
   ylab("predicted parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
@@ -297,7 +298,7 @@ big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
+  theme(legend.position="top",legend.title = element_blank(),
         legend.text = element_text(size=12))
 big_plot
 
@@ -476,7 +477,7 @@ raw_plot<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
   geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
   geom_violin(aes(fill=CI))+
   #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("year")+
+  #xlab("year")+
   ylab("predicted parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
   ylim(0,1)+
@@ -495,23 +496,32 @@ raw_plot
 
 within_fish <- final_dataset %>%
   group_by(CI,before_after,IndividualFishID) %>%
-  summarize(mean_psite_count = mean(psite_count))
+  summarize(mean_psite_count = mean(psite_count),summed_psite_count = sum(psite_count))
 
 raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,before_after)))+
   #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
   geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
-                                                                  jitter.width = 1),
-             size=3,pch=19)+
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
   geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
   stat_summary(
     fun = mean, 
-    geom = "line", 
-    aes(group = CI),
-    linewidth = 1, 
-    color = "red"
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
   )+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("time period (relative to 1973 Clean Water Act)")+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
   ylab("mean parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
   #ylim(0,1)+
@@ -521,30 +531,59 @@ raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,be
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=(rev(levels(as.factor(within_fish$before_after)))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
+  theme(legend.position="top",legend.title = element_blank(),
         legend.text = element_text(size=12))
 raw_plot
 
 truncated_raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,before_after)))+
   #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
   geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
-                                                                  jitter.width = 1),
-             size=3,pch=19)+
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
   geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("time period (relative to 1973 Clean Water Act)")+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
   ylab("mean parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
-  ylim(0,20)+
   #labs(linetype="parasite life history strategy")+
   theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(limits=(rev(levels(as.factor(within_fish$before_after)))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
-        legend.text = element_text(size=12))
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=12))+
+  coord_cartesian(ylim = c(0, 10))
 truncated_raw_plot
+
+
+# Gorgeous. Now put it all together into one figure.
+library(cowplot)
+main_results_figure <- ggdraw(plot=NULL,xlim=c(0,15),ylim=c(0,5))+
+  draw_plot(raw_plot,x=0,y=0.25,width=4.75,height=4.75)+
+  draw_plot(truncated_raw_plot,x=5,y=0.25,width=4.75,height=4.75)+
+  draw_plot(big_plot,x=10,y=0.25,width=4.75,height=4.75)+
+  draw_label("time period (relative to 1973 Clean Water Act)",x=7.75,y=0.25,size=18)+
+  draw_label("(a)",x=0.9,y=4.75,size=25)+
+  draw_label("(b)",x=5.9,y=4.75,size=25)+
+  draw_label("(c)",x=10.9,y=4.75,size=25)
+main_results_figure
 
 
 raw_plots_per_psite<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
