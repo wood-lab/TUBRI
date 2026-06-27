@@ -11,9 +11,9 @@ Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.GO,Trematoda,Trematoda sp. 2
 Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.HET,Trematoda,Trematoda sp. 3,metacercaria,HYBNUC-TREM-SP3,,x
 Hybognathus nuchalis,Hybognathus nuchalis_TREM.META.SP,Trematoda,Trematoda sp. 4,metacercaria,HYBNUC-TREM-SP4,,too small
 Ictalurus punctatus,Ictalurus punctatus_MONO.IP,Monogenea,Ligictaluridus pricei,adult,ICTPUN-MONO-LIG,,
-Ictalurus punctatus,Ictalurus punctatus_NEM.NMTS,Nematoda,Nematoda sp. 1,adult,ICTPUN-NEM-SP1,,
-Ictalurus punctatus,Ictalurus punctatus_NEM.PHAR,Nematoda,Rhabdochona sp.,adult,ICTPUN-NEM-RHA,,
-Ictalurus punctatus,Ictalurus punctatus_NEM.SP,Nematoda,Spinitectus sp.,adult,ICTPUN-NEM-SPI,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.NMTS,Nematoda,Nematoda sp. 1,adult,ICTPUN-NEMA-SP1,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.PHAR,Nematoda,Rhabdochona sp.,adult,ICTPUN-NEMA-RHA,,
+Ictalurus punctatus,Ictalurus punctatus_NEM.SP,Nematoda,Spinitectus sp.,adult,ICTPUN-NEMA-SPI,,
 Ictalurus punctatus,Ictalurus punctatus_TREM.ALLO,Trematoda,Alloglossidium sp.,adult,ICTPUN-TREM-ALL,,
 Ictalurus punctatus,Ictalurus punctatus_TREM.LG,Trematoda,Trematoda sp. 1,metacercaria,ICTPUN-TREM-SP1,,x
 Ictalurus punctatus,Ictalurus punctatus_TREM.MEGICT,Trematoda,Megalogonia ictaluri,adult,ICTPUN-TREM-MEG,ID confirmed by Leo,
@@ -22,7 +22,7 @@ Notropis atherinoides,Notropis atherinoides_TREM.CYST,Trematoda,Trematoda sp. 1,
 Notropis atherinoides,Notropis atherinoides_TREM.LARV,Trematoda,Heterophyidae sp.,metacercaria,NOTATH-TREM-HET,,
 Notropis atherinoides,Notropis atherinoides_TREM.META,Trematoda,Trematoda sp. 2,metacercaria,NOTATH-TREM-SP2,,too small
 Percina vigil,Percina vigil_ACANTH.CYA,Acanthocephala,Acanthocephala sp. 1,cystacanth,PERVIG-ACAN-SP1,,
-Percina vigil,Percina vigil_NEM.LARV,Nematoda,Ascaridoidea sp.,larval,PERVIG-NEM-ASC,,
+Percina vigil,Percina vigil_NEM.LARV,Nematoda,Ascaridoidea sp.,larval,PERVIG-NEMA-ASC,,
 Pimephales vigilax,Pimephales vigilax_META.UNK,Trematoda,Trematoda sp. 1,metacercaria,PIMVIG-TREM-SP1,,x
 Pimephales vigilax,Pimephales vigilax_MONO.DACT,Monogenea,Dactylogyrus sp.,adult,PIMVIG-MONO-DAC,,
 Pimephales vigilax,Pimephales vigilax_TREM.BUC,Trematoda,Bucephalidae sp. 1,metacercaria,PIMVIG-TREM-BU1,,x

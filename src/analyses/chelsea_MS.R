@@ -339,23 +339,26 @@ for(i in 1:nrow(mean_)){
 
 raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
 names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
+psite_code_break<-read.csv("data/translating_psite_codes.csv", sep=",", header=TRUE)
+raneff_data_named<-merge(raneff_data, psite_code_break, by.x = "psite_taxon", by.y = "data_combo")
 
 # Visualize
 
-ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
+library(forcats)
+
+ranef_plot<-ggplot(raneff_data_named,aes(x = fct_reorder(psite_uniform_code, interaction),interaction))+
   geom_point(size=3)+
-  geom_errorbar(data=raneff_data,mapping=aes(ymin=min,ymax=max),width=0.5)+
+  geom_errorbar(data=raneff_data_named,mapping=aes(ymin=min,ymax=max),width=0.5)+
   geom_hline(yintercept = -0.52998176, linetype = "dotted")+
   geom_hline(yintercept = 0, linetype = "solid")+
   coord_flip()+
   xlab("parasite taxon")+
-  ylab("change over time")+
+  ylab("interaction effect BA*CI")+
   theme_minimal()+
   theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
         axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_y_reverse()
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
 #labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
 #theme(legend.position="none")
 ranef_plot
@@ -368,21 +371,33 @@ raneff_predictions<-ggpredict(model_draft_5c,c("before_after", "CI", "fish_psite
 str(raneff_predictions)
 raneff_predictions$facet
 
-raneff_plots<-ggplot(raneff_predictions,aes(x,predicted),group=group,color=group)+
-  facet_wrap(vars(facet),nrow=9,ncol=4)+
+filtered_predictions <- raneff_predictions %>%
+  filter(facet=="Pimephales vigilax_TREM.SSS" | facet == "Pimephales vigilax_TREM.METAGS" |
+           facet == "Pimephales vigilax_TREM.BUC" | facet == "Hybognathus nuchalis_TREM.BC" |
+           facet == "Pimephales vigilax_META.UNK" | facet == "Percina vigil_NEM.LARV" |
+           facet == "Carpiodes velifer_TREM.META.UNK" | facet == "Ictalurus punctatus_TREM.LG" |
+           facet == "Hybognathus nuchalis_TREM.META.GO" | facet == "Pimephales vigilax_MONO.DACT" |
+           facet == "Hybognathus nuchalis_TREM.META.HET" | facet == "Notropis atherinoides_TREM.META" |
+           facet == "Notropis atherinoides_TREM.LARV" | facet == "Ictalurus punctatus_MONO.IP" |
+           facet == "Gambusia affinis_TREM.POS" | facet == "Notropis atherinoides_MONO.ALL")
+
+raneff_plots<-ggplot(filtered_predictions,aes(x,predicted),group=group,color=group)+
+  facet_wrap(vars(facet),nrow=4,ncol=4)+
   geom_point(aes(group=group,color=group),size=4,pch=19)+
-  geom_errorbar(data=raneff_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_errorbar(data=filtered_predictions,
+                mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
   geom_line(aes(group=group,color=group))+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
   xlab("year")+
-  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
+  ylab("predicted parasite abundance\n per host individual")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),
+        axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  scale_x_discrete(limits=(rev(levels(filtered_predictions$x))))+
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=12))
 raneff_plots
@@ -590,6 +605,1321 @@ main_results_figure <- ggdraw(plot=NULL,xlim=c(0,15),ylim=c(0,5))+
   draw_label("(b)",x=5.9,y=4.75,size=25)+
   draw_label("(c)",x=10.9,y=4.75,size=25)
 main_results_figure
+
+
+# Now do the same thing for individual parasite taxa
+
+raw_plot_per_psite<-ggplot(final_dataset,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  facet_wrap(vars(fish_psite_combo),nrow=8,ncol=4)+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("parasite abundance\n per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=12))+
+  coord_cartesian(ylim = c(0, 1))
+raw_plot_per_psite
+
+
+# Okay - a lot going on, every parasite has its own story. I think we need to focus just on those parasites
+# with significant interaction effects, and show what they're up to. As in the other main figure, this
+# needs to be the overall raw data and the cartesian version of the plot (zoomed in on where the action is).
+# All we need to do is isolate each parasite and then plot it.
+
+psite_code_break<-read.csv("data/translating_psite_codes.csv", sep=",", header=TRUE)
+final_data_named<-merge(final_dataset, psite_code_break, by.x = "fish_psite_combo", by.y = "data_combo")
+
+
+PIMVIGTREMSP3_data <- final_data_named %>%
+  filter(psite_uniform_code == "PIMVIG-TREM-SP3")
+
+PIMVIGTREMSP3_plot<-ggplot(PIMVIGTREMSP3_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-SP3")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+PIMVIGTREMSP3_plot
+
+PIMVIGTREMSP3_plot_trunc<-ggplot(PIMVIGTREMSP3_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-SP3")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 1))
+PIMVIGTREMSP3_plot_trunc
+
+
+PIMVIGTREMBU2_data <- final_data_named %>%
+  filter(psite_uniform_code == "PIMVIG-TREM-BU2")
+
+PIMVIGTREMBU2_plot<-ggplot(PIMVIGTREMBU2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-BU2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 1))+
+  theme(legend.position = "none")
+PIMVIGTREMBU2_plot
+
+PIMVIGTREMBU2_plot_trunc<-ggplot(PIMVIGTREMBU2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-BU2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 20))
+PIMVIGTREMBU2_plot_trunc
+
+
+PIMVIGTREMBU1_data <- final_data_named %>%
+  filter(psite_uniform_code == "PIMVIG-TREM-BU1")
+
+PIMVIGTREMBU1_plot<-ggplot(PIMVIGTREMBU1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-BU1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+PIMVIGTREMBU1_plot
+
+PIMVIGTREMBU1_plot_trunc<-ggplot(PIMVIGTREMBU1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-BU1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 1))
+PIMVIGTREMBU1_plot_trunc
+
+
+HYBNUCTREMNEA_data <- final_data_named %>%
+  filter(psite_uniform_code == "HYBNUC-TREM-NEA")
+
+HYBNUCTREMNEA_plot<-ggplot(HYBNUCTREMNEA_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-NEA")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+HYBNUCTREMNEA_plot
+
+HYBNUCTREMNEA_plot_trunc<-ggplot(HYBNUCTREMNEA_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-NEA")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 2))
+HYBNUCTREMNEA_plot_trunc
+
+
+PIMVIGTREMSP1_data <- final_data_named %>%
+  filter(psite_uniform_code == "PIMVIG-TREM-SP1")
+
+PIMVIGTREMSP1_plot<-ggplot(PIMVIGTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+PIMVIGTREMSP1_plot
+
+PIMVIGTREMSP1_plot_trunc<-ggplot(PIMVIGTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 2))
+PIMVIGTREMSP1_plot_trunc
+
+
+PERVIGNEMAASC_data <- final_data_named %>%
+  filter(psite_uniform_code == "PERVIG-NEMA-ASC")
+
+PERVIGNEMAASC_plot<-ggplot(PERVIGNEMAASC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PERVIG-NEMA-ASC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+PERVIGNEMAASC_plot
+
+PERVIGNEMAASC_plot_trunc<-ggplot(PERVIGNEMAASC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PERVIG-NEMA-ASC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 0.5))
+PERVIGNEMAASC_plot_trunc
+
+
+CARVELTREMSP1_data <- final_data_named %>%
+  filter(psite_uniform_code == "CARVEL-TREM-SP1")
+
+CARVELTREMSP1_plot<-ggplot(CARVELTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("CARVEL-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+CARVELTREMSP1_plot
+
+CARVELTREMSP1_plot_trunc<-ggplot(CARVELTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("CARVEL-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 0.5))
+CARVELTREMSP1_plot_trunc
+
+
+ICTPUNTREMSP1_data <- final_data_named %>%
+  filter(psite_uniform_code == "ICTPUN-TREM-SP1")
+
+ICTPUNTREMSP1_plot<-ggplot(ICTPUNTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("ICTPUN-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+ICTPUNTREMSP1_plot
+
+ICTPUNTREMSP1_plot_trunc<-ggplot(ICTPUNTREMSP1_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("ICTPUN-TREM-SP1")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 5))
+ICTPUNTREMSP1_plot_trunc
+
+
+HYBNUCTREMSP2_data <- final_data_named %>%
+  filter(psite_uniform_code == "HYBNUC-TREM-SP2")
+
+HYBNUCTREMSP2_plot<-ggplot(HYBNUCTREMSP2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-SP2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+HYBNUCTREMSP2_plot
+
+HYBNUCTREMSP2_plot_trunc<-ggplot(HYBNUCTREMSP2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-SP2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 1))
+HYBNUCTREMSP2_plot_trunc
+
+
+PIMVIGMONODAC_data <- final_data_named %>%
+  filter(psite_uniform_code == "PIMVIG-MONO-DAC")
+
+PIMVIGMONODAC_plot<-ggplot(PIMVIGMONODAC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-MONO-DAC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+PIMVIGMONODAC_plot
+
+PIMVIGMONODAC_plot_trunc<-ggplot(PIMVIGMONODAC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("PIMVIG-MONO-DAC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 4))
+PIMVIGMONODAC_plot_trunc
+
+
+HYBNUCTREMSP3_data <- final_data_named %>%
+  filter(psite_uniform_code == "HYBNUC-TREM-SP3")
+
+HYBNUCTREMSP3_plot<-ggplot(HYBNUCTREMSP3_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-SP3")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+HYBNUCTREMSP3_plot
+
+HYBNUCTREMSP3_plot_trunc<-ggplot(HYBNUCTREMSP3_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("HYBNUC-TREM-SP3")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 0.5))
+HYBNUCTREMSP3_plot_trunc
+
+
+NOTATHTREMSP2_data <- final_data_named %>%
+  filter(psite_uniform_code == "NOTATH-TREM-SP2")
+
+NOTATHTREMSP2_plot<-ggplot(NOTATHTREMSP2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-TREM-SP2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+NOTATHTREMSP2_plot
+
+NOTATHTREMSP2_plot_trunc<-ggplot(NOTATHTREMSP2_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-TREM-SP2")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 5))
+NOTATHTREMSP2_plot_trunc
+
+
+NOTATHTREMHET_data <- final_data_named %>%
+  filter(psite_uniform_code == "NOTATH-TREM-HET")
+
+NOTATHTREMHET_plot<-ggplot(NOTATHTREMHET_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-TREM-HET")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+NOTATHTREMHET_plot
+
+NOTATHTREMHET_plot_trunc<-ggplot(NOTATHTREMHET_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-TREM-HET")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 2))
+NOTATHTREMHET_plot_trunc
+
+
+ICTPUNMONOLIG_data <- final_data_named %>%
+  filter(psite_uniform_code == "ICTPUN-MONO-LIG")
+
+ICTPUNMONOLIG_plot<-ggplot(ICTPUNMONOLIG_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("ICTPUN-MONO-LIG")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+ICTPUNMONOLIG_plot
+
+ICTPUNMONOLIG_plot_trunc<-ggplot(ICTPUNMONOLIG_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("ICTPUN-MONO-LIG")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 10))
+ICTPUNMONOLIG_plot_trunc
+
+
+GAMAFFTREMPOS_data <- final_data_named %>%
+  filter(psite_uniform_code == "GAMAFF-TREM-POS")
+
+GAMAFFTREMPOS_plot<-ggplot(GAMAFFTREMPOS_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("GAMAFF-TREM-POS")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+GAMAFFTREMPOS_plot
+
+GAMAFFTREMPOS_plot_trunc<-ggplot(GAMAFFTREMPOS_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("GAMAFF-TREM-POS")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 8))
+GAMAFFTREMPOS_plot_trunc
+
+
+NOTATHMONODAC_data <- final_data_named %>%
+  filter(psite_uniform_code == "NOTATH-MONO-DAC")
+
+NOTATHMONODAC_plot<-ggplot(NOTATHMONODAC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-MONO-DAC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")
+NOTATHMONODAC_plot
+
+NOTATHMONODAC_plot_trunc<-ggplot(NOTATHMONODAC_data,aes(before_after,psite_count,group=str_c(CI,before_after)))+
+  geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
+                                                                  jitter.width = 0.8),
+             size=1,pch=19)+
+  geom_violin(aes(fill=str_c(CI)),position = position_dodge(width = 0.9),alpha=0.5)+
+  stat_summary(
+    fun = mean, 
+    geom = "point", 
+    aes(color = CI),
+    size=5, 
+    position = position_dodge(width = 0.9),
+    alpha = 0.75
+  )+
+  stat_summary(
+    fun = "mean", 
+    geom = "line",
+    aes(group = CI, color = CI),
+    position = position_dodge(width = 0.9),
+    linetype = "solid", 
+    linewidth = 0.5)+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  ggtitle("NOTATH-MONO-DAC")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
+  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 8))
+NOTATHMONODAC_plot_trunc
+
+
+# Now put it all together
+
+psite_taxon_raw_together <- ggdraw(plot=NULL,xlim=c(0,8),ylim=c(0,16))+
+  draw_plot(PIMVIGTREMSP3_plot_trunc,x=0,y=14,width=4,height=2)+
+  draw_plot(PIMVIGTREMBU2_plot_trunc,x=0,y=12,width=4,height=2)+
+  draw_plot(PIMVIGTREMBU1_plot_trunc,x=0,y=10,width=4,height=2)+
+  draw_plot(HYBNUCTREMNEA_plot_trunc,x=0,y=8,width=4,height=2)+
+  draw_plot(PIMVIGTREMSP1_plot_trunc,x=0,y=6,width=4,height=2)+
+  draw_plot(PERVIGNEMAASC_plot_trunc,x=0,y=4,width=4,height=2)+
+  draw_plot(CARVELTREMSP1_plot_trunc,x=0,y=2,width=4,height=2)+
+  draw_plot(ICTPUNTREMSP1_plot_trunc,x=0,y=0,width=4,height=2)+
+  draw_plot(HYBNUCTREMSP2_plot_trunc,x=4,y=14,width=4,height=2)+
+  draw_plot(PIMVIGMONODAC_plot_trunc,x=4,y=12,width=4,height=2)+
+  draw_plot(HYBNUCTREMSP3_plot_trunc,x=4,y=10,width=4,height=2)+
+  draw_plot(NOTATHTREMSP2_plot_trunc,x=4,y=8,width=4,height=2)+
+  draw_plot(NOTATHTREMHET_plot_trunc,x=4,y=6,width=4,height=2)+
+  draw_plot(ICTPUNMONOLIG_plot_trunc,x=4,y=4,width=4,height=2)+
+  draw_plot(GAMAFFTREMPOS_plot_trunc,x=4,y=2,width=4,height=2)+
+  draw_plot(NOTATHMONODAC_plot_trunc,x=4,y=0,width=4,height=2)
+#draw_label("(a)",x=0.25,y=4.75,size=30)+
+#draw_label("(b)",x=5,y=4.75,size=30)+
+#draw_label("(c)",x=10.4,y=4.75,size=30)
+psite_taxon_raw_together
+
+# Make titles smaller
+# Add annotations for x- and y-axis labels
+# Minimize white space
+# Create an identical set with full axis for supplement
+# For big raneff plot, reverse the order of the y-axis to match
+# Update plots with NEMA (and caption)
+
+
 
 
 raw_plots_per_psite<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
