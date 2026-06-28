@@ -686,7 +686,7 @@ PIMVIGTREMSP3_plot<-ggplot(PIMVIGTREMSP3_data,aes(before_after,psite_count,group
   ggtitle("PIMVIG-TREM-SP3")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -722,7 +722,7 @@ PIMVIGTREMSP3_plot_trunc<-ggplot(PIMVIGTREMSP3_data,aes(before_after,psite_count
   ggtitle("PIMVIG-TREM-SP3")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -763,7 +763,7 @@ PIMVIGTREMBU2_plot<-ggplot(PIMVIGTREMBU2_data,aes(before_after,psite_count,group
   ggtitle("PIMVIG-TREM-BU2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -799,7 +799,7 @@ PIMVIGTREMBU2_plot_trunc<-ggplot(PIMVIGTREMBU2_data,aes(before_after,psite_count
   ggtitle("PIMVIG-TREM-BU2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -840,7 +840,7 @@ PIMVIGTREMBU1_plot<-ggplot(PIMVIGTREMBU1_data,aes(before_after,psite_count,group
   ggtitle("PIMVIG-TREM-BU1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -876,7 +876,7 @@ PIMVIGTREMBU1_plot_trunc<-ggplot(PIMVIGTREMBU1_data,aes(before_after,psite_count
   ggtitle("PIMVIG-TREM-BU1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -917,7 +917,7 @@ HYBNUCTREMNEA_plot<-ggplot(HYBNUCTREMNEA_data,aes(before_after,psite_count,group
   ggtitle("HYBNUC-TREM-NEA")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -953,7 +953,7 @@ HYBNUCTREMNEA_plot_trunc<-ggplot(HYBNUCTREMNEA_data,aes(before_after,psite_count
   ggtitle("HYBNUC-TREM-NEA")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -994,7 +994,7 @@ PIMVIGTREMSP1_plot<-ggplot(PIMVIGTREMSP1_data,aes(before_after,psite_count,group
   ggtitle("PIMVIG-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1030,7 +1030,7 @@ PIMVIGTREMSP1_plot_trunc<-ggplot(PIMVIGTREMSP1_data,aes(before_after,psite_count
   ggtitle("PIMVIG-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1071,7 +1071,7 @@ PERVIGNEMAASC_plot<-ggplot(PERVIGNEMAASC_data,aes(before_after,psite_count,group
   ggtitle("PERVIG-NEMA-ASC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1107,7 +1107,7 @@ PERVIGNEMAASC_plot_trunc<-ggplot(PERVIGNEMAASC_data,aes(before_after,psite_count
   ggtitle("PERVIG-NEMA-ASC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1148,7 +1148,7 @@ CARVELTREMSP1_plot<-ggplot(CARVELTREMSP1_data,aes(before_after,psite_count,group
   ggtitle("CARVEL-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1184,7 +1184,7 @@ CARVELTREMSP1_plot_trunc<-ggplot(CARVELTREMSP1_data,aes(before_after,psite_count
   ggtitle("CARVEL-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1225,7 +1225,7 @@ ICTPUNTREMSP1_plot<-ggplot(ICTPUNTREMSP1_data,aes(before_after,psite_count,group
   ggtitle("ICTPUN-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1261,7 +1261,7 @@ ICTPUNTREMSP1_plot_trunc<-ggplot(ICTPUNTREMSP1_data,aes(before_after,psite_count
   ggtitle("ICTPUN-TREM-SP1")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1302,7 +1302,7 @@ HYBNUCTREMSP2_plot<-ggplot(HYBNUCTREMSP2_data,aes(before_after,psite_count,group
   ggtitle("HYBNUC-TREM-SP2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1338,7 +1338,7 @@ HYBNUCTREMSP2_plot_trunc<-ggplot(HYBNUCTREMSP2_data,aes(before_after,psite_count
   ggtitle("HYBNUC-TREM-SP2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1379,7 +1379,7 @@ PIMVIGMONODAC_plot<-ggplot(PIMVIGMONODAC_data,aes(before_after,psite_count,group
   ggtitle("PIMVIG-MONO-DAC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1415,7 +1415,7 @@ PIMVIGMONODAC_plot_trunc<-ggplot(PIMVIGMONODAC_data,aes(before_after,psite_count
   ggtitle("PIMVIG-MONO-DAC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1456,7 +1456,7 @@ HYBNUCTREMSP3_plot<-ggplot(HYBNUCTREMSP3_data,aes(before_after,psite_count,group
   ggtitle("HYBNUC-TREM-SP3")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1492,7 +1492,7 @@ HYBNUCTREMSP3_plot_trunc<-ggplot(HYBNUCTREMSP3_data,aes(before_after,psite_count
   ggtitle("HYBNUC-TREM-SP3")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1533,7 +1533,7 @@ NOTATHTREMSP2_plot<-ggplot(NOTATHTREMSP2_data,aes(before_after,psite_count,group
   ggtitle("NOTATH-TREM-SP2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1569,7 +1569,7 @@ NOTATHTREMSP2_plot_trunc<-ggplot(NOTATHTREMSP2_data,aes(before_after,psite_count
   ggtitle("NOTATH-TREM-SP2")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1610,7 +1610,7 @@ NOTATHTREMHET_plot<-ggplot(NOTATHTREMHET_data,aes(before_after,psite_count,group
   ggtitle("NOTATH-TREM-HET")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1646,7 +1646,7 @@ NOTATHTREMHET_plot_trunc<-ggplot(NOTATHTREMHET_data,aes(before_after,psite_count
   ggtitle("NOTATH-TREM-HET")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1687,7 +1687,7 @@ ICTPUNMONOLIG_plot<-ggplot(ICTPUNMONOLIG_data,aes(before_after,psite_count,group
   ggtitle("ICTPUN-MONO-LIG")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1723,12 +1723,12 @@ ICTPUNMONOLIG_plot_trunc<-ggplot(ICTPUNMONOLIG_data,aes(before_after,psite_count
   ggtitle("ICTPUN-MONO-LIG")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
   scale_x_discrete(labels=NULL,limits=(rev(levels(as.factor(within_fish$before_after)))))+
-  scale_y_continuous(labels = label_number(accuracy = 0.1))+
+  scale_y_continuous(labels = label_number(accuracy = 1))+
   theme(legend.position = "none")+
   coord_cartesian(ylim = c(0, 10))
 ICTPUNMONOLIG_plot_trunc
@@ -1764,7 +1764,7 @@ GAMAFFTREMPOS_plot<-ggplot(GAMAFFTREMPOS_data,aes(before_after,psite_count,group
   ggtitle("GAMAFF-TREM-POS")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1800,7 +1800,7 @@ GAMAFFTREMPOS_plot_trunc<-ggplot(GAMAFFTREMPOS_data,aes(before_after,psite_count
   ggtitle("GAMAFF-TREM-POS")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1841,7 +1841,7 @@ NOTATHMONODAC_plot<-ggplot(NOTATHMONODAC_data,aes(before_after,psite_count,group
   ggtitle("NOTATH-MONO-DAC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1877,7 +1877,7 @@ NOTATHMONODAC_plot_trunc<-ggplot(NOTATHMONODAC_data,aes(before_after,psite_count
   ggtitle("NOTATH-MONO-DAC")+
   theme_minimal()+
   #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=12,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
+  theme(plot.title=element_text(size=10,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),axis.title.y=element_text(size=16),
         axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
         panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
         panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
@@ -1890,34 +1890,55 @@ NOTATHMONODAC_plot_trunc
 
 # Now put it all together
 
-psite_taxon_raw_together <- ggdraw(plot=NULL,xlim=c(0,8),ylim=c(0,16))+
-  draw_plot(PIMVIGTREMSP3_plot_trunc,x=0,y=14,width=4,height=2)+
-  draw_plot(PIMVIGTREMBU2_plot_trunc,x=0,y=12,width=4,height=2)+
-  draw_plot(PIMVIGTREMBU1_plot_trunc,x=0,y=10,width=4,height=2)+
-  draw_plot(HYBNUCTREMNEA_plot_trunc,x=0,y=8,width=4,height=2)+
-  draw_plot(PIMVIGTREMSP1_plot_trunc,x=0,y=6,width=4,height=2)+
-  draw_plot(PERVIGNEMAASC_plot_trunc,x=0,y=4,width=4,height=2)+
-  draw_plot(CARVELTREMSP1_plot_trunc,x=0,y=2,width=4,height=2)+
-  draw_plot(ICTPUNTREMSP1_plot_trunc,x=0,y=0,width=4,height=2)+
-  draw_plot(HYBNUCTREMSP2_plot_trunc,x=4,y=14,width=4,height=2)+
-  draw_plot(PIMVIGMONODAC_plot_trunc,x=4,y=12,width=4,height=2)+
-  draw_plot(HYBNUCTREMSP3_plot_trunc,x=4,y=10,width=4,height=2)+
-  draw_plot(NOTATHTREMSP2_plot_trunc,x=4,y=8,width=4,height=2)+
-  draw_plot(NOTATHTREMHET_plot_trunc,x=4,y=6,width=4,height=2)+
-  draw_plot(ICTPUNMONOLIG_plot_trunc,x=4,y=4,width=4,height=2)+
-  draw_plot(GAMAFFTREMPOS_plot_trunc,x=4,y=2,width=4,height=2)+
-  draw_plot(NOTATHMONODAC_plot_trunc,x=4,y=0,width=4,height=2)
-#draw_label("(a)",x=0.25,y=4.75,size=30)+
-#draw_label("(b)",x=5,y=4.75,size=30)+
-#draw_label("(c)",x=10.4,y=4.75,size=30)
+psite_taxon_raw_together <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
+  draw_plot(HYBNUCTREMSP2_plot_trunc,x=4,y=14,width=4,height=2.2)+
+  draw_plot(PIMVIGMONODAC_plot_trunc,x=4,y=12,width=4,height=2.2)+
+  draw_plot(HYBNUCTREMSP3_plot_trunc,x=4,y=10,width=4,height=2.2)+
+  draw_plot(NOTATHTREMSP2_plot_trunc,x=4,y=8,width=4,height=2.2)+
+  draw_plot(NOTATHTREMHET_plot_trunc,x=4,y=6,width=4,height=2.2)+
+  draw_plot(ICTPUNMONOLIG_plot_trunc,x=4,y=4,width=4,height=2.2)+
+  draw_plot(GAMAFFTREMPOS_plot_trunc,x=4,y=2,width=4,height=2.2)+
+  draw_plot(NOTATHMONODAC_plot_trunc,x=4,y=0,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMSP3_plot_trunc,x=0.15,y=14,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMBU2_plot_trunc,x=0.15,y=12,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMBU1_plot_trunc,x=0.15,y=10,width=4,height=2.2)+
+  draw_plot(HYBNUCTREMNEA_plot_trunc,x=0.15,y=8,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMSP1_plot_trunc,x=0.15,y=6,width=4,height=2.2)+
+  draw_plot(PERVIGNEMAASC_plot_trunc,x=0.15,y=4,width=4,height=2.2)+
+  draw_plot(CARVELTREMSP1_plot_trunc,x=0.15,y=2,width=4,height=2.2)+
+  draw_plot(ICTPUNTREMSP1_plot_trunc,x=0.15,y=0,width=4,height=2.2)+
+  draw_label("before        after",x=2.5,y=0.25,size=12)+
+  draw_label("before        after",x=6.4,y=0.25,size=12)+
+  draw_label("parasite abundance per host individual",x=0.2,y=8,size=16,angle=90)
 psite_taxon_raw_together
 
-# Make titles smaller
-# Add annotations for x- and y-axis labels
-# Minimize white space
-# Create an identical set with full axis for supplement
+
+psite_taxon_raw_supplement <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
+  draw_plot(HYBNUCTREMSP2_plot,x=4,y=14,width=4,height=2.2)+
+  draw_plot(PIMVIGMONODAC_plot,x=4,y=12,width=4,height=2.2)+
+  draw_plot(HYBNUCTREMSP3_plot,x=4,y=10,width=4,height=2.2)+
+  draw_plot(NOTATHTREMSP2_plot,x=4,y=8,width=4,height=2.2)+
+  draw_plot(NOTATHTREMHET_plot,x=4,y=6,width=4,height=2.2)+
+  draw_plot(ICTPUNMONOLIG_plot,x=4,y=4,width=4,height=2.2)+
+  draw_plot(GAMAFFTREMPOS_plot,x=4,y=2,width=4,height=2.2)+
+  draw_plot(NOTATHMONODAC_plot,x=4,y=0,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMSP3_plot,x=0.15,y=14,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMBU2_plot,x=0.15,y=12,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMBU1_plot,x=0.15,y=10,width=4,height=2.2)+
+  draw_plot(HYBNUCTREMNEA_plot,x=0.15,y=8,width=4,height=2.2)+
+  draw_plot(PIMVIGTREMSP1_plot,x=0.15,y=6,width=4,height=2.2)+
+  draw_plot(PERVIGNEMAASC_plot,x=0.15,y=4,width=4,height=2.2)+
+  draw_plot(CARVELTREMSP1_plot,x=0.15,y=2,width=4,height=2.2)+
+  draw_plot(ICTPUNTREMSP1_plot,x=0.15,y=0,width=4,height=2.2)+
+  draw_label("before        after",x=2.5,y=0.25,size=12)+
+  draw_label("before        after",x=6.4,y=0.25,size=12)+
+  draw_label("parasite abundance per host individual",x=0.2,y=8,size=16,angle=90)
+psite_taxon_raw_supplement
+
+
 # For big raneff plot, reverse the order of the y-axis to match
 # Update plots with NEMA (and caption)
+# Clean up code so that order corresponds to the MS
 
 
 
