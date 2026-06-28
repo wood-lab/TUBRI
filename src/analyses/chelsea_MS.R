@@ -9,14 +9,34 @@ library(lme4)
 library(emmeans)
 library(ggeffects)
 library(ggplot2)
- 
+library(maps)
+library(mapdata)
+#library(maptools) #for shapefiles
+library(scales) #for transparency
+#library(rgdal)
+library(maps)
+library(mapdata)
+library(ggmap)
+#library(ggsn)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(cowplot)
+library(sp)
+#library(rgeos)
+library(raster)
+library(magick)
+library(pdftools)
+library(forcats)
+
 
 # Read in the dataset
 
 full_dataset_with_LH<-read.csv("data/processed/Full_dataset_with_psite_life_history_info_2024.11.21.csv")
 
 
-# Take out myxos, since they were counted differently (you'll run a parallel analysis for them).
+# Take out myxos, since they were counted differently (Daki has run a parallel analysis for them).
+
 minus_myxos <- full_dataset_with_LH %>%
   filter(Parasite_taxonomic_group!="Myxozoa")
 
@@ -36,7 +56,7 @@ levels(as.factor(minus_myxos$Parasite_taxonomic_group))
 str(minus_myxos)
 
 
-# Let's do some initial tallies
+# Let's do some initial tallies. These appear in Table 1 in the MS.
 
 total_n_fish_lines <- minus_myxos %>%
   group_by(IndividualFishID,Fish_sp.x) %>%
@@ -58,9 +78,8 @@ psite_species <- levels(as.factor(minus_myxos$fish_psite_combo))
 length(psite_species)
 
 
-
-
-# Now lets remove any parasites that occur at <5% prevalence in their host species.
+# Now lets remove any parasites that occur at <5% prevalence in their host species. This is reported in
+# Table 2 of the MS.
 
 minus_myxos$positive<-vector("numeric",length(minus_myxos$fish_psite_combo))
 
@@ -126,7 +145,6 @@ View(check)
 # (= 0.0814). Table caption updated accordingly.
 
 
-
 high_prev_psites$fish_psite_combo
 
 final_dataset <- minus_myxos %>%
@@ -150,6 +168,140 @@ final_dataset <- minus_myxos %>%
 levels(as.factor(final_dataset$fish_psite_combo))
 
 sum(final_dataset$psite_count,na.rm=TRUE)
+
+
+# Now let's make a map to show where fish were collected and a plot to show how sampling was distributed
+# across time - this will be Figure 2.
+# First you need to reduce the dataset to make each fish a row.
+
+fish_sampled <- final_dataset %>%
+  group_by(Fish_sp.x,IndividualFishID,CI,Latitude,Longitude,YearCollected) %>%
+  summarize(count = n())
+
+
+# Make the map of where each fish was sampled.
+
+bounds<-c(left=-89.855, bottom=30.69, right=-89.81, top=30.81)
+map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% ggmap()+
+  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "none")+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))
+#geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+map
+
+
+# Make the inset map showing the US.
+
+bounds<-c(left=-124.77, bottom=24.52, right=-66.95, top=49.38)
+inset_map_us<-get_stadiamap(bounds, zoom=5, maptype = "stamen_terrain_background") %>% ggmap()+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "none")+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
+  geom_rect(xmin=-92,ymin=28.922129,xmax=-88.821197,ymax=31,fill="black",alpha=0.1,linetype="blank")
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+inset_map_us
+
+
+# Make the inset map showing sampling sites relative to NOLA.
+
+bounds<-c(left=-92, bottom=28.922129, right=-88.821197, top=31)
+inset_map_la<-get_stadiamap(bounds, zoom=7, maptype = "stamen_terrain") %>% ggmap()+
+  xlab("")+
+  ylab("")+
+  theme(legend.position = "none")+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
+        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
+  geom_rect(xmin=-89.855,ymin=30.69,xmax=-89.81,ymax=30.81,fill="black",alpha=0.2,linetype="blank")
+#geom_hline(yintercept=35.2102673,linetype="dashed")+
+#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
+#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
+#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
+#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
+inset_map_la
+
+
+# Now make plots showing how fish fall into BACI quadrants, for each fish species.
+
+fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
+  scale_y_discrete(limits=rev,labels=c("I","C"))+
+  facet_wrap(vars(Fish_sp.x),nrow=4,ncol=2)+
+  geom_point(data=fish_sampled,aes(x=YearCollected,fill=CI),
+             position=position_jitter(width=0.15),shape=21,size=3)+
+  scale_fill_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("")+
+  annotate("rect", xmin = -Inf, xmax = 1972+(292/366), ymin = -Inf, ymax = Inf,
+           fill = "black", alpha = 0.2)+
+  geom_vline(xintercept=1972+(292/366),linetype="dashed")+
+  geom_hline(yintercept=1.5,linetype="solid")+
+  #Katrina: geom_vline(xintercept=2005,linetype="dotted")+
+  xlim(1962,2006)+
+  theme_bw()+
+  theme(legend.position = "none")+
+  guides(fill = guide_legend(override.aes = list(size=7)))+
+  scale_x_continuous(breaks=seq(1960,2010,10))+
+  theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
+        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),
+        legend.text = element_text(size=18),strip.text = element_text(face="italic"),
+        strip.background = element_blank())
+fish_plot
+
+
+# Put everything in a single plot.
+
+figure_2 <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,10))+
+  draw_plot(map,x=0.5,y=-0.1,width=6,height=9.75)+
+  draw_plot(inset_map_us,x=-0.8,y=5.5,width=4,height=3)+
+  draw_plot(inset_map_la,x=-0.8,y=1.5,width=4,height=3.5)+
+  draw_plot(fish_plot,x=4.8,y=0,width=5,height=10)
+#draw_label("(a)",x=0.25,y=4.75,size=30)+
+#draw_label("(b)",x=5,y=4.75,size=30)+
+#draw_label("(c)",x=10.4,y=4.75,size=30)
+figure_2
+
+
+# Before you dive into analysis, just investigate what's up with body size over time. We did our best
+# to equalize, and the models account for body size, but good to know what's going on. This will be
+# Supplementary Figure S1.
+
+raw_plot_body_size<-ggplot(final_dataset,aes(YearCollected,TotalLength_mm),group=CI,color=CI)+
+  facet_wrap(vars(Fish_sp.x),nrow=2,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_smooth(aes(color=CI),method="lm")+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("year")+
+  ylab("total length of host fish (mm)")+
+  theme_minimal()+
+  #ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(strip.text=element_text(size=20,face="italic"),
+        plot.title=element_text(size=30,hjust=0.5,face="plain"),
+        axis.text.y=element_text(size=20),
+        axis.title.y=element_text(size=26),
+        axis.text.x=element_text(size=20,color="black"),
+        axis.title.x=element_text(size=26),
+        panel.background=element_rect(fill="white",color="black"),
+        panel.grid.minor=element_line(color=NA),panel.spacing = unit(1, "lines"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=20))
+raw_plot_body_size
 
 
 ### Test out various models, starting with the three-way interaction between BA*CI*life_history
@@ -287,9 +439,13 @@ model_draft_5c<-glmer.nb(psite_count~CI*before_after+Fish_sp.x*scale(TotalLength
                          data=final_dataset,family="nbinom")
 summary(model_draft_5c)
 
+
+# Okay, I think model_draft_5c is what we want! Let's visualize. I want to see the patterns in the raw data
+# alongside the prediction plot.
+
 big_predictions<-ggeffect(model_draft_5c,c("before_after", "CI"))
 
-big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
+prediction_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
   geom_point(aes(group=group,color=group),size=4,pch=19,position = position_dodge(width = 0.5))+
   geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),
                 width=0.04,position = position_dodge(width = 0.5))+
@@ -306,193 +462,10 @@ big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
   scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
   theme(legend.position="top",legend.title = element_blank(),
         legend.text = element_text(size=12))
-big_plot
+prediction_plot
 
 
-# Extract the fixed and random effects
-
-a<-fixef(model_draft_5c)
-b<-ranef(model_draft_5c,condVar=TRUE)
-
-
-# Extract the variances of the random effects
-
-qq<-attr(b[[3]],"postVar")
-e<-sqrt(qq)
-e<-e[4,2,]
-
-
-# Calculate the CIs
-
-liminf=(b[[3]][4]+a[11])-(e*2)
-mean_=(b[[3]][4]+a[11])
-limsup=(b[[3]][4]+a[11])+(e*2)
-
-dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
-
-# add CIs
-
-for(i in 1:nrow(mean_)){
-  lines(x=c(liminf[i,1],limsup[i,1]),y=
-          c(i,i))
-}
-
-raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
-names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
-psite_code_break<-read.csv("data/translating_psite_codes.csv", sep=",", header=TRUE)
-raneff_data_named<-merge(raneff_data, psite_code_break, by.x = "psite_taxon", by.y = "data_combo")
-
-# Visualize
-
-library(forcats)
-
-ranef_plot<-ggplot(raneff_data_named,aes(x = fct_reorder(psite_uniform_code, interaction, .desc = TRUE),
-                                         interaction))+
-  geom_point(size=3)+
-  geom_errorbar(data=raneff_data_named,mapping=aes(ymin=min,ymax=max),width=0.5)+
-  geom_hline(yintercept = -0.52998176, linetype = "dotted")+
-  geom_hline(yintercept = 0, linetype = "solid")+
-  coord_flip()+
-  xlab("parasite taxon")+
-  ylab("interaction effect BA*CI")+
-  theme_minimal()+
-  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
-        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
-        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
-#labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
-#theme(legend.position="none")
-ranef_plot
-
-
-### Make individual prediction plots for each fish_psite_combo
-
-raneff_predictions<-ggpredict(model_draft_5c,c("before_after", "CI", "fish_psite_combo"))
-
-str(raneff_predictions)
-raneff_predictions$facet
-
-filtered_predictions <- raneff_predictions %>%
-  filter(facet=="Pimephales vigilax_TREM.SSS" | facet == "Pimephales vigilax_TREM.METAGS" |
-           facet == "Pimephales vigilax_TREM.BUC" | facet == "Hybognathus nuchalis_TREM.BC" |
-           facet == "Pimephales vigilax_META.UNK" | facet == "Percina vigil_NEM.LARV" |
-           facet == "Carpiodes velifer_TREM.META.UNK" | facet == "Ictalurus punctatus_TREM.LG" |
-           facet == "Hybognathus nuchalis_TREM.META.GO" | facet == "Pimephales vigilax_MONO.DACT" |
-           facet == "Hybognathus nuchalis_TREM.META.HET" | facet == "Notropis atherinoides_TREM.META" |
-           facet == "Notropis atherinoides_TREM.LARV" | facet == "Ictalurus punctatus_MONO.IP" |
-           facet == "Gambusia affinis_TREM.POS" | facet == "Notropis atherinoides_MONO.ALL")
-
-raneff_plots<-ggplot(filtered_predictions,aes(x,predicted),group=group,color=group)+
-  facet_wrap(vars(facet),nrow=4,ncol=4)+
-  geom_point(aes(group=group,color=group),size=4,pch=19)+
-  geom_errorbar(data=filtered_predictions,
-                mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
-  geom_line(aes(group=group,color=group))+
-  scale_color_manual(values=c("cadetblue","burlywood4"))+
-  xlab("year")+
-  ylab("predicted parasite abundance\n per host individual")+
-  theme_minimal()+
-  #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),
-        axis.title.y=element_text(size=16),
-        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
-        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_x_discrete(limits=(rev(levels(filtered_predictions$x))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
-        legend.text = element_text(size=12))
-raneff_plots
-
-
-# Okay, so model_draft_5c is the final version of the BA*CI model. But it would be cool if we could turn
-# BA into a continuous variable... see if the models will run?
-
-model_draft_6<-glmer.nb(psite_count~CI*YearCollected_sc+Fish_sp.x*scale(TotalLength_mm)+
-                          (1+CI*YearCollected_sc|fish_psite_combo)+(1|CatalogNumber_chr),
-                        data=final_dataset,family="nbinom")
-summary(model_draft_6)
-
-big_predictions<-ggeffect(model_draft_6,c("YearCollected_sc", "CI"))
-
-big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
-  geom_point(aes(group=group,color=group),size=4,pch=19)+
-  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
-  geom_line(aes(group=group,color=group))+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("year")+
-  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
-  theme_minimal()+
-  #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
-        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
-        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
-        legend.text = element_text(size=12))
-big_plot
-
-
-# Extract the fixed and random effects
-
-a<-fixef(model_draft_6)
-b<-ranef(model_draft_6,condVar=TRUE)
-
-
-# Extract the variances of the random effects
-
-qq<-attr(b[[2]],"postVar")
-e<-sqrt(qq)
-e<-e[4,2,]
-
-
-# Calculate the CIs
-
-liminf=(b[[2]][4]+a[11])-(e*2)
-mean_=(b[[2]][4]+a[11])
-limsup=(b[[2]][4]+a[11])+(e*2)
-
-dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
-
-# add CIs
-
-for(i in 1:nrow(mean_)){
-  lines(x=c(liminf[i,1],limsup[i,1]),y=
-          c(i,i))
-}
-
-raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
-names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
-
-# Visualize
-
-ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
-  geom_point(size=3)+
-  geom_errorbar(data=raneff_data,mapping=aes(ymin=min,ymax=max),width=0.5)+
-  geom_hline(yintercept = -0.52998176, linetype = "dotted")+
-  geom_hline(yintercept = 0, linetype = "solid")+
-  coord_flip()+
-  xlab("parasite taxon")+
-  ylab("change over time")+
-  theme_minimal()+
-  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
-        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
-        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_y_reverse()
-#labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
-#theme(legend.position="none")
-ranef_plot
-
-# Whole lotta nuthin'. Not very informative. Would probably be better just to plot the raw data across time, 
-# or to do the changepoint analysis originally planned if you want to explore the granular temporal trend.
-
-
-
-### Okay now time to look at the raw data - first in BA form, then in granular temporal gradient, with
-### changepoint analysis.
-
-str(final_dataset)
+# Now for the raw data.
 
 raw_plot<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
   #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
@@ -512,6 +485,7 @@ raw_plot<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
   theme(legend.position="top",legend.title = element_text(size = 18),
         legend.text = element_text(size=12))
 raw_plot
+
 
 # Not very useful. Maybe we can aggregate this a bit to make the pattern easier to see, 
 # averaging within individual fish?
@@ -557,6 +531,9 @@ raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,be
         legend.text = element_text(size=12))
 raw_plot
 
+
+# And zooming in on the lower portion of the y-axis to better visualize the slopes.
+
 truncated_raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=str_c(CI,before_after)))+
   #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
   geom_point(aes(color=str_c(CI)),position = position_jitterdodge(seed = 1, dodge.width = 0.9, 
@@ -595,8 +572,8 @@ truncated_raw_plot<-ggplot(within_fish,aes(before_after,mean_psite_count,group=s
 truncated_raw_plot
 
 
-# Gorgeous. Now put it all together into one figure.
-library(cowplot)
+# Gorgeous. Now put it all together into one figure, which will be Figure 4 in the MS.
+
 main_results_figure <- ggdraw(plot=NULL,xlim=c(0,15),ylim=c(0,5))+
   draw_plot(raw_plot,x=0,y=0.25,width=4.75,height=4.75)+
   draw_plot(truncated_raw_plot,x=5,y=0.25,width=4.75,height=4.75)+
@@ -608,7 +585,110 @@ main_results_figure <- ggdraw(plot=NULL,xlim=c(0,15),ylim=c(0,5))+
 main_results_figure
 
 
-# Now do the same thing for individual parasite taxa
+# Now it's time to look at the individual parasite-taxon-level random effects. This will be Figure 5 in
+# the MS. Start by extracting the overall fixed and random effects.
+
+a<-fixef(model_draft_5c)
+b<-ranef(model_draft_5c,condVar=TRUE)
+
+
+# Extract the variances of the random effects
+
+qq<-attr(b[[3]],"postVar")
+e<-sqrt(qq)
+e<-e[4,2,]
+
+
+# Calculate the CIs
+
+liminf=(b[[3]][4]+a[11])-(e*2)
+mean_=(b[[3]][4]+a[11])
+limsup=(b[[3]][4]+a[11])+(e*2)
+
+dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
+
+
+# add CIs
+
+for(i in 1:nrow(mean_)){
+  lines(x=c(liminf[i,1],limsup[i,1]),y=
+          c(i,i))
+}
+
+raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
+names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
+psite_code_break<-read.csv("data/translating_psite_codes.csv", sep=",", header=TRUE)
+raneff_data_named<-merge(raneff_data, psite_code_break, by.x = "psite_taxon", by.y = "data_combo")
+
+
+# Visualize. Again, this will be Figure 5 in the MS.
+
+ranef_plot<-ggplot(raneff_data_named,aes(x = fct_reorder(psite_uniform_code, interaction, .desc = TRUE),
+                                         interaction))+
+  geom_point(size=3)+
+  geom_errorbar(data=raneff_data_named,mapping=aes(ymin=min,ymax=max),width=0.5)+
+  geom_hline(yintercept = -0.52998176, linetype = "dotted")+
+  geom_hline(yintercept = 0, linetype = "solid")+
+  coord_flip()+
+  xlab("parasite taxon")+
+  ylab("interaction effect BA*CI")+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
+        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))
+#labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
+#theme(legend.position="none")
+ranef_plot
+
+
+# Okay, let's see what these predictions look like for each individual fish_psite_combo.
+# Narrow to just those combos with a significant interaction effect.
+
+raneff_predictions<-ggpredict(model_draft_5c,c("before_after", "CI", "fish_psite_combo"))
+
+str(raneff_predictions)
+raneff_predictions$facet
+
+filtered_predictions <- raneff_predictions %>%
+  filter(facet=="Pimephales vigilax_TREM.SSS" | facet == "Pimephales vigilax_TREM.METAGS" |
+           facet == "Pimephales vigilax_TREM.BUC" | facet == "Hybognathus nuchalis_TREM.BC" |
+           facet == "Pimephales vigilax_META.UNK" | facet == "Percina vigil_NEM.LARV" |
+           facet == "Carpiodes velifer_TREM.META.UNK" | facet == "Ictalurus punctatus_TREM.LG" |
+           facet == "Hybognathus nuchalis_TREM.META.GO" | facet == "Pimephales vigilax_MONO.DACT" |
+           facet == "Hybognathus nuchalis_TREM.META.HET" | facet == "Notropis atherinoides_TREM.META" |
+           facet == "Notropis atherinoides_TREM.LARV" | facet == "Ictalurus punctatus_MONO.IP" |
+           facet == "Gambusia affinis_TREM.POS" | facet == "Notropis atherinoides_MONO.ALL")
+
+raneff_plots<-ggplot(filtered_predictions,aes(x,predicted),group=group,color=group)+
+  facet_wrap(vars(facet),nrow=4,ncol=4)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=filtered_predictions,
+                mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("year")+
+  ylab("predicted parasite abundance\n per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),
+        axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(filtered_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+raneff_plots
+
+# Looks like there isn't enough difference in the individual interaction effects to make these individual
+# combos differ from the overall interaction effect. That's fine, since a plot like this would have been
+# pretty repetitive of the already-plotted overall interaction effect and random effects plot.
+# Instead, it would be more useful to see what the raw data look like. Let's plot that instead.
+
+
+# Plots of raw parasite abundance data for all parasite taxa with a significant BA*CI interaction effect.
+# This will wind up being Figure 6 in the MS.
 
 raw_plot_per_psite<-ggplot(final_dataset,aes(before_after,psite_count,group=str_c(CI,before_after)))+
   facet_wrap(vars(fish_psite_combo),nrow=8,ncol=4)+
@@ -1889,7 +1969,8 @@ NOTATHMONODAC_plot_trunc<-ggplot(NOTATHMONODAC_data,aes(before_after,psite_count
 NOTATHMONODAC_plot_trunc
 
 
-# Now put it all together
+# Now put it all together - the truncated versions (zoomed in on the part of the y-axis where all the 
+# action is) will go in the main text as Figure 6. The full plots will go in the supplement.
 
 psite_taxon_raw_together <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
   draw_plot(HYBNUCTREMSP2_plot_trunc,x=4,y=14,width=4,height=2.2)+
@@ -1914,6 +1995,8 @@ psite_taxon_raw_together <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
 psite_taxon_raw_together
 
 
+# And here is Supplementary Figure S2.
+
 psite_taxon_raw_supplement <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
   draw_plot(HYBNUCTREMSP2_plot,x=4,y=14,width=4,height=2.2)+
   draw_plot(PIMVIGMONODAC_plot,x=4,y=12,width=4,height=2.2)+
@@ -1937,34 +2020,10 @@ psite_taxon_raw_supplement <- ggdraw(plot=NULL,xlim=c(0,8.25),ylim=c(0,16.25))+
 psite_taxon_raw_supplement
 
 
-# For big raneff plot, reverse the order of the y-axis to match
-# Update plots with NEMA (and caption)
-# Clean up code so that order corresponds to the MS
-
-
-
-
-raw_plots_per_psite<-ggplot(final_dataset,aes(before_after,psite_count),group=CI,color=CI)+
-  facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
-  #geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=4,pch=19)+
-  geom_violin(aes(fill=CI))+
-  #scale_color_manual(name = c(""),values=plasma_pal)+
-  xlab("year")+
-  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
-  theme_minimal()+
-  ylim(0,10)+
-  #labs(linetype="parasite life history strategy")+
-  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
-        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
-        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
-        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
-  scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
-  theme(legend.position="top",legend.title = element_text(size = 18),
-        legend.text = element_text(size=12))
-raw_plots_per_psite
-
-
-# Now over time
+# Playing around with modeling time as continuous.
+# Okay, so model_draft_5c is the final version of the BA*CI model. But it would be cool if we could turn
+# BA into a continuous variable... see if the models will run?
+# First visualize.
 
 raw_plot_time<-ggplot(final_dataset,aes(YearCollected,psite_count),group=CI,color=CI)+
   #facet_wrap(vars(fish_psite_combo),nrow=9,ncol=4)+
@@ -2006,152 +2065,89 @@ raw_plot_time_per_psite<-ggplot(final_dataset,aes(YearCollected,psite_count),gro
 raw_plot_time_per_psite
 
 
-raw_plot_body_size<-ggplot(final_dataset,aes(YearCollected,TotalLength_mm),group=CI,color=CI)+
-  facet_wrap(vars(Fish_sp.x),nrow=2,ncol=4)+
-  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
-  geom_smooth(aes(color=CI),method="lm")+
-  scale_color_manual(values=c("cadetblue","burlywood4"))+
+model_draft_6<-glmer.nb(psite_count~CI*YearCollected_sc+Fish_sp.x*scale(TotalLength_mm)+
+                          (1+CI*YearCollected_sc|fish_psite_combo)+(1|CatalogNumber_chr),
+                        data=final_dataset,family="nbinom")
+summary(model_draft_6)
+
+big_predictions<-ggeffect(model_draft_6,c("YearCollected_sc", "CI"))
+
+big_plot<-ggplot(big_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19)+
+  geom_errorbar(data=big_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),width=0.03)+
+  geom_line(aes(group=group,color=group))+
+  #scale_color_manual(name = c(""),values=plasma_pal)+
   xlab("year")+
-  ylab("total length of host fish (mm)")+
+  ylab("predicted parasite abundance\n per parasite taxon per host individual")+
   theme_minimal()+
-  #ylim(0,10)+
   #labs(linetype="parasite life history strategy")+
-  theme(strip.text=element_text(size=20,face="italic"),
-        plot.title=element_text(size=30,hjust=0.5,face="plain"),
-        axis.text.y=element_text(size=20),
-        axis.title.y=element_text(size=26),
-        axis.text.x=element_text(size=20,color="black"),
-        axis.title.x=element_text(size=26),
-        panel.background=element_rect(fill="white",color="black"),
-        panel.grid.minor=element_line(color=NA),panel.spacing = unit(1, "lines"))+
-  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
-  theme(legend.position="top",legend.title = element_blank(),
-        legend.text = element_text(size=20))
-raw_plot_body_size
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_text(size = 18),
+        legend.text = element_text(size=12))
+big_plot
+
+
+# Extract the fixed and random effects
+
+a<-fixef(model_draft_6)
+b<-ranef(model_draft_6,condVar=TRUE)
+
+
+# Extract the variances of the random effects
+
+qq<-attr(b[[2]],"postVar")
+e<-sqrt(qq)
+e<-e[4,2,]
+
+
+# Calculate the CIs
+
+liminf=(b[[2]][4]+a[11])-(e*2)
+mean_=(b[[2]][4]+a[11])
+limsup=(b[[2]][4]+a[11])+(e*2)
+
+dotchart(mean_[,1],labels=rownames(mean_),cex=0.5)
+
+# add CIs
+
+for(i in 1:nrow(mean_)){
+  lines(x=c(liminf[i,1],limsup[i,1]),y=
+          c(i,i))
+}
+
+raneff_data<-cbind.data.frame(rownames(mean_),mean_,e,(e^2),mean_-(e*2),mean_+(e*2),row.names=NULL)
+names(raneff_data)<-c("psite_taxon","interaction","sd","var","min","max")
+
+# Visualize
+
+ranef_plot<-ggplot(raneff_data,aes(psite_taxon,interaction))+
+  geom_point(size=3)+
+  geom_errorbar(data=raneff_data,mapping=aes(ymin=min,ymax=max),width=0.5)+
+  geom_hline(yintercept = -0.52998176, linetype = "dotted")+
+  geom_hline(yintercept = 0, linetype = "solid")+
+  coord_flip()+
+  xlab("parasite taxon")+
+  ylab("change over time")+
+  theme_minimal()+
+  theme(plot.title=element_text(size=14,hjust=0.5,face="plain"),axis.text.y=element_text(size=10),
+        axis.title.y=element_text(size=14),axis.text.x=element_text(size=14),axis.title.x=element_text(size=14),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_y_reverse()
+#labels=c("CHONAR"=expression(paste(italic("Chondracanthus narium")))))
+#theme(legend.position="none")
+ranef_plot
+
+# Whole lotta nuthin'. Not very informative. Would probably be better just to plot the raw data across time, 
+# or to do the changepoint analysis originally planned if you want to explore the granular temporal trend.
 
 
 
-
-### Make a nice plot of all lots
-
-library(maps)
-library(mapdata)
-#library(maptools) #for shapefiles
-library(scales) #for transparency
-#library(rgdal)
-library(maps)
-library(mapdata)
-library(ggmap)
-#library(ggsn)
-library(tidyverse)
-library(tidyr)
-library(dplyr)
-library(cowplot)
-library(sp)
-#library(rgeos)
-library(raster)
-library(magick)
-library(pdftools)
-
-
-# First you need to reduce the dataset to make each fish a row
-
-fish_sampled <- final_dataset %>%
-  group_by(Fish_sp.x,IndividualFishID,CI,Latitude,Longitude,YearCollected) %>%
-  summarize(count = n())
-
-
-# Make the map
-
-bounds<-c(left=-89.855, bottom=30.69, right=-89.81, top=30.81)
-map<-get_stadiamap(bounds, zoom=12, maptype = "stamen_terrain_background") %>% ggmap()+
-  geom_point(data = fish_sampled, aes(x=Longitude,y=Latitude,fill=CI),shape=21,size=4)+
-  scale_fill_manual(values=c("cadetblue","burlywood4"))+
-  geom_point(y=30.76558198250576, x=-89.83398463056083, size=4)+
-  xlab("")+
-  ylab("")+
-  theme(legend.position = "none")+
-  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))
-#geom_rect(xmin=-106.89,ymin=34.8,xmax=-106.45,ymax=35.2102673,fill="grey",alpha=0.2,linetype="blank")+
-#geom_hline(yintercept=35.2102673,linetype="dashed")+
-#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
-#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
-#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
-#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
-map
-
-# Make the inset map
-
-bounds<-c(left=-124.77, bottom=24.52, right=-66.95, top=49.38)
-inset_map_us<-get_stadiamap(bounds, zoom=5, maptype = "stamen_terrain_background") %>% ggmap()+
-  xlab("")+
-  ylab("")+
-  theme(legend.position = "none")+
-  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
-  geom_rect(xmin=-92,ymin=28.922129,xmax=-88.821197,ymax=31,fill="black",alpha=0.1,linetype="blank")
-#geom_hline(yintercept=35.2102673,linetype="dashed")+
-#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
-#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
-#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
-#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
-inset_map_us
-
-bounds<-c(left=-92, bottom=28.922129, right=-88.821197, top=31)
-inset_map_la<-get_stadiamap(bounds, zoom=7, maptype = "stamen_terrain") %>% ggmap()+
-  xlab("")+
-  ylab("")+
-  theme(legend.position = "none")+
-  theme(plot.margin = unit(c(0,0,0,0), "cm"),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20),
-        axis.text.x=element_text(size=15,angle=45,hjust=1),axis.text.y=element_text(size=20))+
-  geom_rect(xmin=-89.855,ymin=30.69,xmax=-89.81,ymax=30.81,fill="black",alpha=0.2,linetype="blank")
-#geom_hline(yintercept=35.2102673,linetype="dashed")+
-#geom_map(data=water_AL_df,map=water_AL_df,aes(x=long,y=lat,map_id=id),color="lightsteelblue3",fill="lightsteelblue3")
-#geom_map(data=polygon_df,map=polygon_df,aes(x=long,y=lat,map_id=id),color="black",fill=NA)+
-#annotate("text",x=-106.6,y=35.097,label="City of Albuquerque",size=5)+
-#annotate("text",x=-106.58,y=35.33,label="Rio Grande River",size=5,angle=55)
-inset_map_la
-
-
-# Plot the fish sampled
-
-fish_plot<-ggplot(data=fish_sampled,aes(x=YearCollected,y=CI))+
-  scale_y_discrete(limits=rev,labels=c("I","C"))+
-  facet_wrap(vars(Fish_sp.x),nrow=4,ncol=2)+
-  geom_point(data=fish_sampled,aes(x=YearCollected,fill=CI),
-             position=position_jitter(width=0.15),shape=21,size=3)+
-  scale_fill_manual(values=c("cadetblue","burlywood4"))+
-  xlab("")+
-  ylab("")+
-  annotate("rect", xmin = -Inf, xmax = 1972+(292/366), ymin = -Inf, ymax = Inf,
-           fill = "black", alpha = 0.2)+
-  geom_vline(xintercept=1972+(292/366),linetype="dashed")+
-  geom_hline(yintercept=1.5,linetype="solid")+
-  #Katrina: geom_vline(xintercept=2005,linetype="dotted")+
-  xlim(1962,2006)+
-  theme_bw()+
-  theme(legend.position = "none")+
-  guides(fill = guide_legend(override.aes = list(size=7)))+
-  scale_x_continuous(breaks=seq(1960,2010,10))+
-  theme(plot.margin = unit(c(0,0,0,-0.6), "cm"), text=element_text(family='sans',size=20),
-        axis.text.y = element_text(size=14),axis.text.x = element_text(size=14),
-        legend.text = element_text(size=18),strip.text = element_text(face="italic"),
-        strip.background = element_blank())
-fish_plot
-
-
-# Set the map and the plot side-by-side
-library(cowplot)
-final_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,10))+
-  draw_plot(map,x=0.5,y=-0.1,width=6,height=9.75)+
-  draw_plot(inset_map_us,x=-0.8,y=5.5,width=4,height=3)+
-  draw_plot(inset_map_la,x=-0.8,y=1.5,width=4,height=3.5)+
-  draw_plot(fish_plot,x=4.8,y=0,width=5,height=10)
-#draw_label("(a)",x=0.25,y=4.75,size=30)+
-#draw_label("(b)",x=5,y=4.75,size=30)+
-#draw_label("(c)",x=10.4,y=4.75,size=30)
-final_figure
+### CHANGEPOINT ANALYSIS.
 
 
 
