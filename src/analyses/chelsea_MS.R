@@ -346,7 +346,8 @@ raneff_data_named<-merge(raneff_data, psite_code_break, by.x = "psite_taxon", by
 
 library(forcats)
 
-ranef_plot<-ggplot(raneff_data_named,aes(x = fct_reorder(psite_uniform_code, interaction),interaction))+
+ranef_plot<-ggplot(raneff_data_named,aes(x = fct_reorder(psite_uniform_code, interaction, .desc = TRUE),
+                                         interaction))+
   geom_point(size=3)+
   geom_errorbar(data=raneff_data_named,mapping=aes(ymin=min,ymax=max),width=0.5)+
   geom_hline(yintercept = -0.52998176, linetype = "dotted")+
