@@ -2149,6 +2149,129 @@ ranef_plot
 
 ### CHANGEPOINT ANALYSIS.
 
+library(cpm)
 
+
+# Find average psite abundance within each year
+
+psite_by_year <- final_dataset %>%
+  group_by(YearCollected) %>%
+  summarize(mean_psite_count = mean(psite_count,na.rm=T), 
+            se_psite_count = (sd(psite_count,na.rm=T)/sqrt(sum(complete.cases(final_dataset$psite_count)))))
+
+plot(psite_by_year$mean_psite_count~psite_by_year$YearCollected)
+
+psite_overall<-psite_by_year$mean_psite_count
+str(psite_overall)
+
+fit_cpm <- processStream(psite_overall, cpmType="Kolmogorov-Smirnov", ARL0=370, startup=20)
+
+plot(psite_overall,type="l")
+for (i in 1:length(fit_cpm$changePoints)){
+  abline(v=fit_cpm$changePoints[i], lty=2)}
+fit_cpm$changePoints
+psite_by_year$YearCollected[34]
+
+
+# Let's look just at impact sites.
+
+psite_impact <- final_dataset %>%
+  filter(CI == "impact")
+
+levels(as.factor(psite_impact$CI))
+
+psite_by_year_impact <- psite_impact %>%
+  group_by(YearCollected) %>%
+  summarize(mean_psite_count = mean(psite_count,na.rm=T), 
+            se_psite_count = (sd(psite_count,na.rm=T)/sqrt(sum(complete.cases(final_dataset$psite_count)))))
+
+plot(psite_by_year_impact$mean_psite_count~psite_by_year_impact$YearCollected)
+
+psite_overall<-psite_by_year_impact$mean_psite_count
+str(psite_overall)
+
+fit_cpm <- processStream(psite_overall, cpmType="Kolmogorov-Smirnov", ARL0=370, startup=20)
+
+plot(psite_overall,type="l")
+for (i in 1:length(fit_cpm$changePoints)){
+  abline(v=fit_cpm$changePoints[i], lty=2)}
+fit_cpm$changePoints
+psite_by_year_impact$YearCollected[33]
+
+
+cpPlot_impact <- ggplot(data=psite_by_year_impact) + 
+  geom_point(aes(YearCollected, mean_psite_count), color="black", size=2) + 
+  geom_errorbar(aes(x=YearCollected,ymin=mean_psite_count-(2*se_psite_count),
+                    ymax=mean_psite_count+(2*se_psite_count)),width=0.5) +
+  geom_vline(aes(xintercept = 1972+(292/366)),  linetype = "dashed",  colour="black", linewidth = 0.9) +
+  geom_vline(aes(xintercept = 1996), linetype = "dotted",  colour="gray45", linewidth = 0.9)  +
+  theme_bw() + 
+  xlim(1962,2006)+
+  ylab("")+
+  xlab("")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  theme(legend.title = element_blank())  +
+  theme(axis.text=element_text(size=16),axis.title=element_text(size=14)) +
+  annotate("text", x = 1973.5, y = 15, label = "Clean Water Act", hjust = 0, size = 5.5, colour="black")+
+  annotate("text", x = 1996.75, y = 15, label = "changepoint", hjust = 0, size = 5.5, colour="gray45")
+cpPlot_impact
+
+
+# Let's look just at control sites.
+
+psite_control <- final_dataset %>%
+  filter(CI == "control")
+
+levels(as.factor(psite_control$CI))
+
+psite_by_year_control <- psite_control %>%
+  group_by(YearCollected) %>%
+  summarize(mean_psite_count = mean(psite_count,na.rm=T), 
+            se_psite_count = (sd(psite_count,na.rm=T)/sqrt(sum(complete.cases(final_dataset$psite_count)))))
+
+plot(psite_by_year_control$mean_psite_count~psite_by_year_control$YearCollected)
+
+psite_overall<-psite_by_year_control$mean_psite_count
+str(psite_overall)
+
+fit_cpm <- processStream(psite_overall, cpmType="Kolmogorov-Smirnov", ARL0=370, startup=20)
+
+plot(psite_overall,type="l")
+for (i in 1:length(fit_cpm$changePoints)){
+  abline(v=fit_cpm$changePoints[i], lty=2)}
+fit_cpm$changePoints
+
+cpPlot_control <- ggplot(data=psite_by_year_control) + 
+  geom_point(aes(YearCollected, mean_psite_count), color="black", size = 2) + 
+  geom_errorbar(aes(x=YearCollected,ymin=mean_psite_count-(2*se_psite_count),
+                    ymax=mean_psite_count+(2*se_psite_count)),width=0.5) +
+  geom_vline(aes(xintercept = 1972+(292/366)),  linetype = "dashed",  colour="black", linewidth = 0.9) +
+  theme_bw() +
+  xlim(1962,2006)+
+  ylab("")+
+  xlab("")+
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  theme(legend.title = element_blank())  +
+  theme(axis.text=element_text(size=16),axis.title=element_text(size=14)) +
+  annotate("text", x = 1973.5, y = 20, label = "Clean Water Act", hjust = 0, size = 5.5, colour="black")
+cpPlot_control
+
+changepoint_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,10))+
+  draw_plot(cpPlot_control,x=0,y=5,width=10,height=5)+
+  draw_plot(cpPlot_impact,x=0,y=0,width=10,height=5)+
+  draw_label("(a)  control",x=0.7,y=9.75,size=25,hjust=0)+
+  draw_label("(b)  impact",x=0.7,y=4.75,size=25,hjust=0)+
+  draw_label("average parasite abundance per parasite taxon per host individual",
+             x = 0.1, y = 0.4, size = 18, hjust = 0, angle = 90)+
+  draw_label("year", x = 5, y = 0.3, size = 25, hjust = 0)
+changepoint_figure
 
 
