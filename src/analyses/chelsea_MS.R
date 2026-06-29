@@ -28,6 +28,7 @@ library(raster)
 library(magick)
 library(pdftools)
 library(forcats)
+library(cpm)
 
 
 # Read in the dataset
@@ -2147,9 +2148,7 @@ ranef_plot
 
 
 
-### CHANGEPOINT ANALYSIS.
-
-library(cpm)
+### CHANGEPOINT ANALYSIS
 
 
 # Find average psite abundance within each year
@@ -2274,4 +2273,7 @@ changepoint_figure <- ggdraw(plot=NULL,xlim=c(0,10),ylim=c(0,10))+
   draw_label("year", x = 5, y = 0.3, size = 25, hjust = 0)
 changepoint_figure
 
+
+
+### DIVERSITY ANALYSIS
 
