@@ -2277,3 +2277,199 @@ changepoint_figure
 
 ### DIVERSITY ANALYSIS
 
+levels(as.factor(minus_myxos$Parasite_taxonomic_group))
+
+# You've already created a column of 0/1 above, minus_myxos$positive. Now sum across those to obtain
+# raw richness for each fish individual.
+
+raw_richness_dataset <- minus_myxos %>%
+  group_by(IndividualFishID,CatalogNumber,YearCollected,TotalLength_mm,CI,Latitude,Fish_sp.x,before_after) %>%
+  summarize(raw_richness = sum(positive))
+
+View(raw_richness_dataset)
+
+# Before you dive into analysis, just see what's up.
+
+raw_richness_plot<-ggplot(raw_richness_dataset,aes(YearCollected,raw_richness),group=CI,color=CI)+
+  #facet_wrap(vars(Fish_sp.x),nrow=2,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_smooth(aes(color=CI),method="lm")+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("year")+
+  ylab("raw richness (number of parasite taxa per fish individual)")+
+  theme_minimal()+
+  #ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(strip.text=element_text(size=20,face="italic"),
+        plot.title=element_text(size=30,hjust=0.5,face="plain"),
+        axis.text.y=element_text(size=20),
+        axis.title.y=element_text(size=26),
+        axis.text.x=element_text(size=20,color="black"),
+        axis.title.x=element_text(size=26),
+        panel.background=element_rect(fill="white",color="black"),
+        panel.grid.minor=element_line(color=NA),panel.spacing = unit(1, "lines"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=20))
+raw_richness_plot
+
+
+hist(raw_richness_dataset$raw_richness)
+
+# Now let's try analyzing. First scale all numerical values, including year. And make sure that
+# CatalogNumber is getting treated as a categorical variable.
+
+raw_richness_dataset$YearCollected_sc <- scale(raw_richness_dataset$YearCollected)
+raw_richness_dataset$CatalogNumber_chr <- as.character(raw_richness_dataset$CatalogNumber)
+
+model_draft_raw_richness<-glmer.nb(raw_richness~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                           +(1|YearCollected_sc)+(1|CatalogNumber_chr),
+                         data=raw_richness_dataset,family="nbinom")
+summary(model_draft_raw_richness)
+
+
+# Now plot.
+
+raw_richness_predictions<-ggeffect(model_draft_raw_richness,c("before_after", "CI"))
+
+prediction_plot<-ggplot(raw_richness_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19,position = position_dodge(width = 0.5))+
+  geom_errorbar(data=raw_richness_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),
+                width=0.04,position = position_dodge(width = 0.5))+
+  geom_line(aes(group=group,color=group),position = position_dodge(width = 0.5))+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("predicted parasite taxon richness per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=12))
+prediction_plot
+
+
+# Okay, nothing going on for raw richness. Let's see what's up if we calculate the jackknife estimate of
+# taxon richness.
+
+# Start by widening the data so that psite_taxa are columns
+
+library(dplyr)
+library(reshape2)
+library(tidyverse)
+
+jack_psite_data<-dcast(data = minus_myxos, IndividualFishID~psite_spp.x, fun.aggregate = sum,
+                       value.var = "psite_count")
+
+jack_factors <- minus_myxos %>%
+  group_by(IndividualFishID,CatalogNumber,YearCollected,TotalLength_mm,CI,Latitude,Fish_sp.x,before_after) %>%
+  summarize(mean_psite_count=mean(psite_count))
+
+jack_factors<-cbind(as.character(factors$site_name),factors$year,as.character(factors$treatment),
+                    as.character(factors$beforeafter),as.character(factors$host_spp))
+#write.csv(jack_factors,file="data/jack_factors.csv")
+#jack_factors<-read.csv("data/jack_factors.csv",sep=",",header=T)
+#jack_factors<-jack_factors[,-1]
+#names(jack_factors)<-c("site_name","year","treatment","beforeafter","host_spp")
+
+#jack_data<-cbind(jack_factors,jack_psite_data)
+
+#write.csv(jack_data,file="data/abundance of parasites in amphibians.csv")
+
+
+#final_psite_data<-jack_data[,-c(1:6)]
+
+
+library(SPECIES)
+jack_estimates<-vector("numeric",length(jack_psite_data$IndividualFishID))
+
+for(i in 1:length(jack_psite_data$IndividualFishID)){
+  
+  v<-jack_psite_data[i,]
+  v<-v[,-1]
+  v<-t(v)
+  t<-table(v)
+  t<-as.data.frame(t)
+  t<-t[-1,]
+  
+  #There will be transects with 0 birds, and we can't run a jackknife on these. Weed them out and record their species richness as 0
+  if(nrow(t)==0)
+    jack_estimates[i]<-0+next
+  
+  #For every other transect, put the data into a matrix form readable for the jackknife function
+  if(nrow(t)!=0)
+    write.csv(t,file="t.csv")
+  t<-read.csv("t.csv",sep=",",header=T)
+  t<-t[,-1]
+  
+  #Run the jackknife function with try
+  j<-try(jackknife(t))
+  
+  #If the jackknife function throws an error, record 9999 and move on
+  if(class(j)=="try-error")
+    jack_estimates[i]<-9999
+  
+  #If you want to record an NA, record this instead: 9999 sum(t$Freq), then replace using code below
+  
+  #If the jackknife function succeeds, record the value for jackknife richness
+  if(class(j)=="list")
+    jack_estimates[i]<-j$Nhat
+}
+
+#Check to make sure you haven't dropped any values
+length(jack_psite_data$IndividualFishID)
+length(jack_estimates)
+
+#Extract the 9999s and replace with NA
+jack_estimates[jack_estimates==9999]<-NA
+jack_estimates<-as.data.frame(cbind(jack_psite_data$IndividualFishID,jack_estimates))
+
+
+
+#Okay, now that you've got your vector of jackknife estimates, put it together with the other columns you need to do the analysis.
+
+#Add your jack estimates to the results
+combineddata<-merge(jack_estimates,jack_factors,by.x="V1",by.y="IndividualFishID")
+
+
+#Run the BACI. First get rid of the deterrent treatments and any day when # photos <20.
+
+combineddata$YearCollected_sc <- scale(combineddata$YearCollected)
+combineddata$CatalogNumber_chr <- as.character(combineddata$CatalogNumber)
+combineddata$jack_estimates <- as.numeric(combineddata$jack_estimates)
+hist(combineddata$jack_estimates)
+
+model_draft_jack_richness<-glmer.nb(jack_estimates~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                                     +(1|YearCollected_sc)+(1|CatalogNumber_chr),
+                                   data=combineddata,family="nbinom")
+summary(model_draft_jack_richness)
+
+
+# Now plot.
+
+jack_richness_predictions<-ggeffect(model_draft_jack_richness,c("before_after", "CI"))
+
+prediction_plot<-ggplot(jack_richness_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19,position = position_dodge(width = 0.5))+
+  geom_errorbar(data=jack_richness_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),
+                width=0.04,position = position_dodge(width = 0.5))+
+  geom_line(aes(group=group,color=group),position = position_dodge(width = 0.5))+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("predicted parasite taxon richness per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=12))
+prediction_plot
+
+
+# Nothing going on. Leave richness out of the paper.
