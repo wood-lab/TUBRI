@@ -2352,6 +2352,79 @@ prediction_plot<-ggplot(raw_richness_predictions,aes(x,predicted),group=group,co
 prediction_plot
 
 
+
+# What if we did it for just those parasites at >5% prev?
+
+raw_richness_dataset <- final_dataset %>%
+  group_by(IndividualFishID,CatalogNumber,YearCollected,TotalLength_mm,CI,Latitude,Fish_sp.x,before_after) %>%
+  summarize(raw_richness = sum(positive))
+
+View(raw_richness_dataset)
+
+# Before you dive into analysis, just see what's up.
+
+raw_richness_plot<-ggplot(raw_richness_dataset,aes(YearCollected,raw_richness),group=CI,color=CI)+
+  #facet_wrap(vars(Fish_sp.x),nrow=2,ncol=4)+
+  geom_point(aes(group=CI,color=CI),position=position_jitter(width=0.15),size=3,pch=19)+
+  geom_smooth(aes(color=CI),method="lm")+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("year")+
+  ylab("raw richness (number of parasite taxa per fish individual)")+
+  theme_minimal()+
+  #ylim(0,10)+
+  #labs(linetype="parasite life history strategy")+
+  theme(strip.text=element_text(size=20,face="italic"),
+        plot.title=element_text(size=30,hjust=0.5,face="plain"),
+        axis.text.y=element_text(size=20),
+        axis.title.y=element_text(size=26),
+        axis.text.x=element_text(size=20,color="black"),
+        axis.title.x=element_text(size=26),
+        panel.background=element_rect(fill="white",color="black"),
+        panel.grid.minor=element_line(color=NA),panel.spacing = unit(1, "lines"))+
+  #scale_x_discrete(limits=(rev(levels(raneff_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=20))
+raw_richness_plot
+
+
+hist(raw_richness_dataset$raw_richness)
+
+# Now let's try analyzing. First scale all numerical values, including year. And make sure that
+# CatalogNumber is getting treated as a categorical variable.
+
+raw_richness_dataset$YearCollected_sc <- scale(raw_richness_dataset$YearCollected)
+raw_richness_dataset$CatalogNumber_chr <- as.character(raw_richness_dataset$CatalogNumber)
+
+model_draft_raw_richness<-glmer.nb(raw_richness~CI*before_after+Fish_sp.x*scale(TotalLength_mm)+
+                                     +(1|YearCollected_sc)+(1|CatalogNumber_chr),
+                                   data=raw_richness_dataset,family="nbinom")
+summary(model_draft_raw_richness)
+
+
+# Now plot.
+
+raw_richness_predictions<-ggeffect(model_draft_raw_richness,c("before_after", "CI"))
+
+prediction_plot<-ggplot(raw_richness_predictions,aes(x,predicted),group=group,color=group)+
+  geom_point(aes(group=group,color=group),size=4,pch=19,position = position_dodge(width = 0.5))+
+  geom_errorbar(data=raw_richness_predictions,mapping=aes(x=x,ymin=conf.low,ymax=conf.high,group=group,color=group),
+                width=0.04,position = position_dodge(width = 0.5))+
+  geom_line(aes(group=group,color=group),position = position_dodge(width = 0.5))+
+  scale_color_manual(values=c("cadetblue","burlywood4"))+
+  xlab("")+
+  ylab("predicted parasite taxon richness per host individual")+
+  theme_minimal()+
+  #labs(linetype="parasite life history strategy")+
+  theme(plot.title=element_text(size=18,hjust=0.5,face="plain"),axis.text.y=element_text(size=14),axis.title.y=element_text(size=16),
+        axis.text.x=element_text(size=18,color="black"),axis.title.x=element_text(size=16),
+        panel.background=element_rect(fill="white",color="black"),panel.grid.major=element_line(color=NA),
+        panel.grid.minor=element_line(color=NA),plot.margin=unit(c(0,0,0,0),"cm"))+
+  scale_x_discrete(limits=(rev(levels(big_predictions$x))))+
+  theme(legend.position="top",legend.title = element_blank(),
+        legend.text = element_text(size=12))
+prediction_plot
+
+
 # Okay, nothing going on for raw richness. Let's see what's up if we calculate the jackknife estimate of
 # taxon richness.
 
